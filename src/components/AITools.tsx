@@ -50,13 +50,10 @@ export default function AITools() {
               {/* Price */}
               <div className="flex items-baseline justify-end gap-2 mb-4" dir="ltr">
                 <span className="font-display text-4xl font-bold text-white">
-                  ${tool.salePrice}
-                </span>
-                <span className="font-display text-base text-white/40">
-                  /mo
+                  {tool.salePrice}
                 </span>
                 <span className="font-display text-sm text-white/25 line-through ml-2">
-                  ${tool.originalPrice}
+                  {tool.originalPrice}
                 </span>
               </div>
 
