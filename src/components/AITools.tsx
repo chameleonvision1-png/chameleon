@@ -48,15 +48,17 @@ export default function AITools() {
               <p className="font-arabic text-sm text-white/35 mb-6">{tool.description}</p>
 
               {/* Price */}
-              <div className="flex items-baseline gap-3 mb-2">
+              <div className="flex items-baseline justify-end gap-2 mb-4" dir="ltr">
                 <span className="font-display text-4xl font-bold text-white">
                   ${tool.salePrice}
                 </span>
-                <span className="font-display text-sm text-white/25 line-through">
-                  ${tool.originalPrice}/mo
+                <span className="font-display text-base text-white/40">
+                  /mo
+                </span>
+                <span className="font-display text-sm text-white/25 line-through ml-2">
+                  ${tool.originalPrice}
                 </span>
               </div>
-              <span className="font-display text-xs text-white/40">/mo</span>
 
               {/* Discount */}
               <div className="mt-4 mb-6">
