@@ -31,87 +31,101 @@ export default function AITools() {
           description="اشتراكات مخفضة لأقوى الأدوات — وفّر وارتقِ بمستوى عملك مع باقات حصرية"
         />
 
-        {/* Dynamic Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
-          {aiTools.map((tool, i) => (
+        {/* Dynamic Grid / Carousel */}
+        <div className="flex w-full overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 gap-6 lg:gap-8 mb-4 md:mb-16 pb-8 md:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          {aiTools.slice(0, 3).map((tool, i) => (
             <motion.div
               key={tool.name}
-              className="group relative bg-[#111319] hover:bg-[#151820] border border-white/5 hover:border-white/10 p-10 rounded-3xl transition-all duration-500 overflow-hidden flex flex-col"
               initial={false}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
+              className="min-w-[85vw] sm:min-w-[320px] md:min-w-0 flex justify-center snap-center"
             >
-              {/* Background glow effect on hover */}
-              <div className="absolute inset-0 bg-linear-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl" />
-
-              {/* Best deal badge */}
-              {tool.bestOffer && (
-                <div className="absolute top-0 left-8 bg-white text-black font-arabic text-xs font-bold px-4 py-2 rounded-b-xl shadow-lg z-20 transform origin-top group-hover:scale-110 transition-transform">
-                  أفضل عرض
-                </div>
-              )}
-
-              {/* Animated Glow */}
-              <div className="absolute -inset-24 bg-linear-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 group-hover:translate-x-full duration-1000 transform transition-all ease-in-out pointer-events-none skew-x-12" />
-
-              <div className="relative z-10 flex-1 flex flex-col">
-                <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-6">
-                  <span className="font-display text-xl font-bold text-white/80">{tool.name.charAt(0)}</span>
-                </div>
-                
-                <h3 className="font-display text-xl font-bold text-white mb-4 tracking-wide">
-                  {tool.name}
-                </h3>
-                <p className="font-arabic text-sm text-white/40 mb-6 leading-[1.8] flex-1">{tool.description}</p>
-
-                {/* Pricing Area */}
-                <div className="p-5 rounded-2xl bg-black/40 border border-white/5 mb-6">
-                  <div className="flex items-baseline justify-between mb-4">
-                    <span className="font-display text-[10px] tracking-widest text-white/40 uppercase">Price</span>
-                    <div className="flex items-baseline gap-2" dir="ltr">
-                      <span className="font-display text-4xl font-bold text-white">{tool.salePrice}</span>
-                      <span className="font-display text-sm text-white/30 line-through">{tool.originalPrice}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <span className="font-arabic text-xs text-white/50">نسبة الخصم</span>
-                    <span className="bg-white/10 text-white font-display text-xs font-bold px-3 py-1.5 rounded-lg border border-white/10">
-                      -{tool.discount}%
-                    </span>
-                  </div>
-                </div>
-
-                {/* CTA */}
-                {(tool as any).link ? (
-                  <a href={(tool as any).link} target="_blank" rel="noopener noreferrer" className="block text-center w-full py-4 bg-transparent border border-white/20 text-white font-arabic font-bold rounded-xl group-hover:bg-white group-hover:text-black transition-colors duration-300">
-                    احصل على العرض
-                  </a>
-                ) : (
-                  <button type="button" className="w-full py-4 bg-transparent border border-white/20 text-white font-arabic font-bold rounded-xl group-hover:bg-white group-hover:text-black transition-colors duration-300">
-                    احصل على العرض
-                  </button>
-                )}
-              </div>
+              <ChameleonGiftCard 
+                name={tool.name} 
+                price={tool.salePrice} 
+                original={tool.originalPrice} 
+                discount={`${tool.discount}% OFF`} 
+                period="1-Month Access" 
+                image={`/sync/covers/${tool.name.split(' ')[0].toLowerCase()}.png`} 
+                featured={tool.bestOffer} 
+              />
             </motion.div>
           ))}
         </div>
 
-        {/* CTA to visit SYNC */}
-        <motion.div
-          className="mt-16 text-center flex justify-center"
-          initial={false}
-          animate={isInView ? { opacity: 1 } : {}}
-          transition={{ delay: 0.5 }}
-        >
-          <a href={SYNC_URL} className="px-8 py-4 bg-white text-black font-arabic font-bold rounded-xl hover:bg-gray-200 transition-colors shadow-[0_0_40px_rgba(255,255,255,0.2)] flex items-center gap-3">
-            استكشف منصة SYNC
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-          </a>
-        </motion.div>
+        {/* Mobile Scroll Indicator */}
+        <div className="md:hidden flex justify-center items-center gap-3 mt-4 mb-8 opacity-50">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="animate-pulse rotate-180">
+            <path d="M9 18l6-6-6-6" />
+          </svg>
+          <span className="text-xs font-arabic tracking-wide uppercase">اسحب للمزيد</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="animate-pulse">
+            <path d="M9 18l6-6-6-6" />
+          </svg>
+        </div>
       </div>
     </section>
+  );
+}
+
+function ChameleonGiftCard({ name, price, original, discount, period, image, featured = false }: any) {
+  return (
+    <div className={`w-full max-w-[320px] rounded-2xl overflow-hidden shadow-2xl flex flex-col justify-between backdrop-blur-md bg-[#111319] transition-all duration-500 hover:scale-105 cursor-pointer`} 
+         style={{ 
+           border: featured ? '2px solid #ffc21a' : '1px solid rgba(255,255,255,0.1)',
+           height: '420px',
+           boxShadow: featured ? '0 20px 50px rgba(255, 194, 26, 0.15)' : '0 20px 40px rgba(0,0,0,0.5)'
+         }}>
+      
+      {/* Top section */}
+      <div className="p-6 pb-2 border-b border-white/10 relative">
+        <div className="flex justify-between items-start mb-4">
+          <img src="/sync-logo.png" alt="SYNC" className="h-12 w-auto object-contain scale-[1.7] -ml-2 -mt-2" />
+          <span className="font-bold text-lg text-[#ffc21a]">{discount}</span>
+        </div>
+        <h3 className="text-2xl font-bold text-white mb-1">{name}</h3>
+        <p className="text-[#ffc21a] text-sm font-semibold">{period}</p>
+        
+        {/* Peg hole punch */}
+        <div className="absolute top-3 left-1/2 transform -translate-x-1/2 w-10 h-2 bg-[#080a0f] rounded-full border border-white/10 opacity-80"></div>
+      </div>
+
+      {/* Middle section */}
+      <div className="grow p-4">
+        <div className="w-full h-full rounded-xl border flex flex-col items-center justify-center p-0 relative overflow-hidden group/card" 
+             style={{ 
+               borderColor: 'rgba(255,255,255,0.1)',
+               background: featured ? 'linear-gradient(135deg, rgba(255,194,26,0.1) 0%, transparent 100%)' : 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 100%)'
+             }}>
+          
+          {/* Fallback Content */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center z-0">
+            <span className="text-xs opacity-60 mb-2 uppercase tracking-widest text-white">Premium Access</span>
+            <span className="font-black italic text-3xl mb-4 text-[#ffc21a]" style={{ filter: 'drop-shadow(0 0 8px rgba(255,194,26,0.4))' }}>{name.split(' ')[0]}</span>
+          </div>
+
+          {/* Image */}
+          <img 
+            src={image} 
+            alt={name} 
+            className="absolute inset-0 w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-700 opacity-90 z-10" 
+            onError={(e: any) => { e.target.style.display = 'none'; }} 
+          />
+        </div>
+      </div>
+
+      {/* Bottom section */}
+      <div className="p-6 pt-4 flex justify-between items-end border-t border-white/10">
+        <div>
+          <p className="text-[10px] opacity-60 uppercase tracking-widest mb-1 text-white">Original Value</p>
+          <p className="line-through opacity-50 text-white">{original}</p>
+        </div>
+        <div className="text-right">
+          <p className="text-[10px] uppercase tracking-widest mb-1 text-[#ffc21a]">Only</p>
+          <p className="text-3xl font-bold text-[#ffc21a]">{price}</p>
+        </div>
+      </div>
+    </div>
   );
 }

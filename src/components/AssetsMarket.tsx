@@ -53,12 +53,12 @@ export default function AssetsMarket() {
           </div>
         </div>
 
-        {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Grid / Carousel */}
+        <div className="flex w-full overflow-x-auto snap-x snap-mandatory md:grid sm:grid-cols-2 lg:grid-cols-3 gap-8 pb-4 md:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {items.map((asset, i) => (
             <motion.div
               key={i}
-              className="group relative overflow-hidden rounded-4xl bg-[#111319] border border-white/5 cursor-pointer hover:border-white/20 transition-all duration-500"
+              className="min-w-[85vw] sm:min-w-[320px] md:min-w-0 snap-center shrink-0 group relative overflow-hidden rounded-4xl bg-[#111319] border border-white/5 cursor-pointer hover:border-white/20 transition-all duration-500"
               initial={false}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: i * 0.08 }}
@@ -93,6 +93,17 @@ export default function AssetsMarket() {
               </div>
             </motion.div>
           ))}
+        </div>
+
+        {/* Mobile Scroll Indicator */}
+        <div className="md:hidden flex justify-center items-center gap-3 mt-6 opacity-50">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="animate-pulse rotate-180">
+            <path d="M9 18l6-6-6-6" />
+          </svg>
+          <span className="text-xs font-arabic tracking-wide uppercase">اسحب للمزيد</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="animate-pulse">
+            <path d="M9 18l6-6-6-6" />
+          </svg>
         </div>
       </div>
     </section>

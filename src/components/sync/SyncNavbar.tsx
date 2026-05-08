@@ -18,13 +18,13 @@ export default function SyncNavbar() {
   }, []);
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? 'bg-[var(--sync-bg)]/80 backdrop-blur-lg border-b border-[var(--sync-border)] shadow-lg' : 'bg-transparent border-b border-transparent'}`}>
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? 'bg-(--sync-bg)/80 backdrop-blur-lg border-b border-(--sync-border) shadow-lg' : 'bg-transparent border-b border-transparent'}`}>
       <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-12 2xl:px-24">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <div className="shrink-0 flex items-center">
             <Link href="/" className="flex items-center gap-2">
-              <img src="/sync-logo.png" alt="SYNC" className="h-16 w-auto object-contain scale-150 -ml-4" />
+              <img src="/sync-logo.png" alt="SYNC" className="h-12 md:h-16 w-auto object-contain scale-125 md:scale-150 origin-left md:-ml-4" />
             </Link>
           </div>
 

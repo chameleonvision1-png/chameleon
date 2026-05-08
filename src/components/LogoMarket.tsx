@@ -54,13 +54,13 @@ export default function LogoMarket() {
           keys={[filterKey]} 
           showClass="block" 
           hideClass="hidden" 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+          className="flex w-full overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-2 lg:grid-cols-3 gap-5 pb-8 md:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
           {logoPortfolio.map((item, i) => (
             <FlipRevealItem
               key={item.id}
               flipKey={item.category}
-              className="relative rounded-3xl group cursor-pointer overflow-hidden border border-white/5 bg-[#111319] w-full"
+              className="min-w-[85vw] sm:min-w-[320px] md:min-w-0 snap-center shrink-0 relative rounded-3xl group cursor-pointer overflow-hidden border border-white/5 bg-[#111319] w-full"
               role="button"
               tabIndex={0}
               onKeyDown={(e) => {
@@ -85,6 +85,17 @@ export default function LogoMarket() {
             </FlipRevealItem>
           ))}
         </FlipReveal>
+
+        {/* Mobile Scroll Indicator */}
+        <div className="md:hidden flex justify-center items-center gap-3 mt-6 mb-4 opacity-50">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="animate-pulse rotate-180">
+            <path d="M9 18l6-6-6-6" />
+          </svg>
+          <span className="text-xs font-arabic tracking-wide uppercase">اسحب للمزيد</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="animate-pulse">
+            <path d="M9 18l6-6-6-6" />
+          </svg>
+        </div>
 
         {/* CTA */}
         <motion.div

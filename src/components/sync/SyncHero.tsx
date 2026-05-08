@@ -30,20 +30,20 @@ export default function SyncHero() {
           <img src="/sync-logo.png" alt="SYNC" className="h-32 md:h-48 lg:h-56 w-auto object-contain drop-shadow-[0_4px_20px_rgba(255,194,26,0.3)]" />
         </div>
         
-        <h1 className="sync-heading text-4xl md:text-6xl lg:text-7xl mb-4 tracking-tight max-w-4xl mx-auto uppercase">
+        <h1 className="sync-heading text-[28px] leading-tight sm:text-4xl md:text-6xl lg:text-7xl mb-2 md:mb-4 tracking-tight max-w-4xl mx-auto uppercase whitespace-nowrap md:whitespace-normal">
           {t.heroTitle}
         </h1>
         
-        <p className="text-lg md:text-xl max-w-2xl mx-auto mb-16 text-[var(--sync-yellow)] font-medium">
+        <p className="text-sm sm:text-base md:text-xl max-w-2xl mx-auto mb-10 md:mb-16 text-(--sync-yellow) font-medium px-2 whitespace-nowrap md:whitespace-normal">
           {t.heroSubtitle}
         </p>
 
         {/* 3 Gift Cards Display */}
-        <div className="relative w-full max-w-4xl h-[450px] md:h-[550px] mb-16 flex justify-center items-center">
+        <div className="relative w-full max-w-4xl h-[420px] md:h-[550px] mb-8 md:mb-16 flex justify-center items-center scale-[0.85] sm:scale-100 origin-top">
           
           {/* Card 1 - Left */}
           <div 
-            className="absolute left-[15%] md:left-[20%] transform -translate-x-1/2 -rotate-12 hover:rotate-0 hover:z-30 transition-all duration-500 hover:scale-105 z-10 cursor-pointer"
+            className="absolute left-1/2 transform -translate-x-1/2 -ml-[120px] md:-ml-[240px] -rotate-12 hover:rotate-0 hover:z-30 transition-all duration-500 hover:scale-105 z-10 cursor-pointer"
             onClick={() => document.getElementById('deals')?.scrollIntoView({ behavior: 'smooth' })}
           >
             <GiftCard name="ChatGPT Plus" price="$8.96" original="$20.00" discount="55% OFF" period="100-Day Access" image="/sync/covers/chatgpt.png" />
@@ -51,7 +51,7 @@ export default function SyncHero() {
 
           {/* Card 3 - Right */}
           <div 
-            className="absolute left-[85%] md:left-[80%] transform -translate-x-1/2 rotate-12 hover:rotate-0 hover:z-30 transition-all duration-500 hover:scale-105 z-10 cursor-pointer"
+            className="absolute left-1/2 transform -translate-x-1/2 ml-[120px] md:ml-[240px] rotate-12 hover:rotate-0 hover:z-30 transition-all duration-500 hover:scale-105 z-10 cursor-pointer"
             onClick={() => document.getElementById('deals')?.scrollIntoView({ behavior: 'smooth' })}
           >
             <GiftCard name="Claude Pro" price="$9.96" original="$20.00" discount="50% OFF" period="100-Day Access" image="/sync/covers/claude.png" />
@@ -101,7 +101,7 @@ function GiftCard({ name, price, original, discount, period, image, featured = f
          style={{ 
            backgroundColor: 'var(--sync-surface)', 
            border: featured ? '2px solid var(--sync-yellow)' : '1px solid var(--sync-border)',
-           height: featured ? '480px' : '420px',
+           height: '420px',
            boxShadow: featured ? '0 20px 50px rgba(255, 194, 26, 0.15)' : '0 20px 40px rgba(0,0,0,0.5)'
          }}>
       

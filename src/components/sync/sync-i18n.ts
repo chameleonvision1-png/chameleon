@@ -10,7 +10,7 @@ export const translations = {
     
     // Hero
     heroTitle: "PREMIUM AI ACCESS",
-    heroSubtitle: "All Your Favorite AI & Creative Tools. One Premium Subscription.",
+    heroSubtitle: "Top AI & Creative Tools in One Subscription.",
     heroCta: "Explore All Deals",
     heroFeature1: "Advanced AI Models",
     heroFeature2: "Smart Automations",
@@ -55,7 +55,7 @@ export const translations = {
     
     // Hero
     heroTitle: "اشتراكات الذكاء الاصطناعي",
-    heroSubtitle: "كل أدوات الذكاء الاصطناعي والتصميم المفضلة عندك. في اشتراك واحد بريميوم.",
+    heroSubtitle: "أقوى أدوات الذكاء والتصميم في اشتراك واحد.",
     heroCta: "تصفح كل العروض",
     heroFeature1: "أحدث نماذج الذكاء",
     heroFeature2: "أتمتة ذكية",

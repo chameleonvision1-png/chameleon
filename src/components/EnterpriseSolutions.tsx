@@ -42,14 +42,14 @@ export default function EnterpriseSolutions() {
         />
 
         {/* Z-pattern solutions */}
-        <div className="flex flex-col gap-8 lg:gap-16 relative">
+        <div className="flex w-full overflow-x-auto snap-x snap-mandatory lg:flex-col gap-8 lg:gap-16 relative pb-8 lg:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {/* Decorative connecting line */}
           <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-linear-to-b from-transparent via-white/10 to-transparent -translate-x-1/2 z-0" />
 
           {enterpriseSolutions.map((sol, i) => (
             <motion.div
               key={sol.id}
-              className={`relative z-10 flex flex-col lg:flex-row items-center gap-12 lg:gap-24 group ${
+              className={`min-w-[85vw] sm:min-w-[320px] lg:min-w-0 snap-center shrink-0 relative z-10 flex flex-col lg:flex-row items-center gap-8 lg:gap-24 group ${
                 i % 2 !== 0 ? "lg:flex-row-reverse" : ""
               }`}
               initial={false}
@@ -88,6 +88,17 @@ export default function EnterpriseSolutions() {
               </div>
             </motion.div>
           ))}
+        </div>
+
+        {/* Mobile Scroll Indicator */}
+        <div className="lg:hidden flex justify-center items-center gap-3 mt-6 mb-4 opacity-50">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="animate-pulse rotate-180">
+            <path d="M9 18l6-6-6-6" />
+          </svg>
+          <span className="text-xs font-arabic tracking-wide uppercase">اسحب للمزيد</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="animate-pulse">
+            <path d="M9 18l6-6-6-6" />
+          </svg>
         </div>
 
         {/* CTA */}

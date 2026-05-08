@@ -51,18 +51,17 @@ export default function SMMMarket() {
         </div>
 
         {/* Pricing Cards Carousel */}
-        {/* Dynamic Grid */}
         <div className="mt-12 min-h-[400px]">
           <div
             key={activeFilter}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-[fadeInUp_0.5s_ease-out_forwards]"
+            className="flex w-full overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 animate-[fadeInUp_0.5s_ease-out_forwards] pb-8 md:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
           >
             {filtered.map((service, index) => {
               const platformData = smmPlatforms.find((p) => p.id === service.platform);
               return (
                 <div
                   key={`${service.platform}-${service.name}-${index}`}
-                  className="group relative bg-black/40 border border-white/10 hover:border-white/30 rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_10px_40px_rgba(255,255,255,0.05)]"
+                  className="min-w-[85vw] sm:min-w-[320px] md:min-w-0 snap-center shrink-0 group relative bg-black/40 border border-white/10 hover:border-white/30 rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_10px_40px_rgba(255,255,255,0.05)]"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   {/* Glow Effect */}
@@ -104,6 +103,17 @@ export default function SMMMarket() {
                 </div>
               );
             })}
+          </div>
+
+          {/* Mobile Scroll Indicator */}
+          <div className="md:hidden flex justify-center items-center gap-3 mt-6 opacity-50">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="animate-pulse rotate-180">
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+            <span className="text-xs font-arabic tracking-wide uppercase">اسحب للمزيد</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="animate-pulse">
+              <path d="M9 18l6-6-6-6" />
+            </svg>
           </div>
         </div>
       </div>
