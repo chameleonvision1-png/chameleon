@@ -73,35 +73,43 @@ export const navLinks = [
 export const portfolioItems = [
   {
     id: 1,
-    title: "متجر إلكتروني فاخر",
-    titleEn: "Luxury E-Commerce",
-    description: "تصميم وتطوير متجر إلكتروني متكامل بتجربة مستخدم راقية",
-    url: "https://example.com",
-    image: "/images/portfolio/1.png",
+    title: "موقع توجيهي - جامعة بدر",
+    titleEn: "BUC Unipath",
+    description: "موقع توجيهي تعليمي متكامل لطلاب جامعة بدر لتسهيل تحديد المسار الأكاديمي.",
+    url: "https://buc-unipath.vercel.app/",
+    iframeUrl: "https://buc-unipath.vercel.app/",
+    image: "/images/portfolio/unipath.png",
+    category: "موقع خدمي",
   },
   {
     id: 2,
-    title: "منصة تعليمية",
-    titleEn: "EdTech Platform",
-    description: "منصة تعليمية تفاعلية مع نظام إدارة محتوى متقدم",
-    url: "https://example.com",
-    image: "/images/portfolio/2.png",
+    title: "مؤسسة ويجي التعليمية",
+    titleEn: "WEGE Foundation",
+    description: "موقع رسمي لمؤسسة تعليمية متكاملة تقدم برامج وتجارب حديثة للطلاب.",
+    url: "https://wege-program.com/",
+    iframeUrl: "https://wege-program.com/",
+    image: "/images/portfolio/wege.png",
+    category: "موقع مؤسسة",
   },
   {
     id: 3,
-    title: "تطبيق صحي",
-    titleEn: "Health App",
-    description: "تطبيق ويب لإدارة المواعيد الطبية والسجلات الصحية",
-    url: "https://example.com",
-    image: "/images/portfolio/3.png",
+    title: "د. ندى الدمياطي",
+    titleEn: "Dr. Nada Clinic",
+    description: "منصة طبية احترافية تقدم استشارات وخدمات رعاية صحية متقدمة.",
+    url: "https://nadaeldomiaty.com/",
+    iframeUrl: "https://nadaeldomiaty.com/",
+    image: "/images/portfolio/nada.png",
+    category: "موقع طبي",
   },
   {
     id: 4,
-    title: "بوابة عقارات",
-    titleEn: "Real Estate Portal",
-    description: "منصة عقارية بخريطة تفاعلية وبحث ذكي",
-    url: "https://example.com",
-    image: "/images/portfolio/4.png",
+    title: "متجر كاميليون",
+    titleEn: "Chameleon Store",
+    description: "متجر رقمي مبتكر يقدم أفضل الأصول الرقمية، الأكواد، وواجهات الاستخدام.",
+    url: "https://chameleon.vision/",
+    iframeUrl: "https://chameleon.vision/",
+    image: "/images/portfolio/chameleon.png",
+    category: "متجر رقمي",
   },
 ];
 
@@ -197,8 +205,19 @@ export const smmServices = [
   },
 ];
 
+export interface AITool {
+  id: number;
+  name: string;
+  originalPrice: string;
+  salePrice: string;
+  discount: number;
+  bestOffer: boolean;
+  description: string;
+  link?: string;
+}
+
 // AI Tools & Software Deals
-export const aiTools = [
+export const aiTools: AITool[] = [
   {
     id: 1,
     name: "Gemini Advanced",

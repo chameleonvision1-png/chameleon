@@ -74,7 +74,7 @@ export default function Navbar() {
       {mobileOpen && (
         <motion.div
           className="lg:hidden fixed inset-0 top-16 bg-[#080a0f] z-40 flex flex-col items-center justify-center gap-10"
-          initial={{ opacity: 0 }}
+          initial={false}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
         >

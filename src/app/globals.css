@@ -38,27 +38,29 @@
   --label-sm: 0.6875rem;
 }
 
-/* Base */
-*,
-*::before,
-*::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+@layer base {
+  /* Base */
+  *,
+  *::before,
+  *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
-html {
-  scroll-behavior: smooth;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-body {
-  background: var(--void);
-  color: var(--primary);
-  font-family: var(--font-manrope), "Segoe UI", sans-serif;
-  line-height: 1.6;
-  overflow-x: hidden;
+  body {
+    background: var(--void);
+    color: var(--primary);
+    font-family: var(--font-manrope), "Segoe UI", sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
 }
 
 /* Arabic text */
@@ -80,14 +82,21 @@ body {
    ============================================ */
 
 .section-container {
-  max-width: 1280px;
+  width: 100%;
+  max-width: 1720px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 1.5rem;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 768px) {
   .section-container {
-    padding: 0 4rem;
+    padding: 0 3rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .section-container {
+    padding: 0 5rem;
   }
 }
 
@@ -119,6 +128,29 @@ body {
   color: rgba(255, 255, 255, 0.45);
   max-width: 32rem;
   line-height: 1.8;
+}
+
+/* Bulletproof Spacing Utilities */
+.section-py {
+  padding-top: 5rem !important;
+  padding-bottom: 5rem !important;
+}
+
+@media (min-width: 768px) {
+  .section-py {
+    padding-top: 7rem !important;
+    padding-bottom: 7rem !important;
+  }
+}
+
+.mb-header {
+  margin-bottom: 3rem !important;
+}
+
+@media (min-width: 768px) {
+  .mb-header {
+    margin-bottom: 4rem !important;
+  }
 }
 
 /* ============================================
@@ -231,4 +263,19 @@ body {
 ::selection {
   background: rgba(255, 255, 255, 0.15);
   color: var(--primary);
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

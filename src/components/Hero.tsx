@@ -1,50 +1,52 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import React, { useState, useRef, useEffect } from "react";
+import { motion } from "framer-motion";
 import ChameleonLogo from "./ChameleonLogo";
+import DotField from "./DotField";
 
+// Keep social data but update visuals
 const socialPlatforms = [
-  { name: "Instagram", icon: "instagram", color: "#E1306C", position: { top: "5%", left: "50%", transform: "translateX(-50%)" } },
-  { name: "TikTok", icon: "tiktok", color: "#00f2ea", position: { top: "20%", left: "12%" } },
-  { name: "YouTube", icon: "youtube", color: "#FF0000", position: { top: "50%", left: "2%", transform: "translateY(-50%)" } },
-  { name: "X", icon: "x", color: "#ffffff", position: { bottom: "5%", left: "50%", transform: "translateX(-50%)" } },
-  { name: "Snapchat", icon: "snapchat", color: "#FFFC00", position: { bottom: "20%", right: "12%" } },
-  { name: "Facebook", icon: "facebook", color: "#1877F2", position: { top: "50%", right: "2%", transform: "translateY(-50%)" } },
+  { name: "Instagram", icon: "instagram", color: "#E1306C" },
+  { name: "TikTok", icon: "tiktok", color: "#00f2ea" },
+  { name: "YouTube", icon: "youtube", color: "#FF0000" },
+  { name: "X", icon: "x", color: "#ffffff" },
+  { name: "Snapchat", icon: "snapchat", color: "#FFFC00" },
+  { name: "Facebook", icon: "facebook", color: "#1877F2" },
 ];
 
 function SocialIcon({ platform }: { platform: string }) {
   const icons: Record<string, React.ReactNode> = {
     instagram: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <rect x="2" y="2" width="20" height="20" rx="5" />
         <circle cx="12" cy="12" r="5" />
         <circle cx="17.5" cy="6.5" r="1.5" />
       </svg>
     ),
     tiktok: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
       </svg>
     ),
     youtube: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.4 19.58C5.12 20 12 20 12 20s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" />
         <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" />
       </svg>
     ),
     x: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
         <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
       </svg>
     ),
     snapchat: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M12 2c-2.5 0-4.5 1.5-5 4l-.5 3c-.5 0-1.5-.5-2 0s0 1.5.5 2c-1.5 1-2.5 2-2 3s2 1 3 1c-.5 1.5 0 3 1 3.5S9 20 12 20s4.5-.5 5-1.5 1.5-2 1-3.5c1 0 2.5 0 3-1s-.5-2-2-3c.5-.5 1-1.5.5-2s-1.5 0-2 0l-.5-3c-.5-2.5-2.5-4-5-4z" />
       </svg>
     ),
     facebook: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
       </svg>
     ),
@@ -54,103 +56,147 @@ function SocialIcon({ platform }: { platform: string }) {
 
 export default function Hero() {
   const [activeColor, setActiveColor] = useState<string | null>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true });
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!ref.current) return;
+      const rect = ref.current.getBoundingClientRect();
+      setMousePos({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      });
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
 
   return (
-    <section ref={ref} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden grid-pattern">
-      {/* Subtle vignette */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,#080a0f_100%)]" />
+    <section ref={ref} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#080a0f]">
+      {/* Background Video */}
+      <video 
+        autoPlay 
+        loop 
+        muted 
+        playsInline 
+        poster="/videos/hero-bg-poster.jpg"
+        className="absolute inset-0 w-full h-full object-cover opacity-60 z-0"
+      >
+        <source src="/videos/hero-bg.mp4" type="video/mp4" />
+        <img src="/videos/hero-bg-poster.jpg" alt="Hero background" className="absolute inset-0 w-full h-full object-cover opacity-60 z-0" />
+      </video>
+      <div className="absolute inset-0 bg-black/50 z-0 pointer-events-none" />
 
-      {/* Color bloom on hover */}
+      {/* Dynamic Background Glow */}
       <motion.div
-        className="absolute inset-0 pointer-events-none"
+        className="absolute w-[800px] h-[800px] rounded-full blur-[120px] pointer-events-none opacity-20"
         animate={{
-          background: activeColor
-            ? `radial-gradient(circle at 50% 50%, ${activeColor}08 0%, transparent 60%)`
-            : "transparent",
+          x: mousePos.x - 400,
+          y: mousePos.y - 400,
+          background: activeColor ? activeColor : "rgba(255, 255, 255, 0.05)",
         }}
-        transition={{ duration: 0.8 }}
+        transition={{ type: "tween", ease: "easeOut", duration: 0.8 }}
       />
+      
+      {/* DotField Animation */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        <DotField
+          dotRadius={1.5}
+          dotSpacing={14}
+          bulgeStrength={67}
+          glowRadius={160}
+          sparkle={false}
+          waveAmplitude={0}
+        />
+      </div>
 
-      <div className="relative z-10 flex flex-col items-center text-center px-6 w-full max-w-4xl">
-        {/* Orbit container */}
-        <div className="relative w-full max-w-[580px] aspect-square mx-auto flex items-center justify-center mb-6 lg:mb-10">
-          {/* Orbit tracks */}
-          <div className="absolute inset-[5%] border border-white/4 rounded-full" />
-          <div className="absolute inset-[18%] border border-white/2 rounded-full" />
+      <div className="relative z-10 w-full max-w-7xl px-6 flex flex-col items-center">
+        {/* Logo Reveal */}
+        <motion.div
+          initial={false}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-8"
+        >
+          <ChameleonLogo activeColor={activeColor || "#ffffff"} />
+        </motion.div>
 
-          {/* Social icons */}
-          {socialPlatforms.map((platform) => (
-            <motion.div
-              key={platform.name}
-              className="absolute w-11 h-11 lg:w-14 lg:h-14 flex items-center justify-center text-white/40 cursor-pointer transition-colors duration-300 bg-[#191b21] hover:text-white"
-              style={platform.position}
-              onMouseEnter={() => setActiveColor(platform.color)}
-              onMouseLeave={() => setActiveColor(null)}
-              whileHover={{ scale: 1.1 }}
-            >
-              <SocialIcon platform={platform.icon} />
-            </motion.div>
-          ))}
-
-          {/* CHAMELEON Logo */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={isInView ? { opacity: 1, scale: 1 } : {}}
-            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+        {/* Cinematic Title & Tags */}
+        <div className="text-center mb-16">
+          <motion.h1 
+            className="font-arabic text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 tracking-tight"
+            initial={false}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.8 }}
           >
-            <ChameleonLogo activeColor={activeColor || "#ffffff"} />
+            يتكيف مع <span className="text-transparent bg-clip-text bg-linear-to-r from-white via-gray-300 to-gray-500">عالمك الرقمي</span>
+          </motion.h1>
+          
+          <motion.div 
+            className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            initial={false}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.8 }}
+          >
+            <span className="px-5 py-2.5 rounded-full bg-white/5 border border-white/10 font-display text-[10px] tracking-[0.35em] text-white/50 backdrop-blur-md">
+              ADAPTS TO YOUR DIGITAL WORLD
+            </span>
           </motion.div>
         </div>
 
-        {/* Tagline */}
-        <motion.p
-          className="font-arabic text-lg lg:text-2xl text-white/50 mb-2"
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.4 }}
+        {/* Social Interactive Dock */}
+        <motion.div 
+          className="flex flex-wrap justify-center gap-4 sm:gap-6 p-4 sm:p-6 rounded-4xl bg-[#111319]/80 backdrop-blur-xl border border-white/5 shadow-2xl"
+          initial={false}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.8 }}
         >
-          يتكيف مع عالمك الرقمي
-        </motion.p>
+          {socialPlatforms.map((platform) => (
+            <motion.div
+              key={platform.name}
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/5 flex items-center justify-center text-white/40 cursor-pointer border border-white/5 transition-colors relative group overflow-hidden"
+              onMouseEnter={() => setActiveColor(platform.color)}
+              onMouseLeave={() => setActiveColor(null)}
+              whileHover={{ y: -5, scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <div 
+                className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300"
+                style={{ backgroundColor: platform.color }}
+              />
+              <div className="relative z-10 group-hover:text-white transition-colors duration-300">
+                <SocialIcon platform={platform.icon} />
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
 
-        <motion.p
-          className="font-display text-[11px] lg:text-xs tracking-[0.35em] text-white/25 mb-10"
-          initial={{ opacity: 0 }}
-          animate={isInView ? { opacity: 1 } : {}}
-          transition={{ delay: 0.6 }}
-        >
-          ADAPTS TO YOUR DIGITAL WORLD
-        </motion.p>
-
-        {/* CTAs */}
+        {/* Actions */}
         <motion.div
-          className="flex flex-col sm:flex-row gap-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.8 }}
+          className="flex flex-col sm:flex-row gap-4 mt-16"
+          initial={false}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8, duration: 0.8 }}
         >
-          <a href="#services" className="btn-primary">اكتشف خدماتنا</a>
-          <a href="#contact" className="btn-ghost">تواصل معنا</a>
+          <a href="#services" className="px-8 py-4 bg-white text-black font-arabic font-bold rounded-xl hover:bg-gray-200 transition-colors shadow-[0_0_40px_rgba(255,255,255,0.2)]">اكتشف خدماتنا</a>
+          <a href="#contact" className="px-8 py-4 bg-white/5 border border-white/10 text-white font-arabic rounded-xl hover:bg-white/10 transition-colors backdrop-blur-md">تواصل معنا</a>
         </motion.div>
       </div>
 
       {/* Scroll indicator */}
       <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-        initial={{ opacity: 0 }}
-        animate={isInView ? { opacity: 1 } : {}}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3"
+        initial={false}
+        animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}
       >
-        <span className="font-display text-[10px] tracking-[0.3em] text-white/20 uppercase">Scroll</span>
-        <motion.svg
-          width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"
-          className="text-white/20"
-          animate={{ y: [0, 6, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          <path d="M12 5v14M5 12l7 7 7-7" />
-        </motion.svg>
+        <span className="font-display text-[9px] tracking-[0.4em] text-white/30 uppercase">Scroll</span>
+        <motion.div 
+          className="w-px h-12 bg-linear-to-b from-white/30 to-transparent"
+          animate={{ height: ["0px", "48px"], opacity: [0, 1, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        />
       </motion.div>
     </section>
   );

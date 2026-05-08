@@ -1,85 +1,82 @@
 "use client";
 
 import React, { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { useInView } from "framer-motion";
 import { portfolioItems } from "@/data/content";
+import SectionHeader from "./SectionHeader";
+import { ExpandingCards, CardItem } from "@/components/ui/expanding-cards";
+import { MonitorPlay, GraduationCap, Stethoscope, Building2, Globe, LayoutTemplate } from "lucide-react";
 
 export default function PortfolioCarousel() {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
+  const icons = [
+    <MonitorPlay key="1" size={24} />,
+    <GraduationCap key="2" size={24} />,
+    <Stethoscope key="3" size={24} />,
+    <Building2 key="4" size={24} />,
+    <Globe key="5" size={24} />,
+    <LayoutTemplate key="6" size={24} />
+  ];
+
+  // Map portfolio items to ExpandingCards format
+  const galleryItems: CardItem[] = portfolioItems.slice(0, 4).map((item, index) => ({
+    id: item.id,
+    title: item.title,
+    description: item.description,
+    imgSrc: item.image,
+    linkHref: item.url,
+    iframeUrl: item.iframeUrl,
+    icon: icons[index],
+    // @ts-ignore - adding category ad-hoc
+    category: item.category
+  }));
+
   return (
-    <section id="portfolio" className="relative py-28 lg:py-40 bg-[#0c0e13]" ref={ref}>
-      <div className="section-container">
+    <section id="portfolio" className="relative section-py bg-[#080a0f]" ref={ref}>
+      <div className="section-container relative z-10">
         {/* Header */}
-        <motion.div
-          className="mb-16 lg:mb-24"
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
-        >
-          <p className="section-label">Our Work</p>
-          <h2 className="section-title">أعمالنا</h2>
-          <p className="section-subtitle">
-            مشاريع حقيقية نفذناها بأعلى معايير الجودة والإبداع
-          </p>
-        </motion.div>
-
-        {/* 2x2 Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {portfolioItems.slice(0, 4).map((item, i) => (
-            <motion.div
-              key={item.id}
-              className="surface group cursor-pointer overflow-hidden"
-              initial={{ opacity: 0, y: 30 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6, delay: i * 0.1 }}
-            >
-              {/* Browser mockup */}
-              <div className="relative aspect-video bg-[#0e0e10]">
-                {/* Chrome bar */}
-                <div className="absolute top-0 left-0 right-0 h-8 bg-[#1a1a1e] flex items-center px-4 gap-2 z-10">
-                  <div className="w-2 h-2 rounded-full bg-white/10" />
-                  <div className="w-2 h-2 rounded-full bg-white/10" />
-                  <div className="w-2 h-2 rounded-full bg-white/10" />
-                  <div className="flex-1 mx-6 h-3.5 bg-white/4" />
-                </div>
-
-                {/* Content placeholder */}
-                <div className="absolute inset-0 top-8 flex items-center justify-center">
-                  <div className="w-3/4 h-2/3 bg-white/2 flex flex-col items-center justify-center gap-3">
-                    <span className="font-display text-4xl lg:text-5xl text-white/8">
-                      {String(item.id).padStart(2, "0")}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Hover gradient */}
-                <div className="absolute inset-0 bg-linear-to-t from-[#191b21] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <SectionHeader
+          badge="Selected Work"
+          title="أحدث أعمالنا"
+          description="مشاريع حقيقية نفذناها بأعلى معايير الجودة والإبداع لنخبة من عملائنا"
+          action={
+            <button className="group flex items-center gap-3 text-white">
+              <span className="font-display text-xs tracking-widest uppercase">View All Projects</span>
+              <div className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all duration-300">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
               </div>
-
-              {/* Info */}
-              <div className="p-6 lg:p-8">
-                <p className="font-display text-[10px] tracking-[0.3em] text-white/20 mb-2">
-                  {item.titleEn}
-                </p>
-                <h3 className="font-arabic text-lg font-bold text-white mb-2">
-                  {item.title}
-                </h3>
-                <p className="font-arabic text-sm text-white/35 leading-relaxed mb-4">
-                  {item.description}
-                </p>
-                <div className="flex items-center gap-2 text-white/15 group-hover:text-white/50 transition-colors">
-                  <span className="font-display text-[10px] tracking-[0.2em]">VIEW PROJECT</span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <path d="M7 17L17 7M17 7H7M17 7v10" />
-                  </svg>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+            </button>
+          }
+        />
       </div>
+
+      {/* Expanding Cards Wrapper - USING FULL WIDTH TO MAXIMIZE HORIZONTAL SPACE */}
+      <div 
+        className="w-full mx-auto px-4 md:px-8 mt-4 opacity-0 translate-y-10"
+        style={{ 
+          animation: isInView ? 'fadeInUp 0.8s ease-out 0.2s forwards' : 'none'
+        }}
+      >
+        <ExpandingCards items={galleryItems} />
+      </div>
+      
+      {/* Required CSS for animation */}
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(40px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}} />
     </section>
   );
 }

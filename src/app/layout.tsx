@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Epilogue, Manrope, Cairo } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import AppWrapper from "@/components/AppWrapper";
 import "./globals.css";
 
 const epilogue = Epilogue({
@@ -43,8 +44,10 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${epilogue.variable} ${manrope.variable} ${cairo.variable}`}
     >
-      <body>
-        {children}
+      <body suppressHydrationWarning>
+        <AppWrapper>
+          {children}
+        </AppWrapper>
         <Analytics />
         <SpeedInsights />
       </body>

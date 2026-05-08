@@ -29,12 +29,12 @@ export default function Footer() {
   ];
 
   return (
-    <footer ref={ref} id="contact" className="relative pt-28 lg:pt-40 pb-8">
+    <footer ref={ref} id="contact" className="relative pt-16 md:pt-20 pb-6">
       <div className="section-container">
         {/* Contact card */}
         <motion.div
-          className="surface p-10 lg:p-16 mb-20 lg:mb-28"
-          initial={{ opacity: 0, y: 30 }}
+          className="surface p-10 lg:p-16 mb-14 lg:mb-20"
+          initial={false}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
         >
           <p className="section-label text-center">Get In Touch</p>
@@ -46,7 +46,7 @@ export default function Footer() {
           </p>
 
           {/* Email form */}
-          <div className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
+          <div className="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto items-center">
             <input
               type="email"
               placeholder="بريدك الإلكتروني"
@@ -54,12 +54,12 @@ export default function Footer() {
               onChange={(e) => setEmail(e.target.value)}
               className="flex-1 w-full bg-white/3 border-b border-white/10 px-4 py-3.5 text-white placeholder:text-white/20 text-sm focus:outline-none focus:border-white/30 transition-colors font-arabic"
             />
-            <button className="btn-primary px-8! cursor-pointer">ابعت</button>
+            <button type="button" className="btn-primary shrink-0 w-full sm:w-auto px-8 cursor-pointer">ابعت</button>
           </div>
         </motion.div>
 
         {/* Footer grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 mb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 mb-14">
           {/* Brand */}
           <div>
             <span className="font-display text-2xl text-white mb-4 block">CHAMELEON</span>
@@ -94,7 +94,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-white/6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="border-t border-white/6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="font-display text-[10px] tracking-[0.15em] text-white/20 uppercase">
             {siteConfig.copyright}
           </p>
