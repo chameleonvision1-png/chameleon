@@ -13,6 +13,7 @@ import AdminProductsTab from '@/components/sync/admin/AdminProductsTab';
 import AdminCurrenciesTab from '@/components/sync/admin/AdminCurrenciesTab';
 import AdminFinanceTab from '@/components/sync/admin/AdminFinanceTab';
 import AdminUserModal from '@/components/sync/admin/AdminUserModal';
+import AdminPaymentSettingsTab from '@/components/sync/admin/AdminPaymentSettingsTab';
 
 interface DashboardStats {
   totalProducts: number;
@@ -23,7 +24,7 @@ interface DashboardStats {
   totalRevenue: number;
 }
 
-type ActiveTab = 'overview' | 'products' | 'users' | 'orders' | 'currencies' | 'finance';
+type ActiveTab = 'overview' | 'products' | 'users' | 'orders' | 'currencies' | 'finance' | 'payment_settings';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -315,6 +316,7 @@ export default function AdminDashboard() {
     { id: 'currencies' as const, label: 'Currencies', icon: DollarSign },
     { id: 'users' as const, label: 'Users', icon: Users },
     { id: 'orders' as const, label: 'Orders', icon: ShoppingCart },
+    { id: 'payment_settings' as const, label: 'Payment Settings', icon: Settings },
   ];
 
   const statCards = [
@@ -431,6 +433,9 @@ export default function AdminDashboard() {
             {activeTab === 'finance' && (
               <AdminFinanceTab onViewUser={(userId) => setSelectedUser({ id: userId })} />
             )}
+
+            {/* Payment Settings Tab */}
+            {activeTab === 'payment_settings' && <AdminPaymentSettingsTab />}
 
             {/* Users Tab */}
             {activeTab === 'users' && (

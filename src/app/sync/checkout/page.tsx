@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useSync } from '@/components/sync/SyncProviders';
 import { useSyncAuth } from '@/components/sync/SyncAuthProvider';
@@ -24,6 +24,19 @@ export default function CheckoutPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [revealedPasswords, setRevealedPasswords] = useState<Set<string>>(new Set());
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [paymentSettings, setPaymentSettings] = useState<any[]>([]);
+
+  // Fetch payment settings on mount
+  useEffect(() => {
+    const fetchSettings = async () => {
+      const supabase = createSyncClient();
+      const { data } = await supabase.from('payment_settings').select('*').eq('is_enabled', true);
+      if (data) setPaymentSettings(data);
+    };
+    fetchSettings();
+  }, []);
+
+  const getPaymentSetting = (method: string) => paymentSettings.find(s => s.payment_method === method);
 
   const balance = Number(profile?.balance || 0);
   const canPayWithBalance = balance >= totalUsd;
@@ -592,27 +605,70 @@ export default function CheckoutPage() {
               </label>
 
               {/* Payment Instructions */}
-              {paymentMethod === 'vodafone' && (
-                <div className="mt-4 p-4 rounded-xl border border-white/5" style={{ background: '#0a1128' }}>
-                  <p className="text-sm font-bold mb-2" style={{ color: 'var(--sync-yellow)' }}>
-                    {lang === 'ar' ? 'تعليمات الدفع:' : 'Payment Instructions:'}
-                  </p>
-                  <ol className="text-xs opacity-70 space-y-1.5 list-decimal list-inside" style={{ color: 'var(--sync-text-primary)' }}>
-                    <li>{lang === 'ar' ? 'حوّل المبلغ المطلوب على رقم 01XXXXXXXXX' : 'Transfer the amount to 01XXXXXXXXX'}</li>
-                    <li>{lang === 'ar' ? 'التقط صورة للإيصال' : 'Take a screenshot of the receipt'}</li>
-                    <li>{lang === 'ar' ? 'ارفع الصورة بالأسفل وأكمل الطلب' : 'Upload the screenshot below and complete order'}</li>
-                  </ol>
-                </div>
-              )}
+              {paymentMethod === 'vodafone' && (() => {
+                const vfSetting = getPaymentSetting('vodafone');
+                return (
+                  <div className="mt-4 p-4 rounded-xl border border-white/5" style={{ background: '#0a1128' }}>
+                    {vfSetting?.account_number && (
+                      <div className="mb-3 flex items-center gap-3">
+                        <span className="text-xs opacity-50">{lang === 'ar' ? 'حوّل على الرقم:' : 'Transfer to:'}</span>
+                        <span className="font-mono font-bold text-lg" style={{ color: 'var(--sync-yellow)' }}>{vfSetting.account_number}</span>
+                        {vfSetting.account_name && <span className="text-xs opacity-40">({vfSetting.account_name})</span>}
+                      </div>
+                    )}
+                    <p className="text-sm font-bold mb-2" style={{ color: 'var(--sync-yellow)' }}>
+                      {lang === 'ar' ? 'تعليمات الدفع:' : 'Payment Instructions:'}
+                    </p>
+                    <div className="text-xs opacity-70 space-y-1.5" style={{ color: 'var(--sync-text-primary)' }}>
+                      {(lang === 'ar' ? vfSetting?.instructions_ar : vfSetting?.instructions_en)?.split('\n').map((line: string, i: number) => (
+                        <p key={i}>{line}</p>
+                      )) || <p>{lang === 'ar' ? 'حوّل المبلغ وارفع صورة الإيصال' : 'Transfer the amount and upload the receipt'}</p>}
+                    </div>
+                    {(lang === 'ar' ? vfSetting?.admin_note_ar : vfSetting?.admin_note_en) && (
+                      <div className="mt-3 pt-3 border-t border-white/5">
+                        <p className="text-xs font-bold opacity-80" style={{ color: 'var(--sync-yellow)' }}>📌 {lang === 'ar' ? 'ملاحظة:' : 'Note:'}</p>
+                        <p className="text-xs opacity-60 mt-1">{lang === 'ar' ? vfSetting.admin_note_ar : vfSetting.admin_note_en}</p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
 
-              {paymentMethod === 'crypto' && (
-                <div className="mt-4 p-4 rounded-xl border border-white/5" style={{ background: '#0a1128' }}>
-                  <p className="text-sm font-bold mb-2" style={{ color: 'var(--sync-yellow)' }}>
-                    {lang === 'ar' ? 'عنوان المحفظة:' : 'Wallet Address:'}
-                  </p>
-                  <code className="text-xs opacity-70 break-all block">TBD — Contact support</code>
-                </div>
-              )}
+              {paymentMethod === 'crypto' && (() => {
+                const cryptoSetting = getPaymentSetting('crypto');
+                return (
+                  <div className="mt-4 p-4 rounded-xl border border-white/5" style={{ background: '#0a1128' }}>
+                    <p className="text-sm font-bold mb-2" style={{ color: 'var(--sync-yellow)' }}>
+                      {lang === 'ar' ? 'عنوان المحفظة:' : 'Wallet Address:'}
+                    </p>
+                    {cryptoSetting?.wallet_address ? (
+                      <div className="mb-2">
+                        <code className="text-xs opacity-90 break-all block font-mono p-2 rounded bg-white/5" style={{ color: 'var(--sync-yellow)' }}>
+                          {cryptoSetting.wallet_address}
+                        </code>
+                        {cryptoSetting.network && (
+                          <span className="text-[10px] opacity-40 mt-1 block">Network: {cryptoSetting.network}</span>
+                        )}
+                      </div>
+                    ) : (
+                      <code className="text-xs opacity-70 break-all block">TBD — Contact support</code>
+                    )}
+                    {(lang === 'ar' ? cryptoSetting?.instructions_ar : cryptoSetting?.instructions_en) && (
+                      <div className="text-xs opacity-60 mt-2 space-y-1">
+                        {(lang === 'ar' ? cryptoSetting.instructions_ar : cryptoSetting.instructions_en).split('\n').map((line: string, i: number) => (
+                          <p key={i}>{line}</p>
+                        ))}
+                      </div>
+                    )}
+                    {(lang === 'ar' ? cryptoSetting?.admin_note_ar : cryptoSetting?.admin_note_en) && (
+                      <div className="mt-3 pt-3 border-t border-white/5">
+                        <p className="text-xs font-bold opacity-80" style={{ color: 'var(--sync-yellow)' }}>📌 {lang === 'ar' ? 'ملاحظة:' : 'Note:'}</p>
+                        <p className="text-xs opacity-60 mt-1">{lang === 'ar' ? cryptoSetting.admin_note_ar : cryptoSetting.admin_note_en}</p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
 
               {/* Proof Upload */}
               {paymentMethod !== 'balance' && (
