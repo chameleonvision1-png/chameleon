@@ -113,7 +113,7 @@ export default function RechargeModal({ isOpen, onClose, userId }: RechargeModal
 
       // Upload proof
       const compressed = await compressImage(proofFile);
-      const fileName = `recharge_${userId}_${Date.now()}.jpg`;
+      const fileName = `${userId}/recharge_${Date.now()}.jpg`;
       const { error: uploadError } = await supabase.storage
         .from('payment-proofs')
         .upload(fileName, compressed, { contentType: 'image/jpeg' });
