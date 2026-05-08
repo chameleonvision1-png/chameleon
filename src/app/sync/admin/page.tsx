@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import AdminProductsTab from '@/components/sync/admin/AdminProductsTab';
 import AdminCurrenciesTab from '@/components/sync/admin/AdminCurrenciesTab';
+import AdminFinanceTab from '@/components/sync/admin/AdminFinanceTab';
 
 interface DashboardStats {
   totalProducts: number;
@@ -21,7 +22,7 @@ interface DashboardStats {
   totalRevenue: number;
 }
 
-type ActiveTab = 'overview' | 'products' | 'users' | 'orders' | 'currencies';
+type ActiveTab = 'overview' | 'products' | 'users' | 'orders' | 'currencies' | 'finance';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -179,6 +180,7 @@ export default function AdminDashboard() {
 
   const sidebarItems = [
     { id: 'overview' as const, label: 'Overview', icon: LayoutDashboard },
+    { id: 'finance' as const, label: 'Finance & Topups', icon: CreditCard },
     { id: 'products' as const, label: 'Products', icon: Package },
     { id: 'currencies' as const, label: 'Currencies', icon: DollarSign },
     { id: 'users' as const, label: 'Users', icon: Users },
@@ -294,6 +296,9 @@ export default function AdminDashboard() {
 
             {/* Currencies Tab */}
             {activeTab === 'currencies' && <AdminCurrenciesTab />}
+
+            {/* Finance Tab */}
+            {activeTab === 'finance' && <AdminFinanceTab />}
 
             {/* Users Tab */}
             {activeTab === 'users' && (

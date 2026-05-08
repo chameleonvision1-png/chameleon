@@ -8,8 +8,9 @@ import { createSyncClient } from '@/lib/sync/supabase-client';
 import { 
   ShoppingBag, Wallet, Clock, Package, Settings, Bell, 
   LogOut, ChevronRight, Loader2, User, Copy, CheckCircle,
-  AlertCircle, MessageSquare, ArrowLeft, CreditCard
+  AlertCircle, MessageSquare, ArrowLeft, CreditCard, PlusCircle
 } from 'lucide-react';
+import RechargeModal from '@/components/sync/RechargeModal';
 
 type TabKey = 'overview' | 'orders' | 'subscriptions' | 'balance' | 'support' | 'notifications' | 'settings';
 
@@ -53,6 +54,7 @@ export default function UserDashboard() {
   const [codeCopied, setCodeCopied] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isActivating, setIsActivating] = useState(false);
+  const [isRechargeModalOpen, setIsRechargeModalOpen] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -457,12 +459,22 @@ export default function UserDashboard() {
                 {activeTab === 'balance' && (
                   <div className="space-y-6">
                     <div className="rounded-xl border border-white/10 p-6" style={{ background: '#0d1530' }}>
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                         <div>
                           <p className="text-sm opacity-50 mb-1">{lang === 'ar' ? 'الرصيد الحالي' : 'Current Balance'}</p>
-                          <p className="text-5xl font-black" style={{ color: 'var(--sync-yellow)' }}>${Number(profile?.balance || 0).toFixed(2)}</p>
+                          <div className="flex items-center gap-4">
+                            <p className="text-5xl font-black" style={{ color: 'var(--sync-yellow)' }}>${Number(profile?.balance || 0).toFixed(2)}</p>
+                            <Wallet className="w-8 h-8 opacity-20 hidden sm:block" />
+                          </div>
                         </div>
-                        <Wallet className="w-12 h-12 opacity-20" />
+                        <button 
+                          onClick={() => setIsRechargeModalOpen(true)}
+                          className="shrink-0 px-8 py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:scale-105 transition-all shadow-[0_0_20px_rgba(255,194,26,0.2)]" 
+                          style={{ background: 'var(--sync-yellow)', color: '#0B132B' }}
+                        >
+                          <PlusCircle className="w-5 h-5" />
+                          {lang === 'ar' ? 'شحن الرصيد' : 'Top Up Balance'}
+                        </button>
                       </div>
                     </div>
                     <div className="rounded-xl border border-white/10 overflow-hidden" style={{ background: '#0d1530' }}>
@@ -570,6 +582,14 @@ export default function UserDashboard() {
           </div>
         </div>
       </div>
+
+      {user && (
+        <RechargeModal 
+          isOpen={isRechargeModalOpen} 
+          onClose={() => setIsRechargeModalOpen(false)} 
+          userId={user.id} 
+        />
+      )}
     </div>
   );
 }
