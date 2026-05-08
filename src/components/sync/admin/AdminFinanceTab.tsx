@@ -13,7 +13,8 @@ interface BalanceTransaction {
   user?: {
     id: string;
     full_name: string;
-    email: string;
+    user_code: string;
+    phone: string;
   };
   public_proof_url?: string;
 }
@@ -29,7 +30,7 @@ export default function AdminFinanceTab() {
     
     const { data, error } = await supabase
       .from('balance_transactions')
-      .select('*, user:profiles(id, full_name, email)')
+      .select('*, user:profiles(id, full_name, user_code, phone)')
       .eq('type', 'topup')
       .eq('status', 'pending')
       .order('created_at', { ascending: false });
@@ -187,8 +188,9 @@ export default function AdminFinanceTab() {
                     <p className="text-xs opacity-40 mt-1">{new Date(tx.created_at).toLocaleString()}</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold">{tx.user?.full_name}</p>
-                    <p className="text-xs opacity-50">{tx.user?.email}</p>
+                    <p className="font-bold">{tx.user?.full_name || 'Unknown User'}</p>
+                    <p className="text-xs opacity-50">{tx.user?.user_code}</p>
+                    {tx.user?.phone && <p className="text-xs opacity-50">{tx.user?.phone}</p>}
                   </div>
                 </div>
 
