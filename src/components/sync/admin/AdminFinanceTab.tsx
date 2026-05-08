@@ -42,8 +42,10 @@ export default function AdminFinanceTab() {
       // Map proof URLs
       for (const tx of txs) {
         if (tx.payment_proof_url) {
-          const { data: urlData } = supabase.storage.from('payment-proofs').getPublicUrl(tx.payment_proof_url);
-          tx.public_proof_url = urlData.publicUrl;
+          const { data: urlData } = await supabase.storage.from('payment-proofs').createSignedUrl(tx.payment_proof_url, 60 * 60); // 1 hour
+          if (urlData) {
+            tx.public_proof_url = urlData.signedUrl;
+          }
         }
       }
       setTransactions(txs);
