@@ -16,6 +16,7 @@ const tajawal = Tajawal({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://sync.chameleon.vision'),
   title: 'SYNC | Premium AI Access',
   description: 'احصل على اشتراكات بريميوم لأشهر أدوات الذكاء الاصطناعي والتصميم بأسعار لا تقبل المنافسة. Premium subscriptions for AI & creative tools.',
   icons: {
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
     siteName: 'SYNC',
     images: [
       {
-        url: '/sync/covers/gemini.png', // Using the cinematic Gemini cover as the default share image since it looks great and has a dark background
+        url: '/sync-logo.png',
         width: 1200,
         height: 630,
         alt: 'SYNC Premium AI Access',
@@ -40,12 +41,13 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'SYNC | Premium AI Access',
     description: 'بوابتك الذكية للوصول إلى كافة أدوات الذكاء الاصطناعي والتصميم.',
-    images: ['/sync/covers/gemini.png'],
+    images: ['/sync-logo.png'],
   },
 };
 
 import SyncNavbar from '@/components/sync/SyncNavbar';
 import SyncFooter from '@/components/sync/SyncFooter';
+import SyncCartDrawer from '@/components/sync/SyncCartDrawer';
 
 export default function SyncLayout({
   children,
@@ -60,6 +62,7 @@ export default function SyncLayout({
           {children}
         </main>
         <SyncFooter />
+        <SyncCartDrawer />
       </SyncProviders>
     </div>
   );

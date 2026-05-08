@@ -2,6 +2,8 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { translations, SyncLang } from "./sync-i18n";
+import { SyncAuthProvider } from "./SyncAuthProvider";
+import { SyncCartProvider } from "./SyncCartProvider";
 
 type Theme = "sync-dark" | "sync-light";
 
@@ -50,9 +52,13 @@ export function SyncProviders({ children }: { children: React.ReactNode }) {
   
   return (
     <SyncContext.Provider value={{ lang, setLang, theme, setTheme, t }}>
-      <div data-theme={theme} className="sync-wrapper w-full h-full text-left font-sans" dir="ltr">
-        {children}
-      </div>
+      <SyncAuthProvider>
+        <SyncCartProvider>
+          <div data-theme={theme} className="sync-wrapper w-full h-full text-left font-sans" dir="ltr">
+            {children}
+          </div>
+        </SyncCartProvider>
+      </SyncAuthProvider>
     </SyncContext.Provider>
   );
 }

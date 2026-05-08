@@ -1,11 +1,13 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSync } from '@/components/sync/SyncProviders';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, Bot, MessageSquare, Image as ImageIcon, Sparkles, Palette, Music, CheckCircle, Info, FileText, Settings, CreditCard, HelpCircle, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle, Info, FileText, Settings, CreditCard, HelpCircle, X, Loader2, Sparkles, ShoppingCart } from 'lucide-react';
+import { createSyncClient } from '@/lib/sync/supabase-client';
+import { useSyncCart } from '@/components/sync/SyncCartProvider';
 
-const CURRENCIES = [
+const DEFAULT_CURRENCIES = [
   { code: 'USD', symbol: '$', rate: 1, label: 'USD ($)' },
   { code: 'EGP', symbol: 'EGP', rate: 50.8, label: 'EGP (ج.م)' },
   { code: 'SAR', symbol: 'SAR', rate: 3.75, label: 'SAR (ر.س)' },
@@ -13,82 +15,36 @@ const CURRENCIES = [
   { code: 'EUR', symbol: '€', rate: 0.92, label: 'EUR (€)' },
 ];
 
-const TOOLS_DATA: Record<string, any> = {
-  chatgpt: {
-    name: 'ChatGPT Plus',
-    icon: MessageSquare,
-    image: '/sync-covers/chatgpt.png',
-    descEn: 'Advanced AI assistant powered by OpenAI\'s latest models.',
-    descAr: 'مساعد الذكاء الاصطناعي المتقدم والمدعوم بأحدث نماذج OpenAI.',
-    plans: [
-      { id: '1', title: '100-Day Access', price: '$8', original: '$20', duration: '/mo', highlight: false, features: ['GPT-4 & GPT-4o Access', 'DALL-E 3 Image Generation', 'Advanced Data Analysis'] },
-      { id: '2', title: '1-Year Access', price: '$7', original: '$20', duration: '/mo', highlight: true, features: ['GPT-4 & GPT-4o Access', 'DALL-E 3 Image Generation', 'Advanced Data Analysis', 'Priority Support'] },
-    ]
-  },
-  gemini: {
-    name: 'Gemini Advanced',
-    icon: Bot,
-    image: '/sync-covers/gemini.png',
-    descEn: 'Google\'s most capable AI model for highly complex tasks.',
-    descAr: 'نموذج الذكاء الاصطناعي الأقوى من جوجل للمهام شديدة التعقيد.',
-    plans: [
-      { id: '1', title: '365-Day Access', price: '$9.69', original: '$196.96', duration: '', highlight: false, discount: '95% OFF', cardStyle: 'gold', features: ['Advanced AI Models', 'Smart Automations', 'Creative AI Tools', 'Massive Cloud Storage'] },
-      { id: '2', title: '18-Month Access', price: '$16.96', original: '$369.00', duration: '', highlight: true, discount: '98% OFF', cardStyle: 'gold', features: ['Advanced AI Models', 'Smart Automations', 'Creative AI Tools', 'Massive Cloud Storage', 'Priority Access'] },
-      { id: '3', title: '100-Day Access', price: '$6.96', original: '$69.00', duration: '', highlight: false, discount: '90% OFF', cardStyle: 'blue', features: ['Advanced AI Models', 'Smart Automations', 'Creative AI Tools', 'Massive Cloud Storage'] },
-    ]
-  },
-  midjourney: {
-    name: 'Midjourney Pro',
-    icon: ImageIcon,
-    image: '/sync-covers/midjourney.png',
-    descEn: 'Industry-leading AI image generation from text descriptions.',
-    descAr: 'توليد الصور بالذكاء الاصطناعي بجودة فائقة واحترافية عالية.',
-    plans: [
-      { id: '1', title: '1-Month Access', price: '$40', original: '$60', duration: '/mo', highlight: false, features: ['Fast GPU Time', 'Stealth Mode', 'Maximum Concurrent Jobs'] },
-      { id: '2', title: '1-Year Access', price: '$33', original: '$60', duration: '/mo', highlight: true, features: ['Fast GPU Time', 'Stealth Mode', 'Maximum Concurrent Jobs', 'Commercial Usage'] },
-    ]
-  },
-  claude: {
-    name: 'Claude Opus',
-    icon: Sparkles,
-    image: '/sync-covers/claude.png',
-    descEn: 'Highly capable, nuanced, and secure AI model by Anthropic.',
-    descAr: 'نموذج ذكاء اصطناعي آمن ودقيق جداً في الكتابة وتحليل البيانات.',
-    plans: [
-      { id: '1', title: '100-Day Access', price: '$8', original: '$20', duration: '/mo', highlight: false, features: ['Claude 3 Opus Model', 'Massive Context Window', 'Advanced Reasoning'] },
-      { id: '2', title: '1-Year Access', price: '$6', original: '$20', duration: '/mo', highlight: true, features: ['Claude 3 Opus Model', 'Massive Context Window', 'Advanced Reasoning', 'Priority Access'] },
-    ]
-  },
-  canva: {
-    name: 'Canva Pro',
-    icon: Palette,
-    image: '/sync-covers/canva.png',
-    descEn: 'Premium design suite with AI tools and millions of assets.',
-    descAr: 'مجموعة التصميم الاحترافية مع أدوات الذكاء الاصطناعي.',
-    plans: [
-      { id: '1', title: '6-Month Access', price: '$7', original: '$12', duration: '/mo', highlight: false, features: ['Magic Studio AI', '100M+ Premium Stock', 'Brand Kit'] },
-      { id: '2', title: '1-Year Access', price: '$5', original: '$12', duration: '/mo', highlight: true, features: ['Magic Studio AI', '100M+ Premium Stock', 'Brand Kit', '1TB Cloud Storage'] },
-    ]
-  },
-  elevenlabs: {
-    name: 'ElevenLabs',
-    icon: Music,
-    image: '/sync-covers/elevenlabs.png',
-    descEn: 'The most realistic and versatile AI speech software.',
-    descAr: 'أقوى أداة لتوليد الأصوات بالذكاء الاصطناعي بواقعية لا مثيل لها.',
-    plans: [
-      { id: '1', title: 'Creator Plan', price: '$15', original: '$22', duration: '/mo', highlight: false, features: ['100,000 Characters', 'Professional Voice Cloning', 'Commercial Rights'] },
-      { id: '2', title: 'Pro Plan', price: '$10', original: '$99', duration: '/mo', highlight: true, features: ['500,000 Characters', 'Highest Quality Audio', 'Priority Rendering'] },
-    ]
-  }
-};
+interface Plan {
+  id: string;
+  title_en: string;
+  title_ar: string;
+  price_usd: number;
+  original_price_usd: number | null;
+  duration_days: number;
+  is_highlighted: boolean;
+  discount_label: string | null;
+  features: string[];
+  sort_order: number;
+}
 
-const GiftCard = ({ plan, tool, lang, currency }: any) => {
+interface Product {
+  id: string;
+  slug: string;
+  name: string;
+  description_en: string | null;
+  description_ar: string | null;
+  cover_image_url: string | null;
+  plans: Plan[];
+}
+
+const GiftCard = ({ plan, tool, lang, currency, onAddToCart }: { plan: Plan; tool: Product; lang: string; currency: any; onAddToCart: () => void }) => {
   const [isFlipped, setIsFlipped] = React.useState(false);
   const [showOptions, setShowOptions] = React.useState(false);
   const [activeModal, setActiveModal] = React.useState<string | null>(null);
   
-  const discountText = plan.highlight ? '98% OFF' : (plan.discount || '95% OFF');
+  const discountText = plan.discount_label || '';
+  const planTitle = lang === 'ar' ? plan.title_ar : plan.title_en;
 
   const modalTitles: any = {
     details: lang === 'ar' ? 'معلومات تفصيلية' : 'Plan Details',
@@ -104,12 +60,11 @@ const GiftCard = ({ plan, tool, lang, currency }: any) => {
     payment: lang === 'ar' ? 'نحن ندعم وسائل الدفع الآمنة بما في ذلك البطاقات الائتمانية، باي بال، ووسائل الدفع المحلية حسب دولتك.' : 'We support secure payment methods including credit cards, PayPal, and local payment methods depending on your country.'
   };
 
-  const parsePrice = (priceStr: string) => parseFloat(priceStr.replace(/[^0-9.]/g, ''));
-  const rawPrice = parsePrice(plan.price);
-  const rawOriginal = parsePrice(plan.original);
+  const convertedPrice = (Number(plan.price_usd) * currency.rate).toFixed(2);
+  const convertedOriginal = plan.original_price_usd ? (Number(plan.original_price_usd) * currency.rate).toFixed(2) : null;
 
-  const convertedPrice = (rawPrice * currency.rate).toFixed(2);
-  const convertedOriginal = (rawOriginal * currency.rate).toFixed(2);
+  // Parse features from jsonb
+  const features: string[] = Array.isArray(plan.features) ? plan.features : [];
 
   return (
     <div className="flex flex-col relative" style={{ perspective: '1500px' }}>
@@ -124,8 +79,8 @@ const GiftCard = ({ plan, tool, lang, currency }: any) => {
           className="absolute inset-0 w-full rounded-4xl overflow-hidden flex flex-col"
           style={{
             background: 'linear-gradient(180deg, #161e31 0%, #080b14 100%)',
-            border: plan.highlight ? '2px solid var(--sync-yellow)' : '1px solid rgba(255,255,255,0.1)',
-            boxShadow: plan.highlight ? '0 20px 50px rgba(255, 194, 26, 0.15)' : '0 20px 40px rgba(0,0,0,0.4)',
+            border: plan.is_highlighted ? '2px solid var(--sync-yellow)' : '1px solid rgba(255,255,255,0.1)',
+            boxShadow: plan.is_highlighted ? '0 20px 50px rgba(255, 194, 26, 0.15)' : '0 20px 40px rgba(0,0,0,0.4)',
             backfaceVisibility: 'hidden',
             WebkitBackfaceVisibility: 'hidden',
             pointerEvents: isFlipped ? 'none' : 'auto'
@@ -141,7 +96,7 @@ const GiftCard = ({ plan, tool, lang, currency }: any) => {
               <span className="font-black text-xl" style={{ color: 'var(--sync-yellow)' }}>{discountText}</span>
             </div>
             <h3 className="text-3xl md:text-4xl font-bold mb-1" style={{ color: 'var(--sync-text-primary)' }}>{tool.name}</h3>
-            <p style={{ color: 'var(--sync-yellow)' }} className="text-sm font-semibold tracking-wide uppercase">{plan.title}</p>
+            <p style={{ color: 'var(--sync-yellow)' }} className="text-sm font-semibold tracking-wide uppercase">{planTitle}</p>
           </div>
 
           {/* Middle Holographic Ticket */}
@@ -149,7 +104,7 @@ const GiftCard = ({ plan, tool, lang, currency }: any) => {
             <div className="w-full h-full rounded-xl border flex flex-col items-center justify-center relative overflow-hidden shadow-inner" 
                 style={{ 
                   borderColor: 'rgba(255,194,26,0.3)',
-                  background: '#04165d' // Match roughly with the blue of the image if it doesn't cover fully
+                  background: '#04165d'
                 }}>
               <div className="absolute inset-0 opacity-20 mix-blend-overlay z-10" style={{ background: 'url("https://www.transparenttextures.com/patterns/carbon-fibre.png")', pointerEvents: 'none' }}></div>
               <img src="/sync-covers/products-ticket.jpg" alt="Products" className="w-full h-full object-cover relative z-0" />
@@ -158,15 +113,17 @@ const GiftCard = ({ plan, tool, lang, currency }: any) => {
 
           {/* Bottom Section */}
           <div className="px-8 pb-8 pt-4 flex justify-between items-end mt-auto shrink-0">
-            <div>
-              <p className="text-[10px] uppercase tracking-widest mb-1 font-bold" style={{ color: 'var(--sync-text-primary)', opacity: 0.7 }}>
-                {lang === 'ar' ? 'القيمة الأصلية' : 'ORIGINAL VALUE'}
-              </p>
-              <p className="text-2xl font-medium relative inline-block" style={{ color: 'var(--sync-text-primary)', opacity: 0.8 }}>
-                {currency.symbol}{convertedOriginal}
-                <span className="absolute top-1/2 left-0 w-full h-[2px] bg-red-500/80 -rotate-12"></span>
-              </p>
-            </div>
+            {convertedOriginal ? (
+              <div>
+                <p className="text-[10px] uppercase tracking-widest mb-1 font-bold" style={{ color: 'var(--sync-text-primary)', opacity: 0.7 }}>
+                  {lang === 'ar' ? 'القيمة الأصلية' : 'ORIGINAL VALUE'}
+                </p>
+                <p className="text-2xl font-medium relative inline-block" style={{ color: 'var(--sync-text-primary)', opacity: 0.8 }}>
+                  {currency.symbol}{convertedOriginal}
+                  <span className="absolute top-1/2 left-0 w-full h-[2px] bg-red-500/80 -rotate-12"></span>
+                </p>
+              </div>
+            ) : <div />}
             <div className="text-right flex flex-col items-end">
               <p className="text-[10px] uppercase tracking-widest mb-1 font-bold" style={{ color: 'var(--sync-yellow)' }}>
                 {lang === 'ar' ? 'فقط' : 'ONLY'}
@@ -191,8 +148,8 @@ const GiftCard = ({ plan, tool, lang, currency }: any) => {
           className="absolute inset-0 w-full rounded-4xl overflow-hidden flex flex-col p-8"
           style={{
             background: 'linear-gradient(180deg, #080b14 0%, #161e31 100%)',
-            border: plan.highlight ? '2px solid var(--sync-yellow)' : '1px solid rgba(255,255,255,0.1)',
-            boxShadow: plan.highlight ? '0 20px 50px rgba(255, 194, 26, 0.15)' : '0 20px 40px rgba(0,0,0,0.4)',
+            border: plan.is_highlighted ? '2px solid var(--sync-yellow)' : '1px solid rgba(255,255,255,0.1)',
+            boxShadow: plan.is_highlighted ? '0 20px 50px rgba(255, 194, 26, 0.15)' : '0 20px 40px rgba(0,0,0,0.4)',
             backfaceVisibility: 'hidden',
             WebkitBackfaceVisibility: 'hidden',
             transform: 'rotateY(180deg)',
@@ -224,39 +181,30 @@ const GiftCard = ({ plan, tool, lang, currency }: any) => {
           <div className="grow flex flex-col justify-center">
             {showOptions ? (
               <div className="grid grid-cols-2 gap-3 z-30 shrink-0 w-full animate-in fade-in zoom-in duration-300">
-                {/* 4 Action Links */}
-                <button 
-                  className="flex flex-col items-center justify-center p-3 md:p-4 rounded-xl transition-all duration-300 hover:scale-105 border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.05)] group"
-                  onClick={(e) => { e.stopPropagation(); setActiveModal('details'); }}
-                >
+                <button className="flex flex-col items-center justify-center p-3 md:p-4 rounded-xl transition-all duration-300 hover:scale-105 border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.05)] group"
+                  onClick={(e) => { e.stopPropagation(); setActiveModal('details'); }}>
                   <Info className="w-6 h-6 mb-2 opacity-80 group-hover:scale-110 transition-transform" style={{ color: 'var(--sync-yellow)' }} />
                   <span className="text-[11px] font-bold text-center opacity-80" style={{ color: 'var(--sync-text-primary)' }}>{lang === 'ar' ? 'معلومات تفصيلية' : 'Details'}</span>
                 </button>
-                <button 
-                  className="flex flex-col items-center justify-center p-3 md:p-4 rounded-xl transition-all duration-300 hover:scale-105 border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.05)] group"
-                  onClick={(e) => { e.stopPropagation(); setActiveModal('policies'); }}
-                >
+                <button className="flex flex-col items-center justify-center p-3 md:p-4 rounded-xl transition-all duration-300 hover:scale-105 border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.05)] group"
+                  onClick={(e) => { e.stopPropagation(); setActiveModal('policies'); }}>
                   <FileText className="w-6 h-6 mb-2 opacity-80 group-hover:scale-110 transition-transform" style={{ color: 'var(--sync-yellow)' }} />
                   <span className="text-[11px] font-bold text-center opacity-80" style={{ color: 'var(--sync-text-primary)' }}>{lang === 'ar' ? 'السياسات والشروط' : 'Policies & Terms'}</span>
                 </button>
-                <button 
-                  className="flex flex-col items-center justify-center p-3 md:p-4 rounded-xl transition-all duration-300 hover:scale-105 border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.05)] group"
-                  onClick={(e) => { e.stopPropagation(); setActiveModal('activation'); }}
-                >
+                <button className="flex flex-col items-center justify-center p-3 md:p-4 rounded-xl transition-all duration-300 hover:scale-105 border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.05)] group"
+                  onClick={(e) => { e.stopPropagation(); setActiveModal('activation'); }}>
                   <Settings className="w-6 h-6 mb-2 opacity-80 group-hover:scale-110 transition-transform" style={{ color: 'var(--sync-yellow)' }} />
                   <span className="text-[11px] font-bold text-center opacity-80" style={{ color: 'var(--sync-text-primary)' }}>{lang === 'ar' ? 'تعليمات التفعيل' : 'Activation Setup'}</span>
                 </button>
-                <button 
-                  className="flex flex-col items-center justify-center p-3 md:p-4 rounded-xl transition-all duration-300 hover:scale-105 border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.05)] group"
-                  onClick={(e) => { e.stopPropagation(); setActiveModal('payment'); }}
-                >
+                <button className="flex flex-col items-center justify-center p-3 md:p-4 rounded-xl transition-all duration-300 hover:scale-105 border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.05)] group"
+                  onClick={(e) => { e.stopPropagation(); setActiveModal('payment'); }}>
                   <CreditCard className="w-6 h-6 mb-2 opacity-80 group-hover:scale-110 transition-transform" style={{ color: 'var(--sync-yellow)' }} />
                   <span className="text-[11px] font-bold text-center opacity-80" style={{ color: 'var(--sync-text-primary)' }}>{lang === 'ar' ? 'الدفع وتفاصيله' : 'Payment Details'}</span>
                 </button>
               </div>
             ) : (
               <ul className="space-y-4 animate-in fade-in zoom-in duration-300">
-                {plan.features.map((feat: string, idx: number) => (
+                {features.map((feat: string, idx: number) => (
                   <li key={idx} className="flex items-start gap-3">
                     <div className="mt-1 p-1 rounded-full shrink-0" style={{ background: 'rgba(255,194,26,0.1)' }}>
                       <CheckCircle className="w-4 h-4" style={{ color: 'var(--sync-yellow)' }} />
@@ -268,14 +216,15 @@ const GiftCard = ({ plan, tool, lang, currency }: any) => {
             )}
           </div>
           
-          {/* Action Button moved to back */}
+          {/* Action Button */}
           <button 
-            className="w-full py-4 mt-6 rounded-xl font-bold text-lg transition-all duration-300 hover:scale-105 shadow-[0_0_20px_rgba(0,0,0,0.2)] relative overflow-hidden group/btn z-30 shrink-0" 
-            style={{ background: plan.highlight ? 'var(--sync-yellow)' : 'var(--sync-surface)', color: plan.highlight ? '#0B132B' : 'var(--sync-text-primary)', border: plan.highlight ? 'none' : '1px solid var(--sync-yellow)' }}
-            onClick={(e) => e.stopPropagation()} // Prevent card flip when clicking the subscribe button
+            className="w-full py-4 mt-6 rounded-xl font-bold text-lg transition-all duration-300 hover:scale-105 shadow-[0_0_20px_rgba(0,0,0,0.2)] relative overflow-hidden group/btn z-30 shrink-0 flex items-center justify-center gap-2" 
+            style={{ background: plan.is_highlighted ? 'var(--sync-yellow)' : 'var(--sync-surface)', color: plan.is_highlighted ? '#0B132B' : 'var(--sync-text-primary)', border: plan.is_highlighted ? 'none' : '1px solid var(--sync-yellow)' }}
+            onClick={(e) => { e.stopPropagation(); onAddToCart(); }}
           >
-            <span className="relative z-10">{lang === 'ar' ? 'اشترك الآن' : 'Get Plan'}</span>
-            <div className="absolute inset-0 opacity-0 group-hover/btn:opacity-20 transition-opacity duration-300" style={{ background: plan.highlight ? '#fff' : 'var(--sync-yellow)' }} />
+            <ShoppingCart className="w-5 h-5 relative z-10" />
+            <span className="relative z-10">{lang === 'ar' ? 'أضف للسلة' : 'Add to Cart'}</span>
+            <div className="absolute inset-0 opacity-0 group-hover/btn:opacity-20 transition-opacity duration-300" style={{ background: plan.is_highlighted ? '#fff' : 'var(--sync-yellow)' }} />
           </button>
         </div>
       </div>
@@ -314,15 +263,81 @@ const GiftCard = ({ plan, tool, lang, currency }: any) => {
 export default function ToolPage({ params }: { params: Promise<{ slug: string }> }) {
   const unwrappedParams = React.use(params);
   const { lang } = useSync();
-  const [selectedCurrency, setSelectedCurrency] = React.useState(CURRENCIES[0]);
-  const tool = TOOLS_DATA[unwrappedParams.slug];
+  const { addItem } = useSyncCart();
+  const [currencies, setCurrencies] = useState(DEFAULT_CURRENCIES);
+  const [selectedCurrency, setSelectedCurrency] = useState(DEFAULT_CURRENCIES[0]);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  if (!tool) {
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const supabase = createSyncClient();
+        
+        const { data: ratesData, error: ratesError } = await supabase.from('exchange_rates').select('*');
+        if (ratesError) console.error("Exchange rates fetch error:", ratesError);
+        
+        if (ratesData && ratesData.length > 0) {
+          const dynamicCurrencies = [
+            { code: 'USD', symbol: '$', rate: 1, label: 'USD ($)' },
+            ...ratesData.map(r => ({
+              code: r.currency_code,
+              symbol: r.symbol || r.currency_code,
+              rate: Number(r.rate_to_usd),
+              label: r.label || `${r.currency_code} (${r.symbol || r.currency_code})`
+            }))
+          ];
+          setCurrencies(dynamicCurrencies);
+          setSelectedCurrency(prev => {
+            const match = dynamicCurrencies.find(c => c.code === prev.code);
+            return match || dynamicCurrencies[0];
+          });
+        }
+
+        const { data, error } = await supabase
+          .from('products')
+          .select(`
+            id, slug, name, description_en, description_ar, cover_image_url,
+            plans(id, title_en, title_ar, price_usd, original_price_usd, duration_days, is_highlighted, discount_label, features, sort_order)
+          `)
+          .eq('slug', unwrappedParams.slug)
+          .eq('is_active', true)
+          .single();
+
+        if (error) throw error;
+
+        if (data) {
+          // Sort plans by sort_order
+          const sorted = { ...data, plans: (data.plans || []).sort((a: any, b: any) => a.sort_order - b.sort_order) };
+          setProduct(sorted as unknown as Product);
+        } else {
+          setProduct(null);
+        }
+      } catch (err: any) {
+        console.error("Error fetching product:", err);
+        setProduct(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [unwrappedParams.slug]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin" style={{ color: 'var(--sync-yellow)' }} />
+      </div>
+    );
+  }
+
+  if (!product) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center pt-20">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4" style={{ color: 'var(--sync-text-primary)' }}>Tool Not Found</h1>
-          <Link href="/" className="px-6 py-3 rounded-full font-bold transition-all hover:scale-105 inline-block" style={{ background: 'var(--sync-yellow)', color: '#0B132B' }}>
+          <Link href="/sync" className="px-6 py-3 rounded-full font-bold transition-all hover:scale-105 inline-block" style={{ background: 'var(--sync-yellow)', color: '#0B132B' }}>
             {lang === 'ar' ? 'الرجوع للعروض' : 'Return Home'}
           </Link>
         </div>
@@ -330,16 +345,14 @@ export default function ToolPage({ params }: { params: Promise<{ slug: string }>
     );
   }
 
-  const Icon = tool.icon;
-
   return (
     <div className="pt-32 pb-24 min-h-screen relative z-10 overflow-hidden" style={{ background: 'var(--sync-bg)' }}>
       {/* Dynamic Background Image & Glow */}
-      {tool.image ? (
+      {product.cover_image_url ? (
         <div className="absolute top-0 left-0 right-0 h-[60vh] z-0 overflow-hidden pointer-events-none">
           <div className="absolute inset-0 z-10" style={{ background: 'linear-gradient(to bottom, rgba(11, 19, 43, 0.4) 0%, var(--sync-bg) 100%)' }} />
           <div className="absolute inset-0 z-10 opacity-60" style={{ background: 'var(--sync-bg)' }} />
-          <img src={tool.image} alt={tool.name} className="w-full h-full object-cover opacity-50 mix-blend-screen blur-[2px]" />
+          <img src={product.cover_image_url} alt={product.name} className="w-full h-full object-cover opacity-50 mix-blend-screen blur-[2px]" />
         </div>
       ) : (
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-96 opacity-20 pointer-events-none blur-[120px]" style={{ background: 'radial-gradient(circle, var(--sync-yellow) 0%, transparent 70%)' }} />
@@ -348,32 +361,24 @@ export default function ToolPage({ params }: { params: Promise<{ slug: string }>
       <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-12 2xl:px-24 relative z-10">
         
         {/* Back Button */}
-        <Link href="/" className="inline-flex items-center gap-2 mb-8 px-4 py-2 rounded-full border border-white/10 hover:border-white/30 transition-all backdrop-blur-md relative z-20" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--sync-text-primary)' }}>
+        <Link href="/sync" className="inline-flex items-center gap-2 mb-8 px-4 py-2 rounded-full border border-white/10 hover:border-white/30 transition-all backdrop-blur-md relative z-20" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--sync-text-primary)' }}>
           {lang === 'ar' ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />}
           <span className="font-semibold text-sm">{lang === 'ar' ? 'الرجوع للعروض' : 'Back to Deals'}</span>
         </Link>
 
         {/* Hero Section for Tool */}
         <div className="flex flex-col items-center gap-6 mb-20 text-center relative z-20 mt-4">
-          {!tool.image && (
-            <div className="relative group">
-              <div className="absolute inset-0 blur-2xl opacity-50 group-hover:opacity-100 transition-opacity duration-500" style={{ background: 'var(--sync-yellow)' }} />
-              <div className="relative w-32 h-32 rounded-3xl flex items-center justify-center shadow-2xl transition-transform duration-500 group-hover:scale-105" style={{ background: 'var(--sync-surface)', border: '1px solid var(--sync-yellow)' }}>
-                <Icon className="w-16 h-16" style={{ color: 'var(--sync-yellow)' }} />
-              </div>
-            </div>
-          )}
-          <div className={tool.image ? "mt-0" : "mt-4"}>
-            <h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tight drop-shadow-lg" style={{ color: 'var(--sync-text-primary)' }}>{tool.name}</h1>
+          <div className={product.cover_image_url ? "mt-0" : "mt-4"}>
+            <h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tight drop-shadow-lg" style={{ color: 'var(--sync-text-primary)' }}>{product.name}</h1>
             <p className="text-xl md:text-2xl opacity-80 max-w-3xl mx-auto leading-relaxed" style={{ color: 'var(--sync-text-primary)' }}>
-              {lang === 'ar' ? tool.descAr : tool.descEn}
+              {lang === 'ar' ? product.description_ar : product.description_en}
             </p>
           </div>
         </div>
 
         {/* Plans Grid Header & Currency Selector */}
         <div className="flex flex-col md:flex-row items-center justify-between mb-12 gap-6 relative z-30">
-          <div className="md:w-1/3 hidden md:block"></div> {/* Spacer for centering */}
+          <div className="md:w-1/3 hidden md:block"></div>
           
           <div className="text-center md:w-1/3">
             <h2 className="text-3xl md:text-4xl font-bold inline-block relative" style={{ color: 'var(--sync-text-primary)' }}>
@@ -386,7 +391,7 @@ export default function ToolPage({ params }: { params: Promise<{ slug: string }>
             <div className="relative group">
               <select 
                 value={selectedCurrency.code} 
-                onChange={(e) => setSelectedCurrency(CURRENCIES.find(c => c.code === e.target.value) || CURRENCIES[0])}
+                onChange={(e) => setSelectedCurrency(currencies.find(c => c.code === e.target.value) || currencies[0])}
                 className="appearance-none outline-none py-3 px-6 pr-12 rounded-xl font-bold cursor-pointer transition-all duration-300 hover:scale-105"
                 style={{ 
                   background: 'rgba(11, 19, 43, 0.8)', 
@@ -396,7 +401,7 @@ export default function ToolPage({ params }: { params: Promise<{ slug: string }>
                   backdropFilter: 'blur(10px)'
                 }}
               >
-                {CURRENCIES.map(c => (
+                {currencies.map(c => (
                   <option key={c.code} value={c.code} style={{ background: '#080b14', color: 'var(--sync-yellow)' }}>
                     {c.label}
                   </option>
@@ -410,8 +415,25 @@ export default function ToolPage({ params }: { params: Promise<{ slug: string }>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-center">
-          {tool.plans.map((plan: any) => (
-            <GiftCard key={plan.id} plan={plan} tool={tool} lang={lang} currency={selectedCurrency} />
+          {product.plans.map((plan) => (
+            <GiftCard 
+              key={plan.id} 
+              plan={plan} 
+              tool={product} 
+              lang={lang} 
+              currency={selectedCurrency}
+              onAddToCart={() => addItem({
+                planId: plan.id,
+                productId: product.id,
+                productName: product.name,
+                productSlug: product.slug,
+                planTitle: lang === 'ar' ? plan.title_ar : plan.title_en,
+                priceUsd: Number(plan.price_usd),
+                originalPriceUsd: plan.original_price_usd ? Number(plan.original_price_usd) : null,
+                durationDays: plan.duration_days,
+                coverImageUrl: product.cover_image_url,
+              })}
+            />
           ))}
         </div>
 

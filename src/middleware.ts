@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
 
 export const config = {
   matcher: [
@@ -14,18 +15,28 @@ export const config = {
   ],
 };
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const url = req.nextUrl;
   const hostname = req.headers.get('host') || '';
 
+  let response = NextResponse.next({
+    request: {
+      headers: req.headers,
+    },
+  });
+
   // Check if it's the khawarizm subdomain
   if (hostname.startsWith('khawarizm.')) {
-    return NextResponse.rewrite(new URL(`/khawarizm${url.pathname}`, req.url));
+    if (!url.pathname.startsWith('/khawarizm')) {
+      response = NextResponse.rewrite(new URL(`/khawarizm${url.pathname}`, req.url));
+    }
   }
 
   // Check if it's the sync subdomain
   if (hostname.startsWith('sync.')) {
-    return NextResponse.rewrite(new URL(`/sync${url.pathname}`, req.url));
+    if (!url.pathname.startsWith('/sync')) {
+      response = NextResponse.rewrite(new URL(`/sync${url.pathname}`, req.url));
+    }
   }
 
   // Optional: Prevent direct access to /khawarizm or /sync from the main domain
@@ -35,5 +46,32 @@ export function middleware(req: NextRequest) {
     // return NextResponse.redirect(new URL('/', req.url));
   }
 
-  return NextResponse.next();
+  // Refresh Supabase session for SYNC routes
+  // This ensures the auth token stays fresh on every request
+  const isSyncRoute = hostname.startsWith('sync.') || url.pathname.startsWith('/sync');
+
+  if (isSyncRoute && process.env.NEXT_PUBLIC_SYNC_SUPABASE_URL && process.env.NEXT_PUBLIC_SYNC_SUPABASE_ANON_KEY) {
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SYNC_SUPABASE_URL,
+      process.env.NEXT_PUBLIC_SYNC_SUPABASE_ANON_KEY,
+      {
+        cookies: {
+          getAll() {
+            return req.cookies.getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              req.cookies.set(name, value);
+              response.cookies.set({ name, value, ...options });
+            });
+          },
+        },
+      }
+    );
+
+    // This refreshes the session if expired
+    await supabase.auth.getUser();
+  }
+
+  return response;
 }

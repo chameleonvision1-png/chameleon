@@ -59,10 +59,10 @@ export default function SyncHero() {
 
           {/* Card 2 - Center (Highest Z-index) */}
           <div 
-            className="absolute left-1/2 transform -translate-x-1/2 hover:scale-110 hover:-translate-y-4 transition-all duration-500 z-20 cursor-pointer drop-shadow-2xl"
+            className="absolute left-1/2 transform -translate-x-1/2 -translate-y-6 hover:scale-110 hover:-translate-y-10 transition-all duration-500 z-20 cursor-pointer drop-shadow-2xl"
             onClick={() => document.getElementById('deals')?.scrollIntoView({ behavior: 'smooth' })}
           >
-            <GiftCard name="Gemini Advanced" price="$16.96" original="$369.00" discount="98% OFF" period="18-Month Access" featured={true} image="/sync/covers/gemini.png" />
+            <GiftCard name="Gemini Advanced" price="$16.96" original="$369.00" discount="98% OFF" period="18-Month Access" featured={true} image="/sync/covers/gemini.png" height="460px" />
           </div>
 
         </div>
@@ -95,13 +95,13 @@ export default function SyncHero() {
   );
 }
 
-function GiftCard({ name, price, original, discount, period, image, featured = false }: any) {
+function GiftCard({ name, price, original, discount, period, image, featured = false, height = '420px' }: any) {
   return (
     <div className={`w-[240px] md:w-[320px] rounded-2xl overflow-hidden shadow-2xl flex flex-col justify-between backdrop-blur-md`} 
          style={{ 
            backgroundColor: 'var(--sync-surface)', 
            border: featured ? '2px solid var(--sync-yellow)' : '1px solid var(--sync-border)',
-           height: '420px',
+           height: height,
            boxShadow: featured ? '0 20px 50px rgba(255, 194, 26, 0.15)' : '0 20px 40px rgba(0,0,0,0.5)'
          }}>
       

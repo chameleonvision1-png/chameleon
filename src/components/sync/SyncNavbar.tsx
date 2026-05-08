@@ -3,19 +3,30 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSync } from './SyncProviders';
-import { Moon, Sun, Globe } from 'lucide-react';
+import { useSyncAuth } from './SyncAuthProvider';
+import { useSyncCart } from './SyncCartProvider';
+import { Moon, Sun, Globe, ShoppingCart, User, LogOut, Wallet } from 'lucide-react';
 
 export default function SyncNavbar() {
   const { lang, setLang, theme, setTheme, t } = useSync();
+  const { user, profile, isAdmin, signOut } = useSyncAuth();
+  const { totalItems, setIsCartOpen } = useSyncCart();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showUserMenu) setShowUserMenu(false);
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [showUserMenu]);
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? 'bg-(--sync-bg)/80 backdrop-blur-lg border-b border-(--sync-border) shadow-lg' : 'bg-transparent border-b border-transparent'}`}>
@@ -38,21 +49,76 @@ export default function SyncNavbar() {
             </div>
           </div>
 
-          {/* Right Toggles */}
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={() => setLang(lang === 'en' ? 'ar' : 'en')}
-              className="flex items-center gap-2 hover:text-(--sync-yellow) transition-colors p-2"
-              aria-label="Toggle Language"
-            >
+          {/* Right Controls */}
+          <div className="flex items-center gap-2 md:gap-3">
+            {/* Balance (logged in only) */}
+            {user && profile && (
+              <Link href="/dashboard" className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/10 hover:border-(--sync-yellow)/30 transition-all font-mono text-sm bg-black/20">
+                <Wallet className="w-4 h-4" style={{ color: 'var(--sync-yellow)' }} />
+                <span className="text-xs font-bold" style={{ color: 'var(--sync-yellow)' }}>${Number(profile.balance || 0).toFixed(2)}</span>
+              </Link>
+            )}
+
+            {/* Cart */}
+            <button onClick={() => setIsCartOpen(true)} className="relative p-2 hover:text-(--sync-yellow) transition-colors" aria-label="Cart">
+              <ShoppingCart className="w-5 h-5" />
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black" style={{ background: 'var(--sync-yellow)', color: '#0B132B' }}>
+                  {totalItems}
+                </span>
+              )}
+            </button>
+
+            {/* User */}
+            {user ? (
+              <div className="relative">
+                <button onClick={() => setShowUserMenu(!showUserMenu)} className="p-2 hover:text-(--sync-yellow) transition-colors rounded-full border border-white/10">
+                  <User className="w-4 h-4" />
+                </button>
+                {showUserMenu && (
+                  <>
+                    <div 
+                      className="fixed inset-0 z-40 outline-none" 
+                      onClick={() => setShowUserMenu(false)} 
+                      onKeyDown={(e) => e.key === 'Escape' && setShowUserMenu(false)}
+                      tabIndex={0}
+                      role="button"
+                      aria-label="Close user menu"
+                    />
+                    <div className="absolute right-0 mt-2 w-48 rounded-xl border border-white/10 shadow-2xl z-50 overflow-hidden" style={{ background: '#0d1530' }}>
+                      <div className="p-3 border-b border-white/10">
+                        <p className="text-xs font-bold truncate">{profile?.full_name || 'User'}</p>
+                        <p className="text-[10px] opacity-50 truncate">{user?.email}</p>
+                      </div>
+                      <Link href="/dashboard" className="block px-4 py-2.5 text-sm hover:bg-white/5 transition-colors" onClick={() => setShowUserMenu(false)}>
+                        {lang === 'ar' ? 'لوحة التحكم' : 'Dashboard'}
+                      </Link>
+                      {isAdmin && (
+                        <Link href="/admin" className="block px-4 py-2.5 text-sm hover:bg-white/5 transition-colors" style={{ color: 'var(--sync-yellow)' }} onClick={() => setShowUserMenu(false)}>
+                          {lang === 'ar' ? 'إدارة المتجر' : 'Admin Panel'}
+                        </Link>
+                      )}
+                      <button onClick={() => { signOut(); setShowUserMenu(false); }} className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors flex items-center gap-2">
+                        <LogOut className="w-3.5 h-3.5" /> {lang === 'ar' ? 'تسجيل الخروج' : 'Sign Out'}
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <Link href="/auth/login" className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold transition-all hover:scale-105" style={{ background: 'var(--sync-yellow)', color: '#0B132B' }}>
+                {lang === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
+              </Link>
+            )}
+
+            {/* Language */}
+            <button onClick={() => setLang(lang === 'en' ? 'ar' : 'en')} className="flex items-center gap-2 hover:text-(--sync-yellow) transition-colors p-2" aria-label="Toggle Language">
               <Globe className="w-5 h-5" />
               <span className="text-sm font-bold">{lang === 'en' ? 'AR' : 'EN'}</span>
             </button>
-            <button 
-              onClick={() => setTheme(theme === 'sync-dark' ? 'sync-light' : 'sync-dark')}
-              className="p-2 hover:text-(--sync-yellow) transition-colors"
-              aria-label="Toggle Theme"
-            >
+
+            {/* Theme */}
+            <button onClick={() => setTheme(theme === 'sync-dark' ? 'sync-light' : 'sync-dark')} className="p-2 hover:text-(--sync-yellow) transition-colors" aria-label="Toggle Theme">
               {theme === 'sync-dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
           </div>
