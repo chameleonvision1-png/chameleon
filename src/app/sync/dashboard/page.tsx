@@ -386,8 +386,8 @@ export default function UserDashboard() {
                                     </h4>
                                     <div className="grid grid-cols-1 gap-3">
                                       {item.inventory.map((inv: any, idx: number) => (
-                                        <div key={inv.id} className="p-4 rounded-xl border border-white/10 bg-black/20 font-mono text-sm">
-                                          <div className="flex justify-between mb-2">
+                                        <div key={inv.id} className="p-4 rounded-xl border border-white/10 bg-black/20 font-mono text-sm space-y-2">
+                                          <div className="flex justify-between">
                                             <span className="opacity-50">Email:</span>
                                             <span className="font-bold text-(--sync-yellow)">{inv.account_email}</span>
                                           </div>
@@ -395,6 +395,31 @@ export default function UserDashboard() {
                                             <span className="opacity-50">Password:</span>
                                             <span className="font-bold text-(--sync-yellow)">{inv.account_password}</span>
                                           </div>
+                                          {inv.backup_email && (
+                                            <>
+                                              <div className="border-t border-white/5 pt-2 mt-2"></div>
+                                              <p className="text-[10px] uppercase tracking-wider opacity-30 font-sans">{lang === 'ar' ? 'حساب الحماية' : 'Backup Account'}</p>
+                                              <div className="flex justify-between">
+                                                <span className="opacity-50">Backup Email:</span>
+                                                <span className="font-bold text-blue-400">{inv.backup_email}</span>
+                                              </div>
+                                              {inv.backup_password && (
+                                                <div className="flex justify-between">
+                                                  <span className="opacity-50">Backup Pass:</span>
+                                                  <span className="font-bold text-blue-400">{inv.backup_password}</span>
+                                                </div>
+                                              )}
+                                            </>
+                                          )}
+                                          {inv.two_fa_secret && (
+                                            <>
+                                              <div className="border-t border-white/5 pt-2 mt-2"></div>
+                                              <div className="flex justify-between">
+                                                <span className="opacity-50">2FA Code:</span>
+                                                <span className="font-bold text-purple-400">{inv.two_fa_secret}</span>
+                                              </div>
+                                            </>
+                                          )}
                                         </div>
                                       ))}
                                     </div>

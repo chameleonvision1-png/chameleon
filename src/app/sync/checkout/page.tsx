@@ -182,7 +182,7 @@ export default function CheckoutPage() {
       // Fetch the completed order with all nested data for display
       const { data: fullOrder } = await supabase
         .from('orders')
-        .select('*, order_items(*, plan:plans(title_en, title_ar, delivery_type), inventory:plan_inventory(id, invite_link, account_email, account_password, status, used_at))')
+        .select('*, order_items(*, plan:plans(title_en, title_ar, delivery_type), inventory:plan_inventory(id, invite_link, account_email, account_password, backup_email, backup_password, two_fa_secret, status, used_at))')
         .eq('id', order.id)
         .single();
 
@@ -353,6 +353,58 @@ export default function CheckoutPage() {
                                 </button>
                               </div>
                             </div>
+                            </div>
+                            {/* Backup Account */}
+                            {inv.backup_email && (
+                              <>
+                                <div className="border-t border-white/5 pt-2 mt-1"></div>
+                                <p className="text-[10px] uppercase tracking-wider opacity-30 mb-1" style={{ color: 'var(--sync-text-primary)' }}>{lang === 'ar' ? 'حساب الحماية' : 'Backup Account'}</p>
+                                <div className="flex items-center justify-between p-3 rounded-lg bg-white/3">
+                                  <div>
+                                    <p className="text-[10px] uppercase tracking-wider opacity-40 mb-0.5" style={{ color: 'var(--sync-text-primary)' }}>Backup Email</p>
+                                    <p className="text-sm font-mono font-bold text-blue-400">{inv.backup_email}</p>
+                                  </div>
+                                  <button onClick={() => handleCopyText(inv.backup_email, `bemail-${inv.id}`)} className="p-2 rounded-lg hover:bg-white/5 transition-colors">
+                                    {copiedId === `bemail-${inv.id}` ? <CheckCircle className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 opacity-50" style={{ color: 'var(--sync-text-primary)' }} />}
+                                  </button>
+                                </div>
+                                {inv.backup_password && (
+                                  <div className="flex items-center justify-between p-3 rounded-lg bg-white/3">
+                                    <div>
+                                      <p className="text-[10px] uppercase tracking-wider opacity-40 mb-0.5" style={{ color: 'var(--sync-text-primary)' }}>Backup Password</p>
+                                      <p className="text-sm font-mono font-bold text-blue-400">
+                                        {revealedPasswords.has(`b-${inv.id}`) ? inv.backup_password : '••••••••••'}
+                                      </p>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                      <button onClick={() => togglePasswordVisibility(`b-${inv.id}`)} className="p-2 rounded-lg hover:bg-white/5 transition-colors">
+                                        {revealedPasswords.has(`b-${inv.id}`)
+                                          ? <EyeOff className="w-4 h-4 opacity-50" style={{ color: 'var(--sync-text-primary)' }} />
+                                          : <Eye className="w-4 h-4 opacity-50" style={{ color: 'var(--sync-text-primary)' }} />}
+                                      </button>
+                                      <button onClick={() => handleCopyText(inv.backup_password, `bpass-${inv.id}`)} className="p-2 rounded-lg hover:bg-white/5 transition-colors">
+                                        {copiedId === `bpass-${inv.id}` ? <CheckCircle className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 opacity-50" style={{ color: 'var(--sync-text-primary)' }} />}
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
+                              </>
+                            )}
+                            {/* 2FA */}
+                            {inv.two_fa_secret && (
+                              <>
+                                <div className="border-t border-white/5 pt-2 mt-1"></div>
+                                <div className="flex items-center justify-between p-3 rounded-lg bg-white/3">
+                                  <div>
+                                    <p className="text-[10px] uppercase tracking-wider opacity-40 mb-0.5" style={{ color: 'var(--sync-text-primary)' }}>2FA Code</p>
+                                    <p className="text-sm font-mono font-bold text-purple-400">{inv.two_fa_secret}</p>
+                                  </div>
+                                  <button onClick={() => handleCopyText(inv.two_fa_secret, `2fa-${inv.id}`)} className="p-2 rounded-lg hover:bg-white/5 transition-colors">
+                                    {copiedId === `2fa-${inv.id}` ? <CheckCircle className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 opacity-50" style={{ color: 'var(--sync-text-primary)' }} />}
+                                  </button>
+                                </div>
+                              </>
+                            )}
                           </div>
                         ))}
                         <p className="text-[11px] opacity-40 mt-2" style={{ color: 'var(--sync-text-primary)' }}>
