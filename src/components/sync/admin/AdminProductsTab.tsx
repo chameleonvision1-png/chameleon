@@ -124,7 +124,7 @@ export default function AdminProductsTab({ products, onRefresh }: { products: an
                 <div className="h-32 relative overflow-hidden flex items-center justify-center p-4 border-b border-white/5" style={{ background: '#04165d' }}>
                   <div className="absolute inset-0 opacity-20 mix-blend-overlay pointer-events-none" style={{ background: 'url("https://www.transparenttextures.com/patterns/carbon-fibre.png")' }}></div>
                   <img src={plan.mini_card_url || selectedProduct.cover_image_url || '/sync-covers/products-ticket.jpg'} alt="" className="w-full h-full object-cover absolute inset-0 z-0 opacity-60 mix-blend-luminosity group-hover:mix-blend-normal transition-all duration-500 group-hover:opacity-100 group-hover:scale-110" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#080b14] to-transparent z-10"></div>
+                  <div className="absolute inset-0 bg-linear-to-t from-[#080b14] to-transparent z-10"></div>
                   
                   {plan.discount_label && (
                     <div className="absolute top-4 right-4 z-20 px-3 py-1 rounded-full text-[10px] font-black shadow-lg" style={{ background: 'var(--sync-yellow)', color: '#0B132B' }}>
