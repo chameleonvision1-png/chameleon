@@ -28,6 +28,7 @@ interface BalanceTransaction {
   id: string;
   amount: number;
   type: string;
+  status: string;
   admin_note: string | null;
   balance_after: number;
   created_at: string;
@@ -490,12 +491,24 @@ export default function UserDashboard() {
                           {transactions.map(tx => (
                             <div key={tx.id} className="p-4 flex items-center justify-between">
                               <div>
-                                <p className="text-sm font-bold" style={{ color: 'var(--sync-text-primary)' }}>
-                                  {tx.admin_note || tx.type}
-                                </p>
-                                <p className="text-xs opacity-40">{new Date(tx.created_at).toLocaleString()}</p>
+                                <div className="flex items-center gap-2">
+                                  <p className="text-sm font-bold" style={{ color: 'var(--sync-text-primary)' }}>
+                                    {tx.admin_note || (tx.type === 'topup' ? (lang === 'ar' ? 'شحن رصيد' : 'Top Up') : tx.type)}
+                                  </p>
+                                  {tx.status === 'pending' && (
+                                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-orange-500/20 text-orange-400 uppercase">
+                                      {lang === 'ar' ? 'قيد المراجعة' : 'Pending'}
+                                    </span>
+                                  )}
+                                  {tx.status === 'rejected' && (
+                                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-400 uppercase">
+                                      {lang === 'ar' ? 'مرفوض' : 'Rejected'}
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-xs opacity-40 mt-1">{new Date(tx.created_at).toLocaleString()}</p>
                               </div>
-                              <span className={`font-black text-lg ${tx.amount >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                              <span className={`font-black text-lg ${tx.status === 'rejected' ? 'text-red-400 line-through opacity-50' : tx.status === 'pending' ? 'text-orange-400' : tx.amount >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                                 {tx.amount >= 0 ? '+' : ''}{Number(tx.amount).toFixed(2)}
                               </span>
                             </div>
