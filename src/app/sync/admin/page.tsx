@@ -131,7 +131,7 @@ export default function AdminDashboard() {
 
           // Notification
           await supabase.from('notifications').insert({
-            user_id: order.user?.id,
+            user_id: order.user_id,
             title_en: 'Payment Confirmed',
             title_ar: 'تم تأكيد الدفع',
             message_en: `Your payment for order #${order.order_number} has been confirmed. It is now processing.`,
@@ -175,7 +175,11 @@ export default function AdminDashboard() {
           if (orderError) throw new Error("Order update failed: " + orderError.message);
 
           // Return inventory to available pool
-          await supabase.rpc('deallocate_inventory_for_order', { p_order_id: order.id });
+          const { error: deallocError } = await supabase.rpc('deallocate_inventory_for_order', { p_order_id: order.id });
+          if (deallocError) {
+            console.error(`Deallocation failed for order ${order.id}:`, deallocError.message);
+            throw new Error('Failed to return inventory: ' + deallocError.message);
+          }
 
           // We don't update order_items delivery_status because 'cancelled' is not a valid enum value for delivery_item_status
           // The parent order status being 'cancelled' is enough.
@@ -252,11 +256,16 @@ export default function AdminDashboard() {
           if (orderError) throw new Error("Status update failed: " + orderError.message);
 
           // Also update all manual order_items to delivered
-          await supabase
+          const { error: itemsError } = await supabase
             .from('order_items')
             .update({ delivery_status: 'delivered' })
             .eq('order_id', order.id)
             .eq('delivery_status', 'pending');
+
+          if (itemsError) {
+            console.error(`Failed to update order_items for order ${order.id}:`, itemsError.message);
+            throw new Error('Failed to update order items: ' + itemsError.message);
+          }
 
           // Send notification
           const { error: notifError } = await supabase.from('notifications').insert({

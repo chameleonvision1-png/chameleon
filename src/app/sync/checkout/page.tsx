@@ -176,7 +176,11 @@ export default function CheckoutPage() {
         }
 
         // Use RPC to finalize order status (user can't update orders directly due to RLS)
-        await supabase.rpc('finalize_order_delivery', { p_order_id: order.id });
+        const { error: finalizeError } = await supabase.rpc('finalize_order_delivery', { p_order_id: order.id });
+        if (finalizeError) {
+          console.error('Finalize order error:', finalizeError);
+          // Don't throw — allocation succeeded, order will show as processing but items are delivered
+        }
       }
 
       // Fetch the completed order with all nested data for display
@@ -213,8 +217,20 @@ export default function CheckoutPage() {
     );
   }
 
-  const handleCopyText = (text: string, id: string) => {
-    navigator.clipboard.writeText(text);
+  const handleCopyText = async (text: string, id: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      // Fallback for browsers that block clipboard API
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
   };
@@ -352,7 +368,6 @@ export default function CheckoutPage() {
                                   {copiedId === `pass-${inv.id}` ? <CheckCircle className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 opacity-50" style={{ color: 'var(--sync-text-primary)' }} />}
                                 </button>
                               </div>
-                            </div>
                             </div>
                             {/* Backup Account */}
                             {inv.backup_email && (

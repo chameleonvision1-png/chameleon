@@ -100,6 +100,8 @@ export default function UserDashboard() {
         
       if (error) throw error;
 
+      // Optimistic UI timestamp — the server writes its own authoritative used_at via the RPC.
+      // This client-side value is only for immediate visual feedback until next data fetch.
       const now = new Date().toISOString();
 
       // Update local state so button immediately disables
