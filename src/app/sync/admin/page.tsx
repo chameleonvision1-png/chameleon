@@ -298,7 +298,9 @@ export default function AdminDashboard() {
             {activeTab === 'currencies' && <AdminCurrenciesTab />}
 
             {/* Finance Tab */}
-            {activeTab === 'finance' && <AdminFinanceTab />}
+            {activeTab === 'finance' && (
+              <AdminFinanceTab onViewUser={() => setActiveTab('users')} />
+            )}
 
             {/* Users Tab */}
             {activeTab === 'users' && (

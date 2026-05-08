@@ -15,14 +15,20 @@ interface BalanceTransaction {
     full_name: string;
     user_code: string;
     phone: string;
+    balance: number;
   };
   public_proof_url?: string;
 }
 
-export default function AdminFinanceTab() {
+interface AdminFinanceTabProps {
+  onViewUser?: (userId: string) => void;
+}
+
+export default function AdminFinanceTab({ onViewUser }: AdminFinanceTabProps) {
   const [transactions, setTransactions] = useState<BalanceTransaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
+  const [confirmPopup, setConfirmPopup] = useState<{ txId: string, userId: string, amount: number, action: 'confirmed' | 'rejected' } | null>(null);
 
   const fetchTransactions = async () => {
     setIsLoading(true);
@@ -30,7 +36,7 @@ export default function AdminFinanceTab() {
     
     const { data, error } = await supabase
       .from('balance_transactions')
-      .select('*, user:profiles(id, full_name, user_code, phone)')
+      .select('*, user:profiles(id, full_name, user_code, phone, balance)')
       .eq('type', 'topup')
       .eq('status', 'pending')
       .order('created_at', { ascending: false });
@@ -57,9 +63,10 @@ export default function AdminFinanceTab() {
     fetchTransactions();
   }, []);
 
-  const handleAction = async (txId: string, userId: string, amount: number, action: 'confirmed' | 'rejected') => {
-    if (!confirm(`Are you sure you want to ${action === 'confirmed' ? 'approve' : 'reject'} this top-up?`)) return;
-    
+  const executeAction = async () => {
+    if (!confirmPopup) return;
+    const { txId, userId, amount, action } = confirmPopup;
+    setConfirmPopup(null);
     setIsUpdating(txId);
     const supabase = createSyncClient();
     
@@ -189,16 +196,23 @@ export default function AdminFinanceTab() {
                     <p className="text-sm opacity-70">via {tx.payment_method}</p>
                     <p className="text-xs opacity-40 mt-1">{new Date(tx.created_at).toLocaleString()}</p>
                   </div>
-                  <div className="text-right">
-                    <p className="font-bold">{tx.user?.full_name || 'Unknown User'}</p>
-                    <p className="text-xs opacity-50">{tx.user?.user_code}</p>
-                    {tx.user?.phone && <p className="text-xs opacity-50">{tx.user?.phone}</p>}
+                  <div className="text-right flex flex-col items-end">
+                    <p className="font-bold text-lg">{tx.user?.full_name || 'Unknown User'}</p>
+                    <p className="text-xs opacity-50 mb-1">{tx.user?.user_code} {tx.user?.phone ? `• ${tx.user?.phone}` : ''}</p>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xs font-bold px-2 py-1 bg-white/5 rounded-md">Balance: <span className="text-[#ffc21a]">${Number(tx.user?.balance || 0).toFixed(2)}</span></span>
+                    </div>
+                    {onViewUser && tx.user_id && (
+                      <button onClick={() => onViewUser(tx.user_id)} className="text-xs text-blue-400 hover:text-blue-300 underline underline-offset-2">
+                        View User Profile
+                      </button>
+                    )}
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3 mt-auto">
                   <button
-                    onClick={() => handleAction(tx.id, tx.user_id, tx.amount, 'confirmed')}
+                    onClick={() => setConfirmPopup({ txId: tx.id, userId: tx.user_id, amount: tx.amount, action: 'confirmed' })}
                     disabled={!!isUpdating}
                     className="flex-1 bg-green-500/20 text-green-400 hover:bg-green-500/30 px-4 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
                   >
@@ -206,7 +220,7 @@ export default function AdminFinanceTab() {
                     Approve & Add Balance
                   </button>
                   <button
-                    onClick={() => handleAction(tx.id, tx.user_id, tx.amount, 'rejected')}
+                    onClick={() => setConfirmPopup({ txId: tx.id, userId: tx.user_id, amount: tx.amount, action: 'rejected' })}
                     disabled={!!isUpdating}
                     className="px-4 py-2.5 rounded-xl font-bold border border-red-500/30 text-red-400 hover:bg-red-500/10 flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
                   >
@@ -217,6 +231,34 @@ export default function AdminFinanceTab() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Confirm Popup */}
+      {confirmPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-2xl border border-white/10 p-6 shadow-2xl relative" style={{ background: '#0a1128', color: '#e2e8f0' }}>
+            <h2 className="text-xl font-bold mb-4">Confirm Action</h2>
+            <p className="opacity-80 mb-6">
+              Are you sure you want to <strong className={confirmPopup.action === 'confirmed' ? 'text-green-400' : 'text-red-400'}>{confirmPopup.action === 'confirmed' ? 'APPROVE' : 'REJECT'}</strong> this top-up of <strong>${confirmPopup.amount.toFixed(2)}</strong>?
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmPopup(null)}
+                className="flex-1 px-4 py-3 rounded-xl border border-white/10 hover:bg-white/5 transition-colors font-bold"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={executeAction}
+                className={`flex-1 px-4 py-3 rounded-xl font-bold text-white transition-colors ${
+                  confirmPopup.action === 'confirmed' ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'
+                }`}
+              >
+                Yes, {confirmPopup.action === 'confirmed' ? 'Approve' : 'Reject'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
