@@ -155,16 +155,16 @@ export default function AdminInventoryModal({ isOpen, onClose, plan, onSuccess }
         </button>
         
         <h2 className="text-2xl font-black mb-1 flex items-center gap-3">
-          <Box className="w-6 h-6 text-[var(--sync-yellow)]" /> 
+          <Box className="w-6 h-6 text-(--sync-yellow)" /> 
           Manage Inventory
         </h2>
         <p className="text-sm opacity-60 mb-6 border-b border-white/5 pb-4">
-          Plan: <strong className="text-[var(--sync-yellow)]">{plan.title_en}</strong> &mdash; <span className="uppercase tracking-widest text-[10px] opacity-80">{plan.delivery_type.replace(/_/g, ' ')}</span>
+          Plan: <strong className="text-(--sync-yellow)">{plan.title_en}</strong> &mdash; <span className="uppercase tracking-widest text-[10px] opacity-80">{plan.delivery_type.replace(/_/g, ' ')}</span>
         </p>
 
         {isLoadingStats ? (
           <div className="flex justify-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin text-[var(--sync-yellow)]" />
+            <Loader2 className="w-8 h-8 animate-spin text-(--sync-yellow)" />
           </div>
         ) : (
           <div className="space-y-8">
@@ -183,7 +183,7 @@ export default function AdminInventoryModal({ isOpen, onClose, plan, onSuccess }
                       {linkStats.map((stat, idx) => (
                         <div key={idx} className="bg-[#060b18] border border-white/5 p-4 rounded-xl flex items-center justify-between gap-4">
                           <div className="flex-1 min-w-0">
-                            <p className="font-mono text-sm text-[var(--sync-yellow)] truncate mb-2">{stat.link}</p>
+                            <p className="font-mono text-sm text-(--sync-yellow) truncate mb-2">{stat.link}</p>
                             <div className="flex gap-4 text-xs font-bold">
                               <span className="flex items-center gap-1 opacity-70"><Box className="w-3 h-3" /> Total: {stat.total}</span>
                               <span className="flex items-center gap-1 text-green-400"><CheckCircle className="w-3 h-3" /> Sold: {stat.sold}</span>
@@ -212,7 +212,7 @@ export default function AdminInventoryModal({ isOpen, onClose, plan, onSuccess }
                         placeholder="https://..." 
                         value={newLinkUrl} 
                         onChange={e => setNewLinkUrl(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[var(--sync-yellow)]/50 bg-[#060b18] text-sm"
+                        className="w-full px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-[#060b18] text-sm"
                       />
                     </div>
                     <div className="w-32">
@@ -223,7 +223,7 @@ export default function AdminInventoryModal({ isOpen, onClose, plan, onSuccess }
                         placeholder="Limit" 
                         value={newLinkLimit} 
                         onChange={e => setNewLinkLimit(parseInt(e.target.value))}
-                        className="w-full px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[var(--sync-yellow)]/50 bg-[#060b18] text-sm"
+                        className="w-full px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-[#060b18] text-sm"
                       />
                     </div>
                     <button 
@@ -246,7 +246,7 @@ export default function AdminInventoryModal({ isOpen, onClose, plan, onSuccess }
                 <div className="flex gap-4 mb-6">
                   <div className="flex-1 bg-[#060b18] border border-white/5 p-4 rounded-xl text-center">
                     <p className="text-xs opacity-50 uppercase tracking-wider mb-1">Available Accounts</p>
-                    <p className="text-3xl font-black text-[var(--sync-yellow)]">{accountStats.available}</p>
+                    <p className="text-3xl font-black text-(--sync-yellow)">{accountStats.available}</p>
                   </div>
                   <div className="flex-1 bg-[#060b18] border border-white/5 p-4 rounded-xl text-center">
                     <p className="text-xs opacity-50 uppercase tracking-wider mb-1">Sold Accounts</p>
@@ -276,7 +276,7 @@ export default function AdminInventoryModal({ isOpen, onClose, plan, onSuccess }
                         {accountList.map((acc, idx) => (
                           <div key={idx} className="p-3 bg-black/40 rounded-lg border border-white/5 flex flex-col gap-1">
                             <div className="flex justify-between">
-                              <span className="text-sm font-bold text-[var(--sync-yellow)]">{acc.account_email}</span>
+                              <span className="text-sm font-bold text-(--sync-yellow)">{acc.account_email}</span>
                             </div>
                             <div className="flex gap-4 text-xs opacity-60 items-center">
                               <span>Password: {revealedPasswords.has(idx) ? acc.account_password : '••••••••'}</span>
@@ -304,7 +304,7 @@ export default function AdminInventoryModal({ isOpen, onClose, plan, onSuccess }
                           type="email" 
                           value={accEmail} 
                           onChange={e => setAccEmail(e.target.value)}
-                          className="w-full px-4 py-2.5 rounded-xl border border-white/10 outline-none focus:border-[var(--sync-yellow)]/50 bg-black/50 text-sm"
+                          className="w-full px-4 py-2.5 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-black/50 text-sm"
                         />
                       </div>
                       <div>
@@ -313,7 +313,7 @@ export default function AdminInventoryModal({ isOpen, onClose, plan, onSuccess }
                           type="password" 
                           value={accPassword} 
                           onChange={e => setAccPassword(e.target.value)}
-                          className="w-full px-4 py-2.5 rounded-xl border border-white/10 outline-none focus:border-[var(--sync-yellow)]/50 bg-black/50 text-sm"
+                          className="w-full px-4 py-2.5 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-black/50 text-sm"
                         />
                       </div>
                       <div>
@@ -322,7 +322,7 @@ export default function AdminInventoryModal({ isOpen, onClose, plan, onSuccess }
                           type="email" 
                           value={accBackupEmail} 
                           onChange={e => setAccBackupEmail(e.target.value)}
-                          className="w-full px-4 py-2.5 rounded-xl border border-white/10 outline-none focus:border-[var(--sync-yellow)]/50 bg-black/50 text-sm"
+                          className="w-full px-4 py-2.5 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-black/50 text-sm"
                         />
                       </div>
                       <div>
@@ -331,7 +331,7 @@ export default function AdminInventoryModal({ isOpen, onClose, plan, onSuccess }
                           type="password" 
                           value={accBackupPassword} 
                           onChange={e => setAccBackupPassword(e.target.value)}
-                          className="w-full px-4 py-2.5 rounded-xl border border-white/10 outline-none focus:border-[var(--sync-yellow)]/50 bg-black/50 text-sm"
+                          className="w-full px-4 py-2.5 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-black/50 text-sm"
                         />
                       </div>
                     </div>
@@ -342,7 +342,7 @@ export default function AdminInventoryModal({ isOpen, onClose, plan, onSuccess }
                         value={acc2Fa} 
                         onChange={e => setAcc2Fa(e.target.value)}
                         placeholder="e.g. JBSWY3DPEHPK3PXP"
-                        className="w-full px-4 py-2.5 rounded-xl border border-white/10 outline-none focus:border-[var(--sync-yellow)]/50 bg-black/50 text-sm font-mono"
+                        className="w-full px-4 py-2.5 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-black/50 text-sm font-mono"
                       />
                     </div>
                     <div className="flex justify-end pt-2">
@@ -364,7 +364,7 @@ export default function AdminInventoryModal({ isOpen, onClose, plan, onSuccess }
             {/* User Provides Email Layout */}
             {plan.delivery_type === 'user_provides_email' && (
               <div className="text-center p-8 bg-[#060b18] border border-white/5 rounded-xl">
-                <Clock className="w-12 h-12 text-[var(--sync-yellow)] mx-auto mb-4 opacity-50" />
+                <Clock className="w-12 h-12 text-(--sync-yellow) mx-auto mb-4 opacity-50" />
                 <h3 className="text-lg font-bold mb-2">Manual Activation</h3>
                 <p className="text-sm opacity-60 max-w-md mx-auto">
                   For this plan type, users will provide their email address during checkout. 

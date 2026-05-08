@@ -106,7 +106,7 @@ export default function AdminProductsTab({ products, onRefresh }: { products: an
         </div>
 
         {isLoadingPlans ? (
-          <div className="flex justify-center p-12"><Loader2 className="w-6 h-6 animate-spin text-[var(--sync-yellow)]" /></div>
+          <div className="flex justify-center p-12"><Loader2 className="w-6 h-6 animate-spin text-(--sync-yellow)" /></div>
         ) : plans.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-white/20 p-12 text-center opacity-50">
             <Tag className="w-12 h-12 mx-auto mb-4 opacity-20" />
@@ -145,8 +145,8 @@ export default function AdminProductsTab({ products, onRefresh }: { products: an
                     <div>
                       <p className="text-[10px] uppercase tracking-widest opacity-50 font-bold mb-1">Pricing</p>
                       <div className="flex items-baseline gap-1">
-                        <span className="font-bold text-lg text-[var(--sync-yellow)]">$</span>
-                        <span className="font-black text-3xl text-[var(--sync-yellow)] tracking-tighter">{plan.price_usd}</span>
+                        <span className="font-bold text-lg text-(--sync-yellow)">$</span>
+                        <span className="font-black text-3xl text-(--sync-yellow) tracking-tighter">{plan.price_usd}</span>
                       </div>
                       {plan.original_price_usd && <p className="text-xs line-through opacity-50 block mt-1">${plan.original_price_usd}</p>}
                     </div>
@@ -169,7 +169,7 @@ export default function AdminProductsTab({ products, onRefresh }: { products: an
                     </div>
                     <div className="flex justify-between pb-1">
                       <span className="opacity-50">In Stock</span>
-                      <span className="font-bold text-[var(--sync-yellow)]">
+                      <span className="font-bold text-(--sync-yellow)">
                         {plan.delivery_type === 'user_provides_email' ? '∞' : (plan.stock_count || 0)}
                       </span>
                     </div>
@@ -178,7 +178,7 @@ export default function AdminProductsTab({ products, onRefresh }: { products: an
                   <div className="flex gap-2">
                     <button 
                       onClick={() => setShowInventoryModal(plan)}
-                      className="flex-2 py-2.5 rounded-xl text-xs font-bold bg-white/5 hover:bg-[var(--sync-yellow)] hover:text-[#0B132B] transition-colors flex justify-center items-center gap-1 border border-white/10 hover:border-transparent"
+                      className="flex-2 py-2.5 rounded-xl text-xs font-bold bg-white/5 hover:bg-(--sync-yellow) hover:text-[#0B132B] transition-colors flex justify-center items-center gap-1 border border-white/10 hover:border-transparent"
                     >
                       <Box className="w-4 h-4" /> Stock
                     </button>
@@ -276,7 +276,7 @@ export default function AdminProductsTab({ products, onRefresh }: { products: an
                   <h3 className="text-xl font-bold mb-1">{p.name}</h3>
                   <p className="text-sm opacity-50">{(p.category as any)?.name_en || 'Uncategorized'}</p>
                 </div>
-                <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-[var(--sync-yellow)] group-hover:text-[#060b18] transition-colors">
+                <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-(--sync-yellow) group-hover:text-[#060b18] transition-colors">
                   <ArrowRight className="w-5 h-5" />
                 </div>
               </div>
