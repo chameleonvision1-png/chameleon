@@ -6,7 +6,7 @@ import { useSync } from '@/components/sync/SyncProviders';
 import { useSyncAuth } from '@/components/sync/SyncAuthProvider';
 import { useSyncCart } from '@/components/sync/SyncCartProvider';
 import { createSyncClient } from '@/lib/sync/supabase-client';
-import { ArrowLeft, Upload, Trash2, CheckCircle, Loader2, Wallet, CreditCard, ShoppingBag, ImageIcon, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Upload, Trash2, CheckCircle, Loader2, Wallet, CreditCard, ShoppingBag, ImageIcon, AlertCircle, Package, Copy, ExternalLink, Clock, Eye, EyeOff } from 'lucide-react';
 
 type PaymentMethod = 'balance' | 'vodafone' | 'crypto';
 
@@ -19,7 +19,10 @@ export default function CheckoutPage() {
   const [proofPreview, setProofPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
+  const [completedOrder, setCompletedOrder] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [revealedPasswords, setRevealedPasswords] = useState<Set<string>>(new Set());
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const balance = Number(profile?.balance || 0);
@@ -168,10 +171,23 @@ export default function CheckoutPage() {
         const { error: allocError } = await supabase.rpc('allocate_inventory_for_order', {
           p_order_id: order.id
         });
-        if (allocError) console.error("Allocation error:", allocError); // Don't fail the order if allocation fails (could be out of stock, admin can handle it)
+        if (allocError) {
+          console.error("Allocation error:", allocError); // Don't fail the order if allocation fails
+        }
+
+        // Use RPC to finalize order status (user can't update orders directly due to RLS)
+        await supabase.rpc('finalize_order_delivery', { p_order_id: order.id });
       }
 
+      // Fetch the completed order with all nested data for display
+      const { data: fullOrder } = await supabase
+        .from('orders')
+        .select('*, order_items(*, plan:plans(title_en, title_ar, delivery_type), inventory:plan_inventory(id, invite_link, account_email, account_password, status, used_at))')
+        .eq('id', order.id)
+        .single();
+
       clearCart();
+      setCompletedOrder(fullOrder);
       setOrderSuccess(true);
     } catch (err: any) {
       setError(err.message || 'Something went wrong');
@@ -197,31 +213,187 @@ export default function CheckoutPage() {
     );
   }
 
+  const handleCopyText = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const togglePasswordVisibility = (id: string) => {
+    setRevealedPasswords(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
   // Order success
   if (orderSuccess) {
+    const isBalancePurchase = paymentMethod === 'balance';
     return (
-      <div className="min-h-screen pt-32 pb-24" style={{ background: 'var(--sync-bg)' }}>
-        <div className="max-w-lg mx-auto px-4 text-center">
-          <div className="w-24 h-24 rounded-full mx-auto mb-8 flex items-center justify-center" style={{ background: 'rgba(34, 197, 94, 0.15)' }}>
-            <CheckCircle className="w-12 h-12 text-green-400" />
+      <div className="min-h-screen pt-28 pb-24" style={{ background: 'var(--sync-bg)' }}>
+        <div className="max-w-2xl mx-auto px-4">
+          {/* Success Header */}
+          <div className="text-center mb-8">
+            <div className="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center" style={{ background: 'rgba(34, 197, 94, 0.15)' }}>
+              <CheckCircle className="w-10 h-10 text-green-400" />
+            </div>
+            <h1 className="text-3xl font-black mb-2" style={{ color: 'var(--sync-text-primary)' }}>
+              {isBalancePurchase
+                ? (lang === 'ar' ? 'تم الشراء بنجاح! 🎉' : 'Purchase Successful! 🎉')
+                : (lang === 'ar' ? 'تم إرسال الطلب! 📦' : 'Order Submitted! 📦')
+              }
+            </h1>
+            {completedOrder && (
+              <p className="text-sm font-mono opacity-50" style={{ color: 'var(--sync-text-primary)' }}>#{completedOrder.order_number}</p>
+            )}
+            <p className="text-sm opacity-60 mt-2" style={{ color: 'var(--sync-text-primary)' }}>
+              {isBalancePurchase
+                ? (lang === 'ar' ? 'تم خصم المبلغ من رصيدك.' : 'Amount deducted from balance.')
+                : (lang === 'ar' ? 'سيتم مراجعة إثبات الدفع خلال ٢٤ ساعة.' : 'Payment proof will be reviewed within 24 hours.')}
+            </p>
           </div>
-          <h1 className="text-4xl font-black mb-4" style={{ color: 'var(--sync-text-primary)' }}>
-            {paymentMethod === 'balance' 
-              ? (lang === 'ar' ? 'تم الشراء بنجاح! 🎉' : 'Purchase Successful! 🎉')
-              : (lang === 'ar' ? 'تم إرسال الطلب! 📦' : 'Order Submitted! 📦')
-            }
-          </h1>
-          <p className="text-lg opacity-70 mb-8" style={{ color: 'var(--sync-text-primary)' }}>
-            {paymentMethod === 'balance'
-              ? (lang === 'ar' ? 'تم خصم المبلغ من رصيدك. ستجد تفاصيل اشتراكاتك في لوحة التحكم.' : 'Amount deducted from balance. Check your dashboard for subscription details.')
-              : (lang === 'ar' ? 'سيتم مراجعة إثبات الدفع خلال ٢٤ ساعة. ستصلك رسالة عند التأكيد.' : 'Payment proof will be reviewed within 24 hours. You will be notified upon confirmation.')
-            }
-          </p>
+
+          {/* Order Items with Delivery Data */}
+          {completedOrder?.order_items?.length > 0 && (
+            <div className="space-y-4 mb-8">
+              {completedOrder.order_items.map((item: any) => (
+                <div key={item.id} className="rounded-2xl border border-white/10 overflow-hidden" style={{ background: '#0d1530' }}>
+                  {/* Item Header */}
+                  <div className="p-5 flex items-center justify-between border-b border-white/5">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,194,26,0.1)' }}>
+                        <Package className="w-5 h-5" style={{ color: 'var(--sync-yellow)' }} />
+                      </div>
+                      <div>
+                        <p className="font-bold" style={{ color: 'var(--sync-text-primary)' }}>
+                          {lang === 'ar' ? item.plan?.title_ar : item.plan?.title_en || 'Product'}
+                        </p>
+                        <p className="text-xs opacity-50" style={{ color: 'var(--sync-text-primary)' }}>Qty: {item.quantity} &times; ${item.unit_price_usd}</p>
+                      </div>
+                    </div>
+                    <p className="font-black text-lg" style={{ color: 'var(--sync-yellow)' }}>${Number(item.quantity * item.unit_price_usd).toFixed(2)}</p>
+                  </div>
+
+                  {/* Delivery Content */}
+                  <div className="p-5">
+                    {/* Invitation Links */}
+                    {item.delivery_type === 'invitation_link' && item.inventory?.length > 0 && (
+                      <div className="space-y-3">
+                        <h4 className="text-sm font-bold text-green-400 flex items-center gap-2 mb-3">
+                          <CheckCircle className="w-4 h-4" />
+                          {lang === 'ar' ? 'روابط الدعوة جاهزة!' : 'Your Invitation Links are Ready!'}
+                        </h4>
+                        {item.inventory.map((inv: any, idx: number) => (
+                          <div key={inv.id} className="flex items-center justify-between p-4 rounded-xl border border-white/10 bg-black/30">
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(59,130,246,0.15)' }}>
+                                <ExternalLink className="w-4 h-4 text-blue-400" />
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-sm font-bold opacity-80" style={{ color: 'var(--sync-text-primary)' }}>
+                                  {lang === 'ar' ? `رابط الدعوة #${idx + 1}` : `Invitation Link #${idx + 1}`}
+                                </p>
+                                <p className="text-[10px] opacity-40" style={{ color: 'var(--sync-text-primary)' }}>
+                                  {lang === 'ar' ? 'جاهز للتفعيل' : 'Ready to activate'}
+                                </p>
+                              </div>
+                            </div>
+                            <span className="px-3 py-1.5 rounded-lg text-xs font-bold bg-green-500/15 text-green-400">
+                              {lang === 'ar' ? '✓ محجوز' : '✓ Reserved'}
+                            </span>
+                          </div>
+                        ))}
+                        <div className="p-3 rounded-xl border border-amber-500/20 bg-amber-500/5 mt-2">
+                          <p className="text-[12px] font-bold" style={{ color: 'var(--sync-yellow)' }}>
+                            {lang === 'ar' ? '⚠️ لتفعيل الرابط، اذهب للوحة التحكم واضغط "تفعيل الآن". الرابط يعمل مرة واحدة فقط.' : '⚠️ To activate, go to your Dashboard and click "Activate Now". Each link works only once.'}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Ready Accounts */}
+                    {item.delivery_type === 'ready_account' && item.inventory?.length > 0 && (
+                      <div className="space-y-3">
+                        <h4 className="text-sm font-bold text-green-400 flex items-center gap-2 mb-3">
+                          <CheckCircle className="w-4 h-4" />
+                          {lang === 'ar' ? 'بيانات حسابك جاهزة!' : 'Your Account Credentials are Ready!'}
+                        </h4>
+                        {item.inventory.map((inv: any, idx: number) => (
+                          <div key={inv.id} className="p-4 rounded-xl border border-white/10 bg-black/30 space-y-3">
+                            <p className="text-xs font-bold opacity-60" style={{ color: 'var(--sync-text-primary)' }}>
+                              {lang === 'ar' ? `حساب #${idx + 1}` : `Account #${idx + 1}`}
+                            </p>
+                            {/* Email */}
+                            <div className="flex items-center justify-between p-3 rounded-lg bg-white/3">
+                              <div>
+                                <p className="text-[10px] uppercase tracking-wider opacity-40 mb-0.5" style={{ color: 'var(--sync-text-primary)' }}>Email</p>
+                                <p className="text-sm font-mono font-bold" style={{ color: 'var(--sync-yellow)' }}>{inv.account_email}</p>
+                              </div>
+                              <button onClick={() => handleCopyText(inv.account_email, `email-${inv.id}`)} className="p-2 rounded-lg hover:bg-white/5 transition-colors">
+                                {copiedId === `email-${inv.id}` ? <CheckCircle className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 opacity-50" style={{ color: 'var(--sync-text-primary)' }} />}
+                              </button>
+                            </div>
+                            {/* Password */}
+                            <div className="flex items-center justify-between p-3 rounded-lg bg-white/3">
+                              <div>
+                                <p className="text-[10px] uppercase tracking-wider opacity-40 mb-0.5" style={{ color: 'var(--sync-text-primary)' }}>Password</p>
+                                <p className="text-sm font-mono font-bold" style={{ color: 'var(--sync-yellow)' }}>
+                                  {revealedPasswords.has(inv.id) ? inv.account_password : '••••••••••'}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <button onClick={() => togglePasswordVisibility(inv.id)} className="p-2 rounded-lg hover:bg-white/5 transition-colors">
+                                  {revealedPasswords.has(inv.id)
+                                    ? <EyeOff className="w-4 h-4 opacity-50" style={{ color: 'var(--sync-text-primary)' }} />
+                                    : <Eye className="w-4 h-4 opacity-50" style={{ color: 'var(--sync-text-primary)' }} />}
+                                </button>
+                                <button onClick={() => handleCopyText(inv.account_password, `pass-${inv.id}`)} className="p-2 rounded-lg hover:bg-white/5 transition-colors">
+                                  {copiedId === `pass-${inv.id}` ? <CheckCircle className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 opacity-50" style={{ color: 'var(--sync-text-primary)' }} />}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                        <p className="text-[11px] opacity-40 mt-2" style={{ color: 'var(--sync-text-primary)' }}>
+                          {lang === 'ar' ? '⚠️ يمكنك أيضاً الوصول لبيانات الحساب من لوحة التحكم.' : '⚠️ You can also access these credentials from your Dashboard anytime.'}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Manual activation (user provides email) */}
+                    {item.delivery_type === 'user_provides_email' && (
+                      <div className="p-4 rounded-xl border border-blue-500/20 bg-blue-500/5 text-center">
+                        <Clock className="w-8 h-8 text-blue-400 mx-auto mb-2 opacity-60" />
+                        <p className="text-sm font-bold text-blue-400">{lang === 'ar' ? 'جاري تفعيل الاشتراك' : 'Activation in Progress'}</p>
+                        <p className="text-xs opacity-60 mt-1" style={{ color: 'var(--sync-text-primary)' }}>
+                          {lang === 'ar' ? 'سيتم تفعيل حسابك خلال ساعات قليلة.' : 'Your account will be activated within a few hours.'}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Pending external payment */}
+                    {!isBalancePurchase && (!item.inventory || item.inventory.length === 0) && item.delivery_type !== 'user_provides_email' && (
+                      <div className="p-4 rounded-xl border border-orange-500/20 bg-orange-500/5 text-center">
+                        <Clock className="w-8 h-8 text-orange-400 mx-auto mb-2 opacity-60" />
+                        <p className="text-sm font-bold text-orange-400">{lang === 'ar' ? 'في انتظار تأكيد الدفع' : 'Awaiting Payment Confirmation'}</p>
+                        <p className="text-xs opacity-60 mt-1" style={{ color: 'var(--sync-text-primary)' }}>
+                          {lang === 'ar' ? 'سيتم تسليم المنتج بعد تأكيد الدفع.' : 'Product will be delivered after payment is confirmed.'}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Action Buttons */}
           <div className="flex gap-4 justify-center">
-            <Link href="/dashboard" className="px-6 py-3 rounded-xl font-bold transition-all hover:scale-105" style={{ background: 'var(--sync-yellow)', color: '#0B132B' }}>
+            <Link href="/sync/dashboard" className="px-6 py-3 rounded-xl font-bold transition-all hover:scale-105" style={{ background: 'var(--sync-yellow)', color: '#0B132B' }}>
               {lang === 'ar' ? 'لوحة التحكم' : 'Dashboard'}
             </Link>
-            <Link href="/" className="px-6 py-3 rounded-xl font-bold border border-white/10 hover:border-white/30 transition-all" style={{ color: 'var(--sync-text-primary)' }}>
+            <Link href="/sync" className="px-6 py-3 rounded-xl font-bold border border-white/10 hover:border-white/30 transition-all" style={{ color: 'var(--sync-text-primary)' }}>
               {lang === 'ar' ? 'تصفح المزيد' : 'Browse More'}
             </Link>
           </div>

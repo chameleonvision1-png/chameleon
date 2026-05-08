@@ -17,12 +17,18 @@ export default function AdminInventoryModal({ isOpen, onClose, plan, onSuccess }
   const [newLinkUrl, setNewLinkUrl] = useState('');
   const [newLinkLimit, setNewLinkLimit] = useState(1);
 
-  // Accounts input
-  const [accountsInput, setAccountsInput] = useState('');
+  // Accounts form
+  const [accEmail, setAccEmail] = useState('');
+  const [accPassword, setAccPassword] = useState('');
+  const [accBackupEmail, setAccBackupEmail] = useState('');
+  const [accBackupPassword, setAccBackupPassword] = useState('');
+  const [acc2Fa, setAcc2Fa] = useState('');
+  const [showAccountsList, setShowAccountsList] = useState(false);
 
   // Stats
   const [linkStats, setLinkStats] = useState<any[]>([]);
   const [accountStats, setAccountStats] = useState({ available: 0, sold: 0 });
+  const [accountList, setAccountList] = useState<any[]>([]);
 
   useEffect(() => {
     if (isOpen && plan) {
@@ -59,9 +65,11 @@ export default function AdminInventoryModal({ isOpen, onClose, plan, onSuccess }
         
         setLinkStats(Object.entries(grouped).map(([link, stats]: any) => ({ link, ...stats })));
       } else if (plan.delivery_type === 'ready_account') {
-        const available = items.filter((i: any) => i.status === 'available').length;
+        const availableItems = items.filter((i: any) => i.status === 'available');
+        const available = availableItems.length;
         const sold = items.filter((i: any) => i.status === 'sold').length;
         setAccountStats({ available, sold });
+        setAccountList(availableItems);
       }
     } catch (err: any) {
       console.error("Error loading stats:", err.message);
@@ -101,35 +109,36 @@ export default function AdminInventoryModal({ isOpen, onClose, plan, onSuccess }
     }
   };
 
-  const handleAddAccounts = async (e: React.FormEvent) => {
+  const handleAddAccountForm = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!accountsInput.trim()) return;
+    if (!accEmail.trim()) return;
     
     setIsUpdating(true);
     const supabase = createSyncClient();
-    const lines = accountsInput.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-    const inserts = [];
-    
-    for (const line of lines) {
-      const [email, password] = line.split(':');
-      inserts.push({
-        plan_id: plan.id,
-        account_email: email,
-        account_password: password || '',
-        status: 'available'
-      });
-    }
     
     try {
-      if (inserts.length > 0) {
-        const { error } = await supabase.from('plan_inventory').insert(inserts);
-        if (error) throw error;
-      }
-      setAccountsInput('');
+      const { error } = await supabase.from('plan_inventory').insert({
+        plan_id: plan.id,
+        account_email: accEmail.trim(),
+        account_password: accPassword.trim(),
+        backup_email: accBackupEmail.trim(),
+        backup_password: accBackupPassword.trim(),
+        two_fa_secret: acc2Fa.trim(),
+        status: 'available'
+      });
+      
+      if (error) throw error;
+      
+      setAccEmail('');
+      setAccPassword('');
+      setAccBackupEmail('');
+      setAccBackupPassword('');
+      setAcc2Fa('');
+      
       loadInventoryStats();
       onSuccess();
     } catch (err: any) {
-      alert("Error adding accounts: " + err.message);
+      alert("Error adding account: " + err.message);
     } finally {
       setIsUpdating(false);
     }
@@ -244,32 +253,103 @@ export default function AdminInventoryModal({ isOpen, onClose, plan, onSuccess }
                   </div>
                 </div>
 
-                <div className="border-t border-white/5 pt-6">
-                  <h3 className="text-sm font-bold opacity-60 mb-2">Add New Accounts</h3>
-                  <p className="text-xs opacity-40 mb-4">Enter accounts (one per line). Format: email:password</p>
-                  <form onSubmit={handleAddAccounts}>
-                    <textarea 
-                      required 
-                      rows={6}
-                      value={accountsInput} 
-                      onChange={e => setAccountsInput(e.target.value)}
-                      placeholder="user1@gmail.com:pass123&#10;user2@gmail.com:pass456"
-                      className="w-full px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 font-mono text-sm mb-4"
-                      style={{ background: '#060b18' }}
-                    />
-                    <div className="flex justify-end">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-bold">Add New Account</h3>
+                  <button 
+                    onClick={() => setShowAccountsList(!showAccountsList)}
+                    className="text-xs px-3 py-1.5 rounded-lg border border-white/10 hover:bg-white/5 transition-colors"
+                  >
+                    {showAccountsList ? 'Hide Accounts' : 'View Available Accounts'}
+                  </button>
+                </div>
+
+                {showAccountsList ? (
+                  <div className="mb-6 border border-white/10 rounded-xl overflow-hidden bg-[#060b18]">
+                    <div className="p-4 border-b border-white/10 bg-white/5">
+                      <h4 className="font-bold text-sm">Available Accounts</h4>
+                    </div>
+                    {accountList.length === 0 ? (
+                      <div className="p-8 text-center opacity-50 text-sm">No accounts available</div>
+                    ) : (
+                      <div className="max-h-60 overflow-y-auto p-2 space-y-2">
+                        {accountList.map((acc, idx) => (
+                          <div key={idx} className="p-3 bg-black/40 rounded-lg border border-white/5 flex flex-col gap-1">
+                            <div className="flex justify-between">
+                              <span className="text-sm font-bold text-(--sync-yellow)">{acc.account_email}</span>
+                            </div>
+                            <div className="flex gap-4 text-xs opacity-60">
+                              <span>Password: {acc.account_password}</span>
+                              {acc.backup_email && <span>Backup: {acc.backup_email}</span>}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <form onSubmit={handleAddAccountForm} className="space-y-4 bg-[#060b18] p-5 rounded-xl border border-white/5">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs opacity-60 mb-1">Primary Email *</label>
+                        <input 
+                          required 
+                          type="email" 
+                          value={accEmail} 
+                          onChange={e => setAccEmail(e.target.value)}
+                          className="w-full px-4 py-2.5 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-black/50 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs opacity-60 mb-1">Primary Password</label>
+                        <input 
+                          type="text" 
+                          value={accPassword} 
+                          onChange={e => setAccPassword(e.target.value)}
+                          className="w-full px-4 py-2.5 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-black/50 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs opacity-60 mb-1">Backup/Protection Email</label>
+                        <input 
+                          type="email" 
+                          value={accBackupEmail} 
+                          onChange={e => setAccBackupEmail(e.target.value)}
+                          className="w-full px-4 py-2.5 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-black/50 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs opacity-60 mb-1">Backup Password</label>
+                        <input 
+                          type="text" 
+                          value={accBackupPassword} 
+                          onChange={e => setAccBackupPassword(e.target.value)}
+                          className="w-full px-4 py-2.5 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-black/50 text-sm"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs opacity-60 mb-1">2FA Secret Code</label>
+                      <input 
+                        type="text" 
+                        value={acc2Fa} 
+                        onChange={e => setAcc2Fa(e.target.value)}
+                        placeholder="e.g. JBSWY3DPEHPK3PXP"
+                        className="w-full px-4 py-2.5 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-black/50 text-sm font-mono"
+                      />
+                    </div>
+                    <div className="flex justify-end pt-2">
                       <button 
                         type="submit"
-                        disabled={isUpdating || !accountsInput.trim()}
-                        className="px-8 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50"
+                        disabled={isUpdating || !accEmail.trim()}
+                        className="px-8 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50 w-full"
                         style={{ background: 'var(--sync-yellow)', color: '#060b18' }}
                       >
                         {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-                        Save Accounts
+                        Save Account
                       </button>
                     </div>
                   </form>
-                </div>
+                )}
               </>
             )}
             

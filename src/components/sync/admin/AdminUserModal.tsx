@@ -23,8 +23,13 @@ export default function AdminUserModal({ userId, onClose, onBalanceUpdated }: Ad
     const supabase = createSyncClient();
     
     // Fetch profile
-    const { data: profile } = await supabase.from('profiles').select('*').eq('id', userId).single();
-    if (profile) setUser(profile);
+    const { data: profile, error: profileErr } = await supabase.from('profiles').select('*').eq('id', userId).single();
+    if (profileErr) console.error("Profile fetch error:", profileErr);
+      if (profile) {
+        setUser(profile);
+      } else {
+        setUser({ id: userId, full_name: 'Unknown User', user_code: 'UNKNOWN', email: '', role: 'user', balance: 0, total_spent: 0, order_count: 0 });
+      }
 
     // Fetch transactions
     const { data: balanceTxs } = await supabase
@@ -112,7 +117,7 @@ export default function AdminUserModal({ userId, onClose, onBalanceUpdated }: Ad
   if (!userId) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
       <div className="w-full max-w-4xl rounded-2xl border border-white/10 shadow-2xl relative flex flex-col max-h-[90vh]" style={{ background: '#0a1128', color: '#e2e8f0' }}>
         <button onClick={onClose} className="absolute top-4 right-4 z-10 opacity-50 hover:opacity-100 bg-black/20 p-2 rounded-full transition-opacity">
           <X className="w-5 h-5" />

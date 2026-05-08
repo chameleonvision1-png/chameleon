@@ -94,12 +94,13 @@ export default function UserDashboard() {
     setIsActivating(true);
     const supabase = createSyncClient();
     try {
-      const { error } = await supabase
-        .from('plan_inventory')
-        .update({ status: 'used' })
-        .eq('id', inventoryId);
+      const { error } = await supabase.rpc('activate_invite_link', {
+        p_inventory_id: inventoryId
+      });
         
       if (error) throw error;
+
+      const now = new Date().toISOString();
 
       // Update local state so button immediately disables
       setOrders(prevOrders => 
@@ -108,7 +109,7 @@ export default function UserDashboard() {
           order_items: order.order_items.map(item => ({
             ...item,
             inventory: item.inventory?.map((inv: any) => 
-              inv.id === inventoryId ? { ...inv, status: 'used' } : inv
+              inv.id === inventoryId ? { ...inv, status: 'used', used_at: now } : inv
             )
           }))
         }))
@@ -121,7 +122,7 @@ export default function UserDashboard() {
           order_items: prev.order_items.map((item: any) => ({
             ...item,
             inventory: item.inventory?.map((inv: any) => 
-              inv.id === inventoryId ? { ...inv, status: 'used' } : inv
+              inv.id === inventoryId ? { ...inv, status: 'used', used_at: now } : inv
             )
           }))
         }));
@@ -406,6 +407,16 @@ export default function UserDashboard() {
                                     <p className="text-sm font-bold text-blue-400">Processing Activation</p>
                                     <p className="text-xs opacity-70 mt-1">
                                       {lang === 'ar' ? 'سيتم تفعيل الاشتراك على الحساب الذي أدخلته خلال ساعات.' : 'Your subscription will be activated on the provided account shortly.'}
+                                    </p>
+                                  </div>
+                                )}
+
+                                {item.delivery_type !== 'user_provides_email' && (!item.inventory || item.inventory.length === 0) && (
+                                  <div className="p-4 rounded-xl border border-orange-500/20 bg-orange-500/5 text-center mt-4">
+                                    <Clock className="w-8 h-8 text-orange-400 mx-auto mb-2 opacity-50" />
+                                    <p className="text-sm font-bold text-orange-400">{lang === 'ar' ? 'جاري تجهيز الطلب' : 'Processing Order'}</p>
+                                    <p className="text-xs opacity-70 mt-1">
+                                      {lang === 'ar' ? 'لم يتم تخصيص المنتج بعد. سيتم التخصيص قريباً من قبل الإدارة.' : 'Item has not been allocated yet. It will be assigned shortly by administration.'}
                                     </p>
                                   </div>
                                 )}

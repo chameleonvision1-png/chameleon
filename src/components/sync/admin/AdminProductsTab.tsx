@@ -169,7 +169,9 @@ export default function AdminProductsTab({ products, onRefresh }: { products: an
                     </div>
                     <div className="flex justify-between pb-1">
                       <span className="opacity-50">In Stock</span>
-                      <span className="font-bold text-(--sync-yellow)">{plan.stock_count || 0}</span>
+                      <span className="font-bold text-(--sync-yellow)">
+                        {plan.delivery_type === 'user_provides_email' ? '∞' : (plan.stock_count || 0)}
+                      </span>
                     </div>
                   </div>
 

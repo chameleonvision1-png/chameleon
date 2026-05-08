@@ -151,7 +151,7 @@ export default function RechargeModal({ isOpen, onClose, userId }: RechargeModal
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-[#0B132B]/80 backdrop-blur-sm" onClick={!isSubmitting ? handleModalClose : undefined} />
       
       <div className="relative w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]" style={{ background: '#0d1530', border: '1px solid rgba(255,255,255,0.1)' }}>
@@ -238,7 +238,7 @@ export default function RechargeModal({ isOpen, onClose, userId }: RechargeModal
                     </div>
                     <CreditCard className="w-5 h-5 opacity-60" />
                     <div>
-                      <p className="font-bold text-sm text-[var(--sync-text-primary)]">Vodafone Cash</p>
+                      <p className="font-bold text-sm text-(--sync-text-primary)">Vodafone Cash</p>
                     </div>
                   </label>
 
@@ -249,7 +249,7 @@ export default function RechargeModal({ isOpen, onClose, userId }: RechargeModal
                     </div>
                     <span className="text-lg">₿</span>
                     <div>
-                      <p className="font-bold text-sm text-[var(--sync-text-primary)]">Cryptocurrency</p>
+                      <p className="font-bold text-sm text-(--sync-text-primary)">Cryptocurrency</p>
                     </div>
                   </label>
                 </div>
@@ -261,13 +261,13 @@ export default function RechargeModal({ isOpen, onClose, userId }: RechargeModal
                   {lang === 'ar' ? 'تعليمات الدفع:' : 'Payment Instructions:'}
                 </p>
                 {paymentMethod === 'vodafone' ? (
-                  <ol className="text-xs opacity-70 space-y-1.5 list-decimal list-inside text-[var(--sync-text-primary)]">
+                  <ol className="text-xs opacity-70 space-y-1.5 list-decimal list-inside text-(--sync-text-primary)">
                     <li>{lang === 'ar' ? `حوّل مبلغ $${finalAmount || '0'} على رقم 01000000000` : `Transfer $${finalAmount || '0'} equivalent to 01000000000`}</li>
                     <li>{lang === 'ar' ? 'التقط صورة للإيصال' : 'Take a screenshot of the receipt'}</li>
                     <li>{lang === 'ar' ? 'ارفع الصورة بالأسفل' : 'Upload the screenshot below'}</li>
                   </ol>
                 ) : (
-                  <div className="text-xs opacity-70 space-y-1.5 text-[var(--sync-text-primary)]">
+                  <div className="text-xs opacity-70 space-y-1.5 text-(--sync-text-primary)">
                     <p>USDT (TRC20) Wallet:</p>
                     <code className="block p-2 bg-black/50 rounded mt-1 break-all select-all">TBD_WALLET_ADDRESS_HERE</code>
                     <p className="mt-2">{lang === 'ar' ? 'حول وارفع صورة المعاملة.' : 'Transfer and upload the transaction screenshot.'}</p>
@@ -277,7 +277,7 @@ export default function RechargeModal({ isOpen, onClose, userId }: RechargeModal
 
               {/* Proof Upload */}
               <div>
-                <label className="text-sm font-bold block mb-3 text-[var(--sync-text-primary)]">
+                <label className="text-sm font-bold block mb-3 text-(--sync-text-primary)">
                   {lang === 'ar' ? 'صورة إثبات الدفع *' : 'Payment Proof *'}
                 </label>
                 {proofPreview ? (

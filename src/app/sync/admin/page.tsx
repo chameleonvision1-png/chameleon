@@ -40,6 +40,13 @@ export default function AdminDashboard() {
   const [selectedUser, setSelectedUser] = useState<any>(null);
 
   const [isUpdating, setIsUpdating] = useState(false);
+  const [confirmModal, setConfirmModal] = useState<{
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    isDestructive?: boolean;
+    error?: string;
+  } | null>(null);
 
   // Auth guard
   useEffect(() => {
@@ -56,19 +63,24 @@ export default function AdminDashboard() {
       supabase.from('products').select('id, name, slug, is_active, sort_order, cover_image_url, category:categories(name_en)').order('is_active', { ascending: false }).order('sort_order'),
       supabase.from('plans').select('id').eq('is_active', true),
       supabase.from('profiles').select('id, full_name, role, balance, created_at').order('created_at', { ascending: false }),
-      supabase.from('orders').select('id, order_number, total_usd, status, payment_status, payment_method, payment_proof_url, created_at, user:profiles(id, full_name)').order('created_at', { ascending: false }).limit(50),
+      supabase.from('orders').select('id, order_number, total_usd, status, payment_status, payment_method, payment_proof_url, created_at, user_id, order_items(id, quantity, unit_price_usd, delivery_type, delivery_status, plan_id, plan:plans(id, title_en, product:products(name)))').order('created_at', { ascending: false }).limit(50),
     ]);
+
+    if (ordersRes.error) console.error("Admin Orders Fetch Error:", ordersRes.error);
+
 
     const prods = productsRes.data || [];
     const usrs = usersRes.data || [];
     const ords = ordersRes.data || [];
 
-    // Map storage urls
+    // Map storage urls and users
     for (const ord of ords) {
       if (ord.payment_proof_url) {
         const { data } = supabase.storage.from('payment-proofs').getPublicUrl(ord.payment_proof_url);
         (ord as any).public_proof_url = data.publicUrl;
       }
+      const matchedUser = usrs.find((u: any) => u.id === ord.user_id);
+      (ord as any).user = matchedUser || { full_name: 'Unknown User' };
     }
 
     setProducts(prods);
@@ -92,45 +104,190 @@ export default function AdminDashboard() {
     router.replace('/sync/auth/login');
   };
 
-  const handleApproveOrder = async (order: any) => {
-    if (!confirm('Approve payment for this order?')) return;
-    setIsUpdating(true);
-    const supabase = createSyncClient();
-    try {
-      const { error } = await supabase
-        .from('orders')
-        .update({ status: 'processing', payment_status: 'confirmed' })
-        .eq('id', order.id);
+  const handleApproveOrder = (order: any) => {
+    setConfirmModal({
+      title: 'Approve Payment',
+      message: `Are you sure you want to approve payment for Order #${order.order_number}?`,
+      onConfirm: async () => {
+        setIsUpdating(true);
+        const supabase = createSyncClient();
+        try {
+          const { error } = await supabase
+            .from('orders')
+            .update({ status: 'processing', payment_status: 'confirmed' })
+            .eq('id', order.id);
 
-      if (error) throw error;
+          if (error) throw error;
 
-      // Allocate inventory for this order now that payment is confirmed
-      const { error: allocError } = await supabase.rpc('allocate_inventory_for_order', {
-        p_order_id: order.id
-      });
-      
-      if (allocError) {
-        console.error("Allocation error:", allocError);
-        alert("Payment approved, but there was an issue allocating inventory: " + allocError.message);
+          // Allocate inventory for this order now that payment is confirmed
+          const { error: allocError } = await supabase.rpc('allocate_inventory_for_order', {
+            p_order_id: order.id
+          });
+          
+          if (allocError) {
+            console.error("Allocation error:", allocError);
+            alert("Payment approved, but there was an issue allocating inventory: " + allocError.message);
+          }
+
+          // Notification
+          await supabase.from('notifications').insert({
+            user_id: order.user?.id,
+            title_en: 'Payment Confirmed',
+            title_ar: 'تم تأكيد الدفع',
+            message_en: `Your payment for order #${order.order_number} has been confirmed. It is now processing.`,
+            message_ar: `تم تأكيد الدفع لطلبك رقم #${order.order_number}. جاري التجهيز.`,
+            is_read: false
+          });
+
+          setSelectedOrder(null);
+          fetchDashboardData();
+        } catch (err: any) {
+          alert(err.message);
+        } finally {
+          setIsUpdating(false);
+          setConfirmModal(null);
+        }
       }
+    });
+  };
 
-      // Notification
-      await supabase.from('notifications').insert({
-        user_id: order.user?.id,
-        title_en: 'Payment Confirmed',
-        title_ar: 'تم تأكيد الدفع',
-        message_en: `Your payment for order #${order.order_number} has been confirmed. It is now processing.`,
-        message_ar: `تم تأكيد الدفع لطلبك رقم #${order.order_number}. جاري التجهيز.`,
-        is_read: false
-      });
+  const handleCancelAndRefundOrder = (order: any) => {
+    const isExternalPayment = order.payment_method !== 'balance';
+    const message = isExternalPayment
+      ? `Are you sure you want to cancel Order #${order.order_number}? \n\nNote: The user paid via ${order.payment_method}. Refunding will add $${order.total_usd} to their in-app balance.`
+      : `Are you sure you want to cancel Order #${order.order_number} and refund $${order.total_usd} to the user's balance?`;
 
-      setSelectedOrder(null);
-      fetchDashboardData();
-    } catch (err: any) {
-      alert(err.message);
-    } finally {
-      setIsUpdating(false);
-    }
+    setConfirmModal({
+      title: 'Cancel & Refund Order',
+      message,
+      isDestructive: true,
+      onConfirm: async () => {
+        setIsUpdating(true);
+        try {
+          const supabase = createSyncClient();
+
+          // Update order status to cancelled
+          const { error: orderError } = await supabase
+            .from('orders')
+            .update({ status: 'cancelled', payment_status: 'rejected' })
+            .eq('id', order.id);
+            
+          if (orderError) throw new Error("Order update failed: " + orderError.message);
+
+          // Return inventory to available pool
+          await supabase.rpc('deallocate_inventory_for_order', { p_order_id: order.id });
+
+          // We don't update order_items delivery_status because 'cancelled' is not a valid enum value for delivery_item_status
+          // The parent order status being 'cancelled' is enough.
+
+          // Add balance back to user
+          if (order.user_id && Number(order.total_usd) > 0) {
+            const { error: refundError } = await supabase.rpc('update_user_balance', {
+              p_user_id: order.user_id,
+              p_amount: Number(order.total_usd),
+              p_type: 'admin_adjust',
+              p_admin_note: `Refund for Order #${order.order_number}`,
+            });
+            if (refundError) throw new Error("Refund failed: " + refundError.message);
+          }
+
+          // Send notification
+          const { error: notifError } = await supabase.from('notifications').insert({
+            user_id: order.user_id,
+            title_en: 'Order Cancelled & Refunded',
+            title_ar: 'تم إلغاء الطلب واسترداد المبلغ',
+            message_en: `Your order #${order.order_number} has been cancelled and $${order.total_usd} has been refunded to your balance.`,
+            message_ar: `تم إلغاء طلبك رقم #${order.order_number} وتم استرداد مبلغ $${order.total_usd} إلى رصيدك.`,
+            is_read: false
+          });
+
+          if (notifError) throw new Error("Notification failed: " + notifError.message);
+
+          setSelectedOrder(null);
+          await fetchDashboardData();
+          setConfirmModal({
+            title: 'Success',
+            message: `Order #${order.order_number} has been cancelled and $${order.total_usd} refunded to the user.`,
+            isDestructive: false,
+            onConfirm: () => setConfirmModal(null)
+          });
+        } catch (err: any) {
+          setConfirmModal((prev: any) => ({
+            ...prev,
+            error: err.message || 'An unknown error occurred while canceling the order.',
+          }));
+        } finally {
+          setIsUpdating(false);
+        }
+      }
+    });
+  };
+
+  const handleMarkDelivered = (order: any) => {
+    setConfirmModal({
+      title: 'Mark Order as Delivered',
+      message: `Are you sure you want to mark Order #${order.order_number} as delivered? \n\nIf there are any pending digital items (Invite Links or Ready Accounts), the system will attempt to auto-allocate them now. For manual plans, ensure you have delivered the service before proceeding.`,
+      isDestructive: false,
+      onConfirm: async () => {
+        setIsUpdating(true);
+        try {
+          const supabase = createSyncClient();
+
+          // Attempt to auto-allocate any pending digital items
+          const { error: allocError } = await supabase.rpc('allocate_inventory_for_order', {
+            p_order_id: order.id
+          });
+
+          if (allocError) {
+            console.error("Allocation error:", allocError);
+            throw new Error("Failed to allocate digital inventory: " + allocError.message);
+          }
+
+          // Update order status
+          const { error: orderError } = await supabase
+            .from('orders')
+            .update({ status: 'delivered' })
+            .eq('id', order.id);
+
+          if (orderError) throw new Error("Status update failed: " + orderError.message);
+
+          // Also update all manual order_items to delivered
+          await supabase
+            .from('order_items')
+            .update({ delivery_status: 'delivered' })
+            .eq('order_id', order.id)
+            .eq('delivery_status', 'pending');
+
+          // Send notification
+          const { error: notifError } = await supabase.from('notifications').insert({
+            user_id: order.user_id,
+            title_en: 'Order Delivered',
+            title_ar: 'تم تسليم الطلب',
+            message_en: `Your order #${order.order_number} has been delivered. Check your dashboard for details.`,
+            message_ar: `تم تسليم طلبك رقم #${order.order_number}. يمكنك مراجعة التفاصيل في لوحة التحكم.`,
+            is_read: false
+          });
+
+          if (notifError) throw new Error("Notification failed: " + notifError.message);
+
+          setSelectedOrder(null);
+          await fetchDashboardData();
+          setConfirmModal({
+            title: 'Success',
+            message: `Order #${order.order_number} has been successfully marked as delivered.`,
+            isDestructive: false,
+            onConfirm: () => setConfirmModal(null)
+          });
+        } catch (err: any) {
+          setConfirmModal((prev: any) => ({
+            ...prev,
+            error: err.message || 'An unknown error occurred.',
+          }));
+        } finally {
+          setIsUpdating(false);
+        }
+      }
+    });
   };
 
 
@@ -366,6 +523,26 @@ export default function AdminDashboard() {
                 <span><StatusBadge status={selectedOrder.status} /></span>
               </div>
 
+              {selectedOrder.order_items && selectedOrder.order_items.length > 0 && (
+                <div className="mt-4 border border-white/10 rounded-xl p-4 bg-white/5">
+                  <h3 className="font-bold mb-3 text-(--sync-yellow)">Order Items</h3>
+                  <div className="space-y-3">
+                    {selectedOrder.order_items.map((item: any) => (
+                      <div key={item.id} className="flex justify-between items-center text-xs">
+                        <div>
+                          <p className="font-bold">{item.plan?.product?.name || 'Unknown Product'} - {item.plan?.title_en || 'Unknown Plan'}</p>
+                          <p className="opacity-50 mt-1">Qty: {item.quantity} • Type: {item.delivery_type?.replace(/_/g, ' ') || 'unknown'}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-(--sync-yellow)">${Number(item.unit_price_usd).toFixed(2)}</p>
+                          <StatusBadge status={item.delivery_status} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {selectedOrder.payment_method !== 'balance' && (
                 <div className="mt-4">
                   <p className="opacity-50 mb-2">Payment Proof</p>
@@ -395,6 +572,32 @@ export default function AdminDashboard() {
                   </button>
                 </div>
               )}
+              
+              {selectedOrder.status === 'processing' && (
+                <div className="pt-2 flex gap-3">
+                  <button 
+                    onClick={() => handleMarkDelivered(selectedOrder)}
+                    disabled={isUpdating}
+                    className="flex-1 py-3 rounded-xl font-bold flex items-center justify-center gap-2 bg-green-500/10 text-green-400 hover:bg-green-500 hover:text-white transition-colors border border-green-500/20 disabled:opacity-50"
+                  >
+                    {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Package className="w-4 h-4" />}
+                    Mark as Delivered
+                  </button>
+                </div>
+              )}
+              
+              {selectedOrder.status !== 'cancelled' && selectedOrder.status !== 'delivered' && (
+                <div className="pt-2 flex gap-3">
+                  <button 
+                    onClick={() => handleCancelAndRefundOrder(selectedOrder)}
+                    disabled={isUpdating}
+                    className="flex-1 py-3 rounded-xl font-bold flex items-center justify-center gap-2 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-colors border border-red-500/20 disabled:opacity-50"
+                  >
+                    {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}
+                    Cancel & Refund
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -407,6 +610,33 @@ export default function AdminDashboard() {
           onClose={() => setSelectedUser(null)} 
           onBalanceUpdated={fetchDashboardData}
         />
+      )}
+      {/* Confirm Modal */}
+      {confirmModal && (
+        <div className="fixed inset-0 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" style={{ zIndex: 99999 }}>
+          <div className="w-full max-w-sm rounded-2xl border border-white/10 shadow-2xl p-6" style={{ background: '#0a1128', color: '#e2e8f0' }}>
+            <div className="flex items-center gap-3 mb-4">
+              {confirmModal.isDestructive ? <AlertCircle className="w-6 h-6 text-red-500" /> : <AlertCircle className="w-6 h-6 text-yellow-500" />}
+              <h3 className="text-xl font-bold">{confirmModal.title}</h3>
+            </div>
+            <p className="opacity-70 mb-6">{confirmModal.message}</p>
+            {confirmModal.error && (
+              <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-mono overflow-auto max-h-32">
+                {confirmModal.error}
+              </div>
+            )}
+            <div className="flex gap-3">
+              <button onClick={() => setConfirmModal(null)} disabled={isUpdating} className="flex-1 py-3 rounded-xl font-bold hover:bg-white/5 transition-colors border border-white/10 disabled:opacity-50">
+                {confirmModal.error ? 'Close' : 'Cancel'}
+              </button>
+              {!confirmModal.error && (
+                <button onClick={confirmModal.onConfirm} disabled={isUpdating} className={`flex-1 py-3 rounded-xl font-bold flex items-center justify-center transition-colors disabled:opacity-50 ${confirmModal.isDestructive ? 'bg-red-500 hover:bg-red-600 text-white' : 'bg-(--sync-yellow) hover:bg-(--sync-yellow)/90 text-black'}`}>
+                  {isUpdating ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Confirm'}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
