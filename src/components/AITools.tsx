@@ -24,8 +24,8 @@ export default function AITools() {
         <SectionHeader
           badge="AI & Software Deals"
           title={
-            <a href={SYNC_URL} className="hover:text-white/80 transition-colors underline decoration-white/20 underline-offset-12">
-              SYNC
+            <a href={SYNC_URL} className="inline-block hover:opacity-80 transition-opacity">
+              <img src="/sync-logo.png" alt="SYNC" className="h-20 w-auto object-contain scale-150" />
             </a>
           }
           description="اشتراكات مخفضة لأقوى الأدوات — وفّر وارتقِ بمستوى عملك مع باقات حصرية"

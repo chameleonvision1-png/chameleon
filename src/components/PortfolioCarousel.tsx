@@ -29,7 +29,6 @@ export default function PortfolioCarousel() {
     linkHref: item.url,
     iframeUrl: item.iframeUrl,
     icon: icons[index],
-    // @ts-ignore - adding category ad-hoc
     category: item.category
   }));
 

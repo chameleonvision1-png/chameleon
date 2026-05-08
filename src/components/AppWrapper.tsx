@@ -20,9 +20,9 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
       // We don't use sessionStorage, so it won't infinite loop.
       if (e.persisted) {
         window.location.reload();
-      } else if (typeof window !== "undefined" && (window as any).ScrollTrigger) {
+      } else if (typeof window !== "undefined" && (window as unknown as { ScrollTrigger?: { refresh: () => void } }).ScrollTrigger) {
         // Normal navigation: just refresh GSAP
-        (window as any).ScrollTrigger.refresh();
+        (window as unknown as { ScrollTrigger?: { refresh: () => void } }).ScrollTrigger?.refresh();
       }
     };
 

@@ -1,0 +1,93 @@
+/* SYNC Identity Variables */
+[data-theme="sync-dark"] {
+  --sync-bg: #0B132B;
+  --sync-bg-elevated: #0f1a38;
+  --sync-surface: #111d3a;
+  --sync-surface-hover: #162850;
+  --sync-blue: #3B82F6;
+  --sync-blue-bright: #60a5fa;
+  --sync-yellow: #FFC21A;
+  --sync-yellow-soft: #FFE8B2;
+  --sync-text: #F5F7FA;
+  --sync-text-dim: #94a3b8;
+  --sync-border: rgba(59,130,246,0.15);
+  --sync-glow: rgba(59,130,246,0.25);
+  color-scheme: dark;
+}
+
+[data-theme="sync-light"] {
+  --sync-bg: #3B82F6; /* Electric Blue Background */
+  --sync-bg-elevated: #2563EB;
+  --sync-surface: #0B132B; /* Navy Cards */
+  --sync-surface-hover: #111d3a;
+  --sync-blue: #0B132B; /* Inverse blue elements to Navy */
+  --sync-blue-bright: #1E3A8A;
+  --sync-yellow: #FFC21A;
+  --sync-yellow-soft: #FFF3CC;
+  --sync-text: rgba(255, 255, 255, 0.9);
+  --sync-text-dim: rgba(255, 255, 255, 0.7);
+  --sync-text-primary: #FFFFFF;
+  --sync-border: rgba(255, 255, 255, 0.15);
+  --sync-glow: rgba(11, 19, 43, 0.25);
+  color-scheme: dark;
+}
+
+.sync-wrapper {
+  background-color: var(--sync-bg);
+  color: var(--sync-text);
+  min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Animations */
+@keyframes orbit-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.sync-orbit-line {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid var(--sync-border);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.sync-orbit-animate {
+  animation: orbit-spin 60s linear infinite;
+}
+
+.sync-glass {
+  background: var(--sync-surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--sync-border);
+}
+
+.sync-button-primary {
+  background-color: var(--sync-yellow);
+  color: #0B132B;
+  font-weight: 700;
+  transition: all 0.3s ease;
+  border-radius: 9999px;
+}
+.sync-button-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(255, 194, 26, 0.4);
+}
+
+/* Typography styles */
+.sync-heading {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--sync-text);
+}
+.sync-subtext {
+  color: var(--sync-text-dim);
+}
