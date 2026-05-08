@@ -643,9 +643,25 @@ export default function CheckoutPage() {
                     </p>
                     {cryptoSetting?.wallet_address ? (
                       <div className="mb-2">
-                        <code className="text-xs opacity-90 break-all block font-mono p-2 rounded bg-white/5" style={{ color: 'var(--sync-yellow)' }}>
-                          {cryptoSetting.wallet_address}
-                        </code>
+                        <div className="flex items-center gap-2">
+                          <code className="flex-1 text-xs opacity-90 break-all font-mono p-2 rounded bg-white/5" style={{ color: 'var(--sync-yellow)' }}>
+                            {cryptoSetting.wallet_address}
+                          </code>
+                          <button
+                            onClick={() => handleCopyText(cryptoSetting.wallet_address, 'wallet')}
+                            className="shrink-0 px-3 py-2 rounded-lg text-xs font-bold transition-all"
+                            style={{ 
+                              background: copiedId === 'wallet' ? '#22c55e' : 'rgba(255,194,26,0.15)', 
+                              color: copiedId === 'wallet' ? '#fff' : 'var(--sync-yellow)' 
+                            }}
+                          >
+                            {copiedId === 'wallet' ? (
+                              <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3" /> Copied!</span>
+                            ) : (
+                              <span className="flex items-center gap-1"><Copy className="w-3 h-3" /> Copy</span>
+                            )}
+                          </button>
+                        </div>
                         {cryptoSetting.network && (
                           <span className="text-[10px] opacity-40 mt-1 block">Network: {cryptoSetting.network}</span>
                         )}
