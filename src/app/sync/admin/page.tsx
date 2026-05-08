@@ -12,6 +12,7 @@ import {
 import AdminProductsTab from '@/components/sync/admin/AdminProductsTab';
 import AdminCurrenciesTab from '@/components/sync/admin/AdminCurrenciesTab';
 import AdminFinanceTab from '@/components/sync/admin/AdminFinanceTab';
+import AdminUserModal from '@/components/sync/admin/AdminUserModal';
 
 interface DashboardStats {
   totalProducts: number;
@@ -37,8 +38,7 @@ export default function AdminDashboard() {
   // Modals
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [selectedUser, setSelectedUser] = useState<any>(null);
-  const [balanceAmount, setBalanceAmount] = useState('');
-  const [balanceNote, setBalanceNote] = useState('');
+
   const [isUpdating, setIsUpdating] = useState(false);
 
   // Auth guard
@@ -133,42 +133,6 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleAddBalance = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedUser || !balanceAmount) return;
-
-    setIsUpdating(true);
-    const supabase = createSyncClient();
-    try {
-      const amount = parseFloat(balanceAmount);
-      const { error } = await supabase.rpc('update_user_balance', {
-        p_user_id: selectedUser.id,
-        p_amount: amount,
-        p_type: 'admin_adjust',
-        p_admin_note: balanceNote || 'Admin adjustment',
-      });
-
-      if (error) throw error;
-
-      await supabase.from('notifications').insert({
-        user_id: selectedUser.id,
-        title_en: 'Balance Updated',
-        title_ar: 'تحديث الرصيد',
-        message_en: `Your balance has been adjusted by $${amount.toFixed(2)}.`,
-        message_ar: `تم تعديل رصيدك بمقدار $${amount.toFixed(2)}.`,
-        is_read: false
-      });
-
-      setSelectedUser(null);
-      setBalanceAmount('');
-      setBalanceNote('');
-      fetchDashboardData();
-    } catch (err: any) {
-      alert(err.message);
-    } finally {
-      setIsUpdating(false);
-    }
-  };
 
   if (authLoading || (!user || !isAdmin)) {
     return (
@@ -320,7 +284,7 @@ export default function AdminDashboard() {
                           <td className="p-4 opacity-60">{new Date(u.created_at).toLocaleDateString()}</td>
                           <td className="p-4 text-right">
                             <button onClick={() => setSelectedUser(u)} className="px-3 py-1.5 rounded-lg text-xs font-bold transition-colors bg-white/5 hover:bg-white/10 inline-flex items-center gap-1">
-                              <Plus className="w-3 h-3" /> Add Balance
+                              <Plus className="w-3 h-3" /> Details / Balance
                             </button>
                           </td>
                         </tr>
@@ -436,52 +400,13 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* Add Balance Modal */}
+      {/* Add Balance / User Details Modal */}
       {selectedUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="w-full max-w-sm rounded-2xl border border-white/10 p-6 shadow-2xl relative" style={{ background: '#0a1128', color: '#e2e8f0' }}>
-            <button onClick={() => setSelectedUser(null)} className="absolute top-4 right-4 opacity-50 hover:opacity-100">
-              <X className="w-5 h-5" />
-            </button>
-            <h2 className="text-xl font-bold mb-4">Add Balance</h2>
-            <p className="text-sm opacity-60 mb-4">Adjust balance for <strong className="opacity-100 text-white">{selectedUser.full_name || 'User'}</strong></p>
-            
-            <form onSubmit={handleAddBalance} className="space-y-4">
-              <div>
-                <label className="text-xs opacity-50 block mb-1">Amount ($)</label>
-                <input 
-                  type="number" 
-                  step="0.01" 
-                  required 
-                  value={balanceAmount} 
-                  onChange={e => setBalanceAmount(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 transition-colors"
-                  style={{ background: '#060b18' }}
-                />
-              </div>
-              <div>
-                <label className="text-xs opacity-50 block mb-1">Note (Optional)</label>
-                <input 
-                  type="text" 
-                  value={balanceNote} 
-                  onChange={e => setBalanceNote(e.target.value)}
-                  placeholder="e.g. Refund, Bonus..."
-                  className="w-full px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 transition-colors"
-                  style={{ background: '#060b18' }}
-                />
-              </div>
-              <button 
-                type="submit"
-                disabled={isUpdating || !balanceAmount}
-                className="w-full py-3 mt-2 rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50"
-                style={{ background: 'var(--sync-yellow)', color: '#060b18' }}
-              >
-                {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-                Confirm Update
-              </button>
-            </form>
-          </div>
-        </div>
+        <AdminUserModal 
+          userId={selectedUser.id} 
+          onClose={() => setSelectedUser(null)} 
+          onBalanceUpdated={fetchDashboardData}
+        />
       )}
     </div>
   );
