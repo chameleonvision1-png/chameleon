@@ -10,6 +10,7 @@ interface BalanceTransaction {
   payment_method: string;
   payment_proof_url: string;
   created_at: string;
+  admin_note?: string;
   user?: {
     id: string;
     full_name: string;
@@ -29,17 +30,25 @@ export default function AdminFinanceTab({ onViewUser }: AdminFinanceTabProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
   const [confirmPopup, setConfirmPopup] = useState<{ txId: string, userId: string, amount: number, action: 'confirmed' | 'rejected' } | null>(null);
+  const [viewMode, setViewMode] = useState<'pending' | 'history'>('pending');
 
   const fetchTransactions = async () => {
     setIsLoading(true);
     const supabase = createSyncClient();
     
-    const { data, error } = await supabase
+    let query = supabase
       .from('balance_transactions')
       .select('*, user:profiles(id, full_name, user_code, phone, balance)')
       .eq('type', 'topup')
-      .eq('status', 'pending')
       .order('created_at', { ascending: false });
+
+    if (viewMode === 'pending') {
+      query = query.eq('status', 'pending');
+    } else {
+      query = query.neq('status', 'pending');
+    }
+
+    const { data, error } = await query;
 
     if (error) {
       console.error(error);
@@ -61,7 +70,7 @@ export default function AdminFinanceTab({ onViewUser }: AdminFinanceTabProps) {
 
   useEffect(() => {
     fetchTransactions();
-  }, []);
+  }, [viewMode]);
 
   const executeAction = async () => {
     if (!confirmPopup) return;
@@ -152,11 +161,27 @@ export default function AdminFinanceTab({ onViewUser }: AdminFinanceTabProps) {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-black">Finance & Recharges</h2>
-          <p className="text-sm opacity-50 mt-1">Review pending balance top-up requests.</p>
+          <p className="text-sm opacity-50 mt-1">Review balance top-up requests and history.</p>
         </div>
-        <button onClick={fetchTransactions} className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
-          <Loader2 className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
-        </button>
+        <div className="flex items-center gap-3">
+          <div className="flex p-1 bg-white/5 rounded-xl border border-white/5">
+            <button
+              onClick={() => setViewMode('pending')}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${viewMode === 'pending' ? 'bg-[#ffc21a] text-[#060b18]' : 'text-white/50 hover:text-white'}`}
+            >
+              Pending
+            </button>
+            <button
+              onClick={() => setViewMode('history')}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${viewMode === 'history' ? 'bg-[#ffc21a] text-[#060b18]' : 'text-white/50 hover:text-white'}`}
+            >
+              History
+            </button>
+          </div>
+          <button onClick={fetchTransactions} className="p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+            <Loader2 className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
+          </button>
+        </div>
       </div>
 
       {isLoading ? (
@@ -166,12 +191,12 @@ export default function AdminFinanceTab({ onViewUser }: AdminFinanceTabProps) {
       ) : transactions.length === 0 ? (
         <div className="text-center py-20 bg-[#0d1530] rounded-2xl border border-white/5">
           <CreditCard className="w-12 h-12 mx-auto mb-4 opacity-20" />
-          <p className="opacity-50">No pending top-up requests.</p>
+          <p className="opacity-50">No top-up requests found in this category.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4">
           {transactions.map(tx => (
-            <div key={tx.id} className="bg-[#0d1530] border border-white/5 rounded-2xl p-6 flex flex-col md:flex-row gap-6">
+            <div key={tx.id} className={`bg-[#0d1530] border border-white/5 rounded-2xl p-6 flex flex-col md:flex-row gap-6 ${viewMode === 'history' ? 'opacity-80' : ''}`}>
               {/* Proof Image */}
               <div className="w-full md:w-48 shrink-0">
                 {tx.public_proof_url ? (
@@ -189,12 +214,15 @@ export default function AdminFinanceTab({ onViewUser }: AdminFinanceTabProps) {
               </div>
 
               {/* Details */}
-              <div className="flex-1">
+              <div className="flex-1 flex flex-col">
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="font-bold text-lg text-[#ffc21a]">${tx.amount.toFixed(2)} Top-Up</h3>
                     <p className="text-sm opacity-70">via {tx.payment_method}</p>
                     <p className="text-xs opacity-40 mt-1">{new Date(tx.created_at).toLocaleString()}</p>
+                    {viewMode === 'history' && tx.admin_note && (
+                      <p className="text-xs mt-2 p-2 bg-white/5 rounded-lg italic">Note: {tx.admin_note}</p>
+                    )}
                   </div>
                   <div className="text-right flex flex-col items-end">
                     <p className="font-bold text-lg">{tx.user?.full_name || 'Unknown User'}</p>
@@ -210,23 +238,35 @@ export default function AdminFinanceTab({ onViewUser }: AdminFinanceTabProps) {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 mt-auto">
-                  <button
-                    onClick={() => setConfirmPopup({ txId: tx.id, userId: tx.user_id, amount: tx.amount, action: 'confirmed' })}
-                    disabled={!!isUpdating}
-                    className="flex-1 bg-green-500/20 text-green-400 hover:bg-green-500/30 px-4 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
-                  >
-                    {isUpdating === tx.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-                    Approve & Add Balance
-                  </button>
-                  <button
-                    onClick={() => setConfirmPopup({ txId: tx.id, userId: tx.user_id, amount: tx.amount, action: 'rejected' })}
-                    disabled={!!isUpdating}
-                    className="px-4 py-2.5 rounded-xl font-bold border border-red-500/30 text-red-400 hover:bg-red-500/10 flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
-                  >
-                    {isUpdating === tx.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
-                    Reject
-                  </button>
+                <div className="mt-auto">
+                  {viewMode === 'pending' ? (
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => setConfirmPopup({ txId: tx.id, userId: tx.user_id, amount: tx.amount, action: 'confirmed' })}
+                        disabled={!!isUpdating}
+                        className="flex-1 bg-green-500/20 text-green-400 hover:bg-green-500/30 px-4 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                      >
+                        {isUpdating === tx.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                        Approve & Add Balance
+                      </button>
+                      <button
+                        onClick={() => setConfirmPopup({ txId: tx.id, userId: tx.user_id, amount: tx.amount, action: 'rejected' })}
+                        disabled={!!isUpdating}
+                        className="px-4 py-2.5 rounded-xl font-bold border border-red-500/30 text-red-400 hover:bg-red-500/10 flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                      >
+                        {isUpdating === tx.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
+                        Reject
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex justify-end">
+                      <span className={`px-4 py-2 rounded-xl text-sm font-bold uppercase tracking-wider ${
+                        tx.status === 'confirmed' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+                      }`}>
+                        {tx.status}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

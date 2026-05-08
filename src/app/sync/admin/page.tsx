@@ -263,7 +263,7 @@ export default function AdminDashboard() {
 
             {/* Finance Tab */}
             {activeTab === 'finance' && (
-              <AdminFinanceTab onViewUser={() => setActiveTab('users')} />
+              <AdminFinanceTab onViewUser={(userId) => setSelectedUser({ id: userId })} />
             )}
 
             {/* Users Tab */}
@@ -277,7 +277,7 @@ export default function AdminDashboard() {
                     </tr></thead>
                     <tbody>
                       {users.map((u: any) => (
-                        <tr key={u.id} className="border-b border-white/5 hover:bg-white/2">
+                        <tr key={u.id} className="border-b border-white/5 hover:bg-white/5 cursor-pointer transition-colors" onClick={() => setSelectedUser(u)}>
                           <td className="p-4 font-bold">{u.full_name || '—'}</td>
                           <td className="p-4"><RoleBadge role={u.role} /></td>
                           <td className="p-4 font-bold" style={{ color: 'var(--sync-yellow)' }}>${Number(u.balance || 0).toFixed(2)}</td>

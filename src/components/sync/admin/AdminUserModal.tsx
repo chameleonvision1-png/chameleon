@@ -27,13 +27,42 @@ export default function AdminUserModal({ userId, onClose, onBalanceUpdated }: Ad
     if (profile) setUser(profile);
 
     // Fetch transactions
-    const { data: txs } = await supabase
+    const { data: balanceTxs } = await supabase
       .from('balance_transactions')
       .select('*')
       .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+      .neq('type', 'purchase');
+      
+    // Fetch orders
+    const { data: orders } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('user_id', userId);
+
+    let allTxs: any[] = [];
     
-    if (txs) setTransactions(txs);
+    if (balanceTxs) {
+      allTxs.push(...balanceTxs.map(t => ({
+        id: t.id,
+        type: t.type,
+        amount: t.amount,
+        status: t.status,
+        created_at: t.created_at
+      })));
+    }
+
+    if (orders) {
+      allTxs.push(...orders.map(o => ({
+        id: o.id,
+        type: 'purchase',
+        amount: -o.total_usd, // Negative because it's spending
+        status: o.status === 'delivered' ? 'confirmed' : o.status === 'cancelled' ? 'rejected' : 'pending',
+        created_at: o.created_at
+      })));
+    }
+
+    allTxs.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    setTransactions(allTxs);
     setIsLoading(false);
   };
 
