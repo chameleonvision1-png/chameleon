@@ -653,6 +653,15 @@ export default function CheckoutPage() {
                     ) : (
                       <code className="text-xs opacity-70 break-all block">TBD — Contact support</code>
                     )}
+                    {cryptoSetting?.qr_code_url && (
+                      <div className="my-3 flex justify-center">
+                        <img 
+                          src={cryptoSetting.qr_code_url} 
+                          alt="Payment QR Code" 
+                          className="w-48 h-48 object-contain rounded-xl border border-white/10 bg-white p-2"
+                        />
+                      </div>
+                    )}
                     {(lang === 'ar' ? cryptoSetting?.instructions_ar : cryptoSetting?.instructions_en) && (
                       <div className="text-xs opacity-60 mt-2 space-y-1">
                         {(lang === 'ar' ? cryptoSetting.instructions_ar : cryptoSetting.instructions_en).split('\n').map((line: string, i: number) => (
