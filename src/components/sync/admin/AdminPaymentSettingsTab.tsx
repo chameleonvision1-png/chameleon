@@ -14,15 +14,15 @@ interface PaymentSetting {
   is_enabled: boolean;
   display_name_en: string;
   display_name_ar: string;
-  account_number: string;
-  account_name: string;
-  wallet_address: string;
-  network: string;
-  instructions_en: string;
-  instructions_ar: string;
-  admin_note_en: string;
-  admin_note_ar: string;
-  qr_code_url: string;
+  account_number: string | null;
+  account_name: string | null;
+  wallet_address: string | null;
+  network: string | null;
+  instructions_en: string | null;
+  instructions_ar: string | null;
+  admin_note_en: string | null;
+  admin_note_ar: string | null;
+  qr_code_url: string | null;
   updated_at: string;
 }
 
@@ -258,7 +258,7 @@ export default function AdminPaymentSettingsTab() {
                       <label className="block text-xs opacity-60 mb-1.5 font-bold uppercase tracking-wider">Phone Number</label>
                       <input
                         type="text"
-                        value={setting.account_number}
+                        value={setting.account_number || ''}
                         onChange={e => handleFieldChange(setting.id, 'account_number', e.target.value)}
                         placeholder="01XXXXXXXXX"
                         className="w-full px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-[#060b18] text-sm font-mono"
@@ -268,7 +268,7 @@ export default function AdminPaymentSettingsTab() {
                       <label className="block text-xs opacity-60 mb-1.5 font-bold uppercase tracking-wider">Account Name</label>
                       <input
                         type="text"
-                        value={setting.account_name}
+                        value={setting.account_name || ''}
                         onChange={e => handleFieldChange(setting.id, 'account_name', e.target.value)}
                         placeholder="e.g. Ahmed Mohamed"
                         className="w-full px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-[#060b18] text-sm"
@@ -282,7 +282,7 @@ export default function AdminPaymentSettingsTab() {
                         <label className="block text-xs opacity-60 mb-1.5 font-bold uppercase tracking-wider">Wallet Address</label>
                         <input
                           type="text"
-                          value={setting.wallet_address}
+                          value={setting.wallet_address || ''}
                           onChange={e => handleFieldChange(setting.id, 'wallet_address', e.target.value)}
                           placeholder="0x... or wallet address"
                           className="w-full px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-[#060b18] text-xs font-mono"
@@ -292,7 +292,7 @@ export default function AdminPaymentSettingsTab() {
                         <label className="block text-xs opacity-60 mb-1.5 font-bold uppercase tracking-wider">Network</label>
                         <input
                           type="text"
-                          value={setting.network}
+                          value={setting.network || ''}
                           onChange={e => handleFieldChange(setting.id, 'network', e.target.value)}
                           placeholder="e.g. APT/APTOS, TRC20, ERC20"
                           className="w-full px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-[#060b18] text-sm"
@@ -353,7 +353,7 @@ export default function AdminPaymentSettingsTab() {
                       Payment Instructions (EN)
                     </label>
                     <textarea
-                      value={setting.instructions_en}
+                      value={setting.instructions_en || ''}
                       onChange={e => handleFieldChange(setting.id, 'instructions_en', e.target.value)}
                       rows={4}
                       placeholder="Step-by-step instructions for the buyer..."
@@ -365,7 +365,7 @@ export default function AdminPaymentSettingsTab() {
                       Payment Instructions (AR)
                     </label>
                     <textarea
-                      value={setting.instructions_ar}
+                      value={setting.instructions_ar || ''}
                       onChange={e => handleFieldChange(setting.id, 'instructions_ar', e.target.value)}
                       rows={4}
                       placeholder="تعليمات الدفع للمشتري..."
@@ -387,7 +387,7 @@ export default function AdminPaymentSettingsTab() {
                     <div>
                       <label className="block text-xs opacity-50 mb-1">Note (EN)</label>
                       <textarea
-                        value={setting.admin_note_en}
+                        value={setting.admin_note_en || ''}
                         onChange={e => handleFieldChange(setting.id, 'admin_note_en', e.target.value)}
                         rows={2}
                         placeholder="e.g. Orders are processed within 30 minutes..."
@@ -397,7 +397,7 @@ export default function AdminPaymentSettingsTab() {
                     <div>
                       <label className="block text-xs opacity-50 mb-1">Note (AR)</label>
                       <textarea
-                        value={setting.admin_note_ar}
+                        value={setting.admin_note_ar || ''}
                         onChange={e => handleFieldChange(setting.id, 'admin_note_ar', e.target.value)}
                         rows={2}
                         placeholder="مثال: يتم معالجة الطلبات خلال 30 دقيقة..."

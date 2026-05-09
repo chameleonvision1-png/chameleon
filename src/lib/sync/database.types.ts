@@ -312,10 +312,73 @@ export type Database = {
           },
         ]
       }
+      payment_settings: {
+        Row: {
+          id: string
+          payment_method: string
+          is_enabled: boolean
+          display_name_en: string
+          display_name_ar: string
+          account_number: string | null
+          account_name: string | null
+          wallet_address: string | null
+          network: string | null
+          instructions_en: string | null
+          instructions_ar: string | null
+          admin_note_en: string | null
+          admin_note_ar: string | null
+          qr_code_url: string | null
+          extra_info: Record<string, unknown> | null
+          updated_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          payment_method: string
+          is_enabled?: boolean
+          display_name_en?: string
+          display_name_ar?: string
+          account_number?: string | null
+          account_name?: string | null
+          wallet_address?: string | null
+          network?: string | null
+          instructions_en?: string | null
+          instructions_ar?: string | null
+          admin_note_en?: string | null
+          admin_note_ar?: string | null
+          qr_code_url?: string | null
+          extra_info?: Record<string, unknown> | null
+          updated_at?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          payment_method?: string
+          is_enabled?: boolean
+          display_name_en?: string
+          display_name_ar?: string
+          account_number?: string | null
+          account_name?: string | null
+          wallet_address?: string | null
+          network?: string | null
+          instructions_en?: string | null
+          instructions_ar?: string | null
+          admin_note_en?: string | null
+          admin_note_ar?: string | null
+          qr_code_url?: string | null
+          extra_info?: Record<string, unknown> | null
+          updated_at?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       plan_inventory: {
         Row: {
           account_email: string | null
           account_password: string | null
+          backup_email: string | null
+          backup_password: string | null
+          two_fa_secret: string | null
           created_at: string | null
           id: string
           invite_link: string | null
@@ -324,10 +387,14 @@ export type Database = {
           sold_at: string | null
           sold_to_user_id: string | null
           status: string | null
+          used_at: string | null
         }
         Insert: {
           account_email?: string | null
           account_password?: string | null
+          backup_email?: string | null
+          backup_password?: string | null
+          two_fa_secret?: string | null
           created_at?: string | null
           id?: string
           invite_link?: string | null
@@ -336,10 +403,14 @@ export type Database = {
           sold_at?: string | null
           sold_to_user_id?: string | null
           status?: string | null
+          used_at?: string | null
         }
         Update: {
           account_email?: string | null
           account_password?: string | null
+          backup_email?: string | null
+          backup_password?: string | null
+          two_fa_secret?: string | null
           created_at?: string | null
           id?: string
           invite_link?: string | null
@@ -348,6 +419,7 @@ export type Database = {
           sold_at?: string | null
           sold_to_user_id?: string | null
           status?: string | null
+          used_at?: string | null
         }
         Relationships: [
           {
@@ -599,13 +671,43 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      activate_invite_link: {
+        Args: {
+          p_inventory_id: string
+        }
+        Returns: void
+      }
       allocate_inventory_for_order: {
         Args: {
           p_order_id: string
         }
         Returns: void
       }
+      deallocate_inventory_for_order: {
+        Args: {
+          p_order_id: string
+        }
+        Returns: void
+      }
+      finalize_order_delivery: {
+        Args: {
+          p_order_id: string
+        }
+        Returns: void
+      }
+      generate_order_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      generate_user_code: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       is_admin: { Args: never; Returns: boolean }
+      update_plan_stock: {
+        Args: Record<PropertyKey, never>
+        Returns: void
+      }
       update_user_balance: {
         Args: {
           p_admin_note?: string
