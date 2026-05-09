@@ -15,7 +15,7 @@ export default function SyncFooter() {
           <p className="text-lg opacity-70 mb-8 max-w-md mx-auto" style={{ color: 'var(--sync-text-primary)' }}>
             {t.heroSubtitle}
           </p>
-          <a href="#" className="inline-flex items-center gap-2 font-bold px-8 py-4 rounded-full hover:scale-105 transition-all shadow-xl" style={{ background: 'var(--sync-bg)', border: '2px solid var(--sync-yellow)', color: 'var(--sync-yellow)' }}>
+          <a href="https://www.facebook.com/share/1CS5uwBHrd/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 font-bold px-8 py-4 rounded-full hover:scale-105 transition-all shadow-xl" style={{ background: 'var(--sync-bg)', border: '2px solid var(--sync-yellow)', color: 'var(--sync-yellow)' }}>
             Contact Support <ArrowUpRight className="w-5 h-5" />
           </a>
         </div>
