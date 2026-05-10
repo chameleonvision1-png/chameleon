@@ -239,7 +239,9 @@ export default function CheckoutPage() {
       clearCart();
       setCompletedOrder(fullOrder);
       setOrderSuccess(true);
-      sessionStorage.setItem('lastSyncOrderId', fullOrder.id);
+      if (fullOrder) {
+        sessionStorage.setItem('lastSyncOrderId', fullOrder.id);
+      }
     } catch (err: any) {
       setError(err.message || 'Something went wrong');
     } finally {
@@ -294,7 +296,7 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (!orderSuccess || !completedOrder?.id || paymentMethod === 'balance') return;
     
-    if (completedOrder.status === 'pending_payment' || completedOrder.status === 'pending') {
+    if (completedOrder.status === 'payment_review' || (completedOrder.status as any) === 'pending' || (completedOrder.status as any) === 'pending_payment') {
       const interval = setInterval(async () => {
         const supabase = createSyncClient();
         const { data } = await supabase
@@ -303,7 +305,7 @@ export default function CheckoutPage() {
           .eq('id', completedOrder.id)
           .single();
           
-        if (data && data.status !== 'pending_payment' && data.status !== 'pending') {
+        if (data && data.status !== 'payment_review' && (data.status as any) !== 'pending' && (data.status as any) !== 'pending_payment') {
           setCompletedOrder(data);
         }
       }, 3000); // Polling every 3 seconds for a snappier experience
