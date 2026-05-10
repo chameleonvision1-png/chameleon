@@ -18,9 +18,9 @@ function SyncLoginContent() {
   React.useEffect(() => {
     if (user && profile) {
       if (profile.role === "admin" || profile.role === "super_admin") {
-        router.push("/sync/admin");
+        router.push("/admin");
       } else {
-        router.push("/sync");
+        router.push("/");
       }
     }
   }, [user, profile, router]);
@@ -99,7 +99,7 @@ function SyncLoginContent() {
       console.log("Admin check:", { userProfile, profileError, userId: signInData.user.id });
 
       if (userProfile?.role === "admin" || userProfile?.role === "super_admin") {
-        router.push("/sync/admin");
+        router.push("/admin");
       } else {
         // Not an admin — sign them out immediately
         await supabase.auth.signOut();
@@ -111,7 +111,7 @@ function SyncLoginContent() {
         setIsSubmitting(false);
       }
     } else {
-      router.push("/sync");
+      router.push("/");
     }
   };
 
@@ -224,7 +224,7 @@ function SyncLoginContent() {
             <div className="sync-auth-field-header">
               <label>{isAr ? "كلمة المرور" : "Password"}</label>
               {!showAdminLogin && (
-                <Link href="/sync/auth/forgot-password" className="sync-auth-forgot">
+                <Link href="/auth/forgot-password" className="sync-auth-forgot">
                   {isAr ? "نسيت كلمة المرور؟" : "Forgot password?"}
                 </Link>
               )}
@@ -290,7 +290,7 @@ function SyncLoginContent() {
 
             <p className="sync-auth-footer-text">
               {isAr ? "مالكش حساب؟" : "Don't have an account?"}{" "}
-              <Link href="/sync/auth/register" className="sync-auth-link">
+              <Link href="/auth/register" className="sync-auth-link">
                 {isAr ? "اعمل حساب" : "Sign up"}
               </Link>
             </p>

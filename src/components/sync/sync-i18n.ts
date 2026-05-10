@@ -45,6 +45,22 @@ export const translations = {
     
     // Footer
     poweredBy: "Powered by Chameleon",
+    privacyPolicy: "Privacy Policy & Terms of Use",
+
+    // Privacy Banner
+    bannerTitle: "Privacy Policy & Terms Update",
+    bannerDesc: "To ensure the best experience, please review our policies. We are committed to providing 100% genuine products and protecting your data.",
+    bannerQuote: "\"All products and accounts offered on the Sync platform are 100% genuine digital products legally sourced from parent companies...\"",
+    bannerReadMore: "Read full policies",
+    bannerAutoAccept: "Auto-accept in",
+    bannerSeconds: "s",
+    bannerAcceptBtn: "I Accept",
+
+    // Payment Methods
+    mobileWalletTitle: "Mobile Wallet / Instapay",
+    mobileWalletDesc: "Vodafone, Etisalat, Orange, WE, or Instapay",
+    senderNumberLabel: "Sender Number or Instapay Address *",
+    senderNumberPlaceholder: "Enter the number or account you transferred from",
   },
   ar: {
     // Navbar
@@ -90,5 +106,21 @@ export const translations = {
     
     // Footer
     poweredBy: "مدعوم بواسطة Chameleon",
+    privacyPolicy: "سياسة الخصوصية وشروط الاستخدام",
+
+    // Privacy Banner
+    bannerTitle: "تحديث سياسة الخصوصية والشروط",
+    bannerDesc: "لضمان أفضل تجربة لك، يرجى مراجعة سياساتنا. نحن ملتزمون بتوفير منتجات أصلية وشرعية 100% وحماية بياناتك بسرية تامة.",
+    bannerQuote: "\"جميع المنتجات والحسابات المعروضة على منصة Sync هي منتجات رقمية أصلية يتم توفيرها بطرق قانونية من الشركات الأم...\"",
+    bannerReadMore: "قراءة المزيد من السياسات",
+    bannerAutoAccept: "موافقة تلقائية بعد",
+    bannerSeconds: "ثوانٍ",
+    bannerAcceptBtn: "أوافق",
+
+    // Payment Methods
+    mobileWalletTitle: "محفظة إلكترونية / إنستاباي",
+    mobileWalletDesc: "فودافون، اتصالات، أورانج، وي، أو إنستاباي",
+    senderNumberLabel: "رقم التحويل أو عنوان إنستاباي *",
+    senderNumberPlaceholder: "اكتب الرقم أو الحساب الذي حولت منه",
   }
 };

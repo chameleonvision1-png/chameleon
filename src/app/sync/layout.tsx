@@ -48,6 +48,7 @@ export const metadata: Metadata = {
 import SyncNavbar from '@/components/sync/SyncNavbar';
 import SyncFooter from '@/components/sync/SyncFooter';
 import SyncCartDrawer from '@/components/sync/SyncCartDrawer';
+import SyncPrivacyBanner from '@/components/sync/SyncPrivacyBanner';
 
 export default function SyncLayout({
   children,
@@ -63,6 +64,7 @@ export default function SyncLayout({
         </main>
         <SyncFooter />
         <SyncCartDrawer />
+        <SyncPrivacyBanner />
       </SyncProviders>
     </div>
   );

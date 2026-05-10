@@ -77,8 +77,15 @@ export default function AdminDashboard() {
     // Map storage urls and users
     for (const ord of ords) {
       if (ord.payment_proof_url) {
-        const { data } = supabase.storage.from('payment-proofs').getPublicUrl(ord.payment_proof_url);
-        (ord as any).public_proof_url = data.publicUrl;
+        // Try to get a signed URL instead of a public URL to ensure it works even if the bucket is private
+        const { data, error } = await supabase.storage.from('payment-proofs').createSignedUrl(ord.payment_proof_url, 60 * 60 * 24); // 24 hours
+        if (data?.signedUrl) {
+          (ord as any).public_proof_url = data.signedUrl;
+        } else {
+          // Fallback to public URL if signed URL fails (e.g., due to RLS)
+          const publicRes = supabase.storage.from('payment-proofs').getPublicUrl(ord.payment_proof_url);
+          (ord as any).public_proof_url = publicRes.data.publicUrl;
+        }
       }
       const matchedUser = usrs.find((u: any) => u.id === ord.user_id);
       (ord as any).user = matchedUser || { full_name: 'Unknown User' };
@@ -559,7 +566,19 @@ export default function AdminDashboard() {
 
               {selectedOrder.payment_method !== 'balance' && (
                 <div className="mt-4">
-                  <p className="opacity-50 mb-2">Payment Proof</p>
+                  <div className="flex justify-between items-end mb-2">
+                    <p className="opacity-50">Payment Proof</p>
+                    {(() => {
+                      const match = selectedOrder.payment_proof_url?.match(/_sender_([^.]+)/);
+                      const sender = match ? match[1] : null;
+                      return sender ? (
+                        <div className="bg-yellow-500/10 text-yellow-500 px-3 py-1 rounded-lg text-xs font-bold border border-yellow-500/20 flex items-center gap-2" style={{ color: 'var(--sync-yellow)', borderColor: 'var(--sync-yellow)' }}>
+                          <span className="opacity-70">Sender Account:</span>
+                          <span className="font-mono text-sm tracking-wider">{sender}</span>
+                        </div>
+                      ) : null;
+                    })()}
+                  </div>
                   {selectedOrder.public_proof_url ? (
                     <a href={selectedOrder.public_proof_url} target="_blank" rel="noopener noreferrer" className="block rounded-lg overflow-hidden border border-white/10 hover:border-white/30 transition-all">
                       <img src={selectedOrder.public_proof_url} alt="Proof" className="w-full h-48 object-cover" />
@@ -658,12 +677,12 @@ export default function AdminDashboard() {
 
 function StatusBadge({ status }: { status: string }) {
   const colors: Record<string, string> = {
-    pending_payment: '#fb923c', pending: '#fb923c', payment_review: '#facc15', processing: '#38bdf8',
-    delivered: '#4ade80', confirmed: '#4ade80', partially_delivered: '#a78bfa', cancelled: '#ef4444', refunded: '#94a3b8',
+    pending_payment: '#fb923c', pending: '#fb923c', payment_review: '#facc15', processing: '#4ade80',
+    delivered: '#a78bfa', confirmed: '#4ade80', partially_delivered: '#38bdf8', cancelled: '#ef4444', refunded: '#94a3b8',
   };
   return (
     <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider" style={{ background: `${colors[status] || '#666'}20`, color: colors[status] || '#666' }}>
-      {status.replace(/_/g, ' ')}
+      {status === 'processing' ? 'APPROVED' : status.replace(/_/g, ' ')}
     </span>
   );
 }

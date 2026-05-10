@@ -17,6 +17,7 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('vodafone');
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [proofPreview, setProofPreview] = useState<string | null>(null);
+  const [senderNumber, setSenderNumber] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [completedOrder, setCompletedOrder] = useState<any>(null);
@@ -35,6 +36,26 @@ export default function CheckoutPage() {
     };
     fetchSettings();
   }, []);
+
+  // Restore session order if refreshed
+  useEffect(() => {
+    const lastOrderId = sessionStorage.getItem('lastSyncOrderId');
+    if (lastOrderId && items.length === 0 && !orderSuccess) {
+      const restoreOrder = async () => {
+        const supabase = createSyncClient();
+        const { data } = await supabase
+          .from('orders')
+          .select('*, order_items(*, plan:plans(title_en, title_ar, delivery_type), inventory:plan_inventory(id, invite_link, account_email, account_password, backup_email, backup_password, two_fa_secret, status, used_at))')
+          .eq('id', lastOrderId)
+          .single();
+        if (data) {
+          setCompletedOrder(data);
+          setOrderSuccess(true);
+        }
+      };
+      restoreOrder();
+    }
+  }, [items.length, orderSuccess]);
 
   const getPaymentSetting = (method: string) => paymentSettings.find(s => s.payment_method === method);
 
@@ -106,9 +127,15 @@ export default function CheckoutPage() {
     if (!user) return;
     if (items.length === 0) return;
     
-    if (paymentMethod !== 'balance' && !proofFile) {
-      setError(lang === 'ar' ? 'من فضلك ارفع صورة إثبات الدفع' : 'Please upload payment proof');
-      return;
+    if (paymentMethod !== 'balance') {
+      if (!proofFile) {
+        setError(lang === 'ar' ? 'من فضلك ارفع صورة إثبات الدفع' : 'Please upload payment proof');
+        return;
+      }
+      if (paymentMethod === 'vodafone' && !senderNumber.trim()) {
+        setError(lang === 'ar' ? 'من فضلك ادخل رقم التحويل أو الحساب' : 'Please enter the sender number or account');
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -122,7 +149,13 @@ export default function CheckoutPage() {
       // Upload proof if not balance payment
       if (paymentMethod !== 'balance' && proofFile) {
         const compressed = await compressImage(proofFile);
-        const fileName = `${user.id}/${Date.now()}.jpg`;
+        let fileName = `${user.id}/${Date.now()}.jpg`;
+        
+        if (paymentMethod === 'vodafone' && senderNumber) {
+          const safeSender = senderNumber.replace(/[^a-zA-Z0-9\u0600-\u06FF\s-]/g, '').trim();
+          fileName = `${user.id}/${Date.now()}_sender_${safeSender}.jpg`;
+        }
+        
         const { error: uploadError } = await supabase.storage
           .from('payment-proofs')
           .upload(fileName, compressed, { contentType: 'image/jpeg' });
@@ -206,6 +239,7 @@ export default function CheckoutPage() {
       clearCart();
       setCompletedOrder(fullOrder);
       setOrderSuccess(true);
+      sessionStorage.setItem('lastSyncOrderId', fullOrder.id);
     } catch (err: any) {
       setError(err.message || 'Something went wrong');
     } finally {
@@ -255,6 +289,28 @@ export default function CheckoutPage() {
       return next;
     });
   };
+
+  // Poll for order status updates on the success screen
+  useEffect(() => {
+    if (!orderSuccess || !completedOrder?.id || paymentMethod === 'balance') return;
+    
+    if (completedOrder.status === 'pending_payment' || completedOrder.status === 'pending') {
+      const interval = setInterval(async () => {
+        const supabase = createSyncClient();
+        const { data } = await supabase
+          .from('orders')
+          .select('*, order_items(*, plan:plans(title_en, title_ar, delivery_type), inventory:plan_inventory(id, invite_link, account_email, account_password, backup_email, backup_password, two_fa_secret, status, used_at))')
+          .eq('id', completedOrder.id)
+          .single();
+          
+        if (data && data.status !== 'pending_payment' && data.status !== 'pending') {
+          setCompletedOrder(data);
+        }
+      }, 3000); // Polling every 3 seconds for a snappier experience
+      
+      return () => clearInterval(interval);
+    }
+  }, [orderSuccess, completedOrder?.id, completedOrder?.status, paymentMethod]);
 
   // Order success
   if (orderSuccess) {
@@ -470,10 +526,10 @@ export default function CheckoutPage() {
 
           {/* Action Buttons */}
           <div className="flex gap-4 justify-center">
-            <Link href="/sync/dashboard" className="px-6 py-3 rounded-xl font-bold transition-all hover:scale-105" style={{ background: 'var(--sync-yellow)', color: '#0B132B' }}>
+            <Link href="/dashboard" className="px-6 py-3 rounded-xl font-bold transition-all hover:scale-105" style={{ background: 'var(--sync-yellow)', color: '#0B132B' }}>
               {lang === 'ar' ? 'لوحة التحكم' : 'Dashboard'}
             </Link>
-            <Link href="/sync" className="px-6 py-3 rounded-xl font-bold border border-white/10 hover:border-white/30 transition-all" style={{ color: 'var(--sync-text-primary)' }}>
+            <Link href="/" className="px-6 py-3 rounded-xl font-bold border border-white/10 hover:border-white/30 transition-all" style={{ color: 'var(--sync-text-primary)' }}>
               {lang === 'ar' ? 'تصفح المزيد' : 'Browse More'}
             </Link>
           </div>
@@ -491,9 +547,14 @@ export default function CheckoutPage() {
           <h1 className="text-3xl font-bold mb-4" style={{ color: 'var(--sync-text-primary)' }}>
             {lang === 'ar' ? 'السلة فارغة' : 'Your cart is empty'}
           </h1>
-          <Link href="/" className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105" style={{ background: 'var(--sync-yellow)', color: '#0B132B' }}>
-            {lang === 'ar' ? 'تصفح المنتجات' : 'Browse Products'}
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+            <Link href="/" className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105" style={{ background: 'var(--sync-yellow)', color: '#0B132B' }}>
+              {lang === 'ar' ? 'تصفح المنتجات' : 'Browse Products'}
+            </Link>
+            <Link href="/dashboard" className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-lg border border-white/10 hover:border-white/30 transition-all" style={{ color: 'var(--sync-text-primary)' }}>
+              {lang === 'ar' ? 'لوحة التحكم' : 'View Dashboard'}
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -560,17 +621,36 @@ export default function CheckoutPage() {
                 {lang === 'ar' ? 'طريقة الدفع' : 'Payment Method'}
               </h2>
 
-              {/* Vodafone Cash */}
-              <label className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all ${paymentMethod === 'vodafone' ? 'border-(--sync-yellow) bg-(--sync-yellow)/5' : 'border-white/10 hover:border-white/20'}`}>
-                <input type="radio" name="payment" checked={paymentMethod === 'vodafone'} onChange={() => setPaymentMethod('vodafone')} className="hidden" />
-                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'vodafone' ? 'border-(--sync-yellow)' : 'border-white/30'}`}>
-                  {paymentMethod === 'vodafone' && <div className="w-2.5 h-2.5 rounded-full" style={{ background: 'var(--sync-yellow)' }} />}
+              <label className={`flex flex-col gap-4 p-4 rounded-xl border transition-all ${paymentMethod === 'vodafone' ? 'border-(--sync-yellow) bg-(--sync-yellow)/5' : 'border-white/10 hover:border-white/20'}`}>
+                <div className="flex items-center gap-4 cursor-pointer" onClick={() => setPaymentMethod('vodafone')}>
+                  <input type="radio" name="payment" checked={paymentMethod === 'vodafone'} readOnly className="hidden" />
+                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${paymentMethod === 'vodafone' ? 'border-(--sync-yellow)' : 'border-white/30'}`}>
+                    {paymentMethod === 'vodafone' && <div className="w-2.5 h-2.5 rounded-full" style={{ background: 'var(--sync-yellow)' }} />}
+                  </div>
+                  <CreditCard className="w-5 h-5 opacity-60 shrink-0" />
+                  <div>
+                    <p className="font-bold text-sm" style={{ color: 'var(--sync-text-primary)' }}>
+                      {lang === 'ar' ? 'محفظة إلكترونية / إنستاباي' : 'Mobile Wallet / Instapay'}
+                    </p>
+                    <p className="text-xs opacity-40">{lang === 'ar' ? 'فودافون، اتصالات، أورانج، وي، أو إنستاباي' : 'Vodafone, Etisalat, Orange, WE, or Instapay'}</p>
+                  </div>
                 </div>
-                <CreditCard className="w-5 h-5 opacity-60" />
-                <div>
-                  <p className="font-bold text-sm" style={{ color: 'var(--sync-text-primary)' }}>Vodafone Cash</p>
-                  <p className="text-xs opacity-40">{lang === 'ar' ? 'حوّل المبلغ وارفع صورة الإيصال' : 'Transfer amount & upload receipt'}</p>
-                </div>
+                
+                {paymentMethod === 'vodafone' && (
+                  <div className="pl-14 pr-4 pt-2 w-full animate-in fade-in slide-in-from-top-2 duration-300">
+                    <label className="block mb-1 text-xs font-bold" style={{ color: 'var(--sync-text-primary)' }}>
+                      {lang === 'ar' ? 'رقم التحويل أو عنوان إنستاباي *' : 'Sender Number or Instapay Address *'}
+                    </label>
+                    <input 
+                      type="text" 
+                      value={senderNumber}
+                      onChange={(e) => setSenderNumber(e.target.value)}
+                      placeholder={lang === 'ar' ? 'اكتب الرقم أو الحساب الذي حولت منه' : 'Enter the number or account you transferred from'}
+                      className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-(--sync-yellow) transition-colors"
+                      style={{ color: 'var(--sync-text-primary)' }}
+                    />
+                  </div>
+                )}
               </label>
 
               {/* Crypto */}

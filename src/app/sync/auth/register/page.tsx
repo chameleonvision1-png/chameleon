@@ -84,7 +84,7 @@ export default function SyncRegisterPage() {
               ? "تم إرسال رابط تأكيد على بريدك الإلكتروني. افتح الرسالة واضغط على الرابط لتفعيل حسابك."
               : "A confirmation link has been sent to your email. Open the message and click the link to activate your account."}
           </p>
-          <Link href="/sync/auth/login" className="sync-auth-submit" style={{ textDecoration: "none", display: "flex", justifyContent: "center" }}>
+          <Link href="/auth/login" className="sync-auth-submit" style={{ textDecoration: "none", display: "flex", justifyContent: "center" }}>
             {isAr ? "الذهاب لتسجيل الدخول" : "Go to Sign In"}
           </Link>
         </motion.div>
@@ -237,7 +237,7 @@ export default function SyncRegisterPage() {
 
         <p className="sync-auth-footer-text">
           {isAr ? "عندك حساب؟" : "Already have an account?"}{" "}
-          <Link href="/sync/auth/login" className="sync-auth-link">
+          <Link href="/auth/login" className="sync-auth-link">
             {isAr ? "سجّل دخول" : "Sign in"}
           </Link>
         </p>

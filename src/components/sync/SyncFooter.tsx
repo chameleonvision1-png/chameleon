@@ -20,9 +20,15 @@ export default function SyncFooter() {
           </a>
         </div>
         
-        <div className="w-full flex flex-col md:flex-row justify-between items-center text-sm pt-8 border-t border-(--sync-border)" style={{ color: 'var(--sync-text-dim)', borderTopColor: 'rgba(255,255,255,0.05)' }}>
-          <p>© {new Date().getFullYear()} SYNC. All rights reserved.</p>
-          <p className="mt-4 md:mt-0 font-semibold">{t.poweredBy}</p>
+        <div className="w-full flex flex-col md:flex-row justify-between items-center gap-4 text-sm pt-8 border-t border-(--sync-border)" style={{ color: 'var(--sync-text-dim)', borderTopColor: 'rgba(255,255,255,0.05)' }}>
+          <p className="text-center md:text-left">© {new Date().getFullYear()} SYNC. All rights reserved.</p>
+          <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 text-xs font-semibold opacity-60">
+            <a href="/privacy-policy" className="hover:text-(--sync-yellow) transition-colors text-center">
+              {t.privacyPolicy}
+            </a>
+            <span className="hidden md:inline opacity-30">•</span>
+            <p className="font-semibold text-center">{t.poweredBy}</p>
+          </div>
         </div>
       </div>
     </footer>

@@ -20,6 +20,7 @@ export default function RechargeModal({ isOpen, onClose, userId }: RechargeModal
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('vodafone');
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [proofPreview, setProofPreview] = useState<string | null>(null);
+  const [senderNumber, setSenderNumber] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -104,6 +105,10 @@ export default function RechargeModal({ isOpen, onClose, userId }: RechargeModal
       setError(lang === 'ar' ? 'من فضلك ارفع صورة إثبات الدفع' : 'Please upload payment proof');
       return;
     }
+    if (paymentMethod === 'vodafone' && !senderNumber.trim()) {
+      setError(lang === 'ar' ? 'من فضلك ادخل رقم التحويل أو الحساب' : 'Please enter the sender number or account');
+      return;
+    }
 
     setIsSubmitting(true);
     setError(null);
@@ -113,7 +118,13 @@ export default function RechargeModal({ isOpen, onClose, userId }: RechargeModal
 
       // Upload proof
       const compressed = await compressImage(proofFile);
-      const fileName = `${userId}/recharge_${Date.now()}.jpg`;
+      let fileName = `${userId}/recharge_${Date.now()}.jpg`;
+      
+      if (paymentMethod === 'vodafone' && senderNumber) {
+        const safeSender = senderNumber.replace(/[^a-zA-Z0-9\u0600-\u06FF\s-]/g, '').trim();
+        fileName = `${userId}/recharge_${Date.now()}_sender_${safeSender}.jpg`;
+      }
+      
       const { error: uploadError } = await supabase.storage
         .from('payment-proofs')
         .upload(fileName, compressed, { contentType: 'image/jpeg' });
@@ -231,15 +242,34 @@ export default function RechargeModal({ isOpen, onClose, userId }: RechargeModal
                   {lang === 'ar' ? 'طريقة الدفع' : 'Payment Method'}
                 </label>
                 <div className="grid grid-cols-1 gap-3">
-                  <label className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all ${paymentMethod === 'vodafone' ? 'border-[#ffc21a] bg-[#ffc21a]/5' : 'border-white/10 hover:border-white/20'}`}>
-                    <input type="radio" checked={paymentMethod === 'vodafone'} onChange={() => setPaymentMethod('vodafone')} className="hidden" />
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'vodafone' ? 'border-[#ffc21a]' : 'border-white/30'}`}>
-                      {paymentMethod === 'vodafone' && <div className="w-2.5 h-2.5 rounded-full bg-[#ffc21a]" />}
+                  <label className={`flex flex-col gap-4 p-4 rounded-xl border transition-all ${paymentMethod === 'vodafone' ? 'border-[#ffc21a] bg-[#ffc21a]/5' : 'border-white/10 hover:border-white/20'}`}>
+                    <div className="flex items-center gap-4 cursor-pointer" onClick={() => setPaymentMethod('vodafone')}>
+                      <input type="radio" checked={paymentMethod === 'vodafone'} readOnly className="hidden" />
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${paymentMethod === 'vodafone' ? 'border-[#ffc21a]' : 'border-white/30'}`}>
+                        {paymentMethod === 'vodafone' && <div className="w-2.5 h-2.5 rounded-full bg-[#ffc21a]" />}
+                      </div>
+                      <CreditCard className="w-5 h-5 opacity-60 shrink-0" />
+                      <div>
+                        <p className="font-bold text-sm text-(--sync-text-primary)">
+                          {lang === 'ar' ? 'محفظة إلكترونية / إنستاباي' : 'Mobile Wallet / Instapay'}
+                        </p>
+                      </div>
                     </div>
-                    <CreditCard className="w-5 h-5 opacity-60" />
-                    <div>
-                      <p className="font-bold text-sm text-(--sync-text-primary)">Vodafone Cash</p>
-                    </div>
+                    
+                    {paymentMethod === 'vodafone' && (
+                      <div className="pl-14 pr-4 pt-2 w-full animate-in fade-in slide-in-from-top-2 duration-300">
+                        <label className="block mb-1 text-xs font-bold text-(--sync-text-primary)">
+                          {lang === 'ar' ? 'رقم التحويل أو عنوان إنستاباي *' : 'Sender Number or Instapay Address *'}
+                        </label>
+                        <input 
+                          type="text" 
+                          value={senderNumber}
+                          onChange={(e) => setSenderNumber(e.target.value)}
+                          placeholder={lang === 'ar' ? 'اكتب الرقم أو الحساب' : 'Enter number or account'}
+                          className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#ffc21a] transition-colors text-(--sync-text-primary)"
+                        />
+                      </div>
+                    )}
                   </label>
 
                   <label className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all ${paymentMethod === 'crypto' ? 'border-[#ffc21a] bg-[#ffc21a]/5' : 'border-white/10 hover:border-white/20'}`}>

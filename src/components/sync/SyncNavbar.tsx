@@ -41,7 +41,8 @@ export default function SyncNavbar() {
   }, [showMobileMenu]);
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? 'bg-(--sync-bg)/80 backdrop-blur-lg border-b border-(--sync-border) shadow-lg' : 'bg-transparent border-b border-transparent'}`}>
+    <>
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? 'bg-(--sync-bg)/80 backdrop-blur-lg border-b border-(--sync-border) shadow-lg' : 'bg-transparent border-b border-transparent'}`}>
       <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-12 2xl:px-24">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
@@ -50,7 +51,7 @@ export default function SyncNavbar() {
             <button onClick={() => setShowMobileMenu(true)} className="md:hidden p-2 mr-2 hover:text-(--sync-yellow) transition-colors">
               <Menu className="w-6 h-6" />
             </button>
-            <Link href="/sync" className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2">
               <img src="/sync-logo.png" alt="SYNC" className="h-10 md:h-16 w-auto object-contain scale-125 md:scale-150 origin-left ml-2 md:-ml-4" />
             </Link>
           </div>
@@ -69,7 +70,7 @@ export default function SyncNavbar() {
           <div className="flex items-center gap-2 md:gap-3">
             {/* Balance (logged in only) */}
             {user && profile && (
-              <Link href="/sync/dashboard" className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/10 hover:border-(--sync-yellow)/30 transition-all font-mono text-sm bg-black/20">
+              <Link href="/dashboard" className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/10 hover:border-(--sync-yellow)/30 transition-all font-mono text-sm bg-black/20">
                 <Wallet className="w-4 h-4" style={{ color: 'var(--sync-yellow)' }} />
                 <span className="text-xs font-bold" style={{ color: 'var(--sync-yellow)' }}>${Number(profile.balance || 0).toFixed(2)}</span>
               </Link>
@@ -106,11 +107,11 @@ export default function SyncNavbar() {
                         <p className="text-xs font-bold truncate">{profile?.full_name || 'User'}</p>
                         <p className="text-[10px] opacity-50 truncate">{user?.email}</p>
                       </div>
-                      <Link href="/sync/dashboard" className="block px-4 py-2.5 text-sm hover:bg-white/5 transition-colors" onClick={() => setShowUserMenu(false)}>
+                      <Link href="/dashboard" className="block px-4 py-2.5 text-sm hover:bg-white/5 transition-colors" onClick={() => setShowUserMenu(false)}>
                         {lang === 'ar' ? 'لوحة التحكم' : 'Dashboard'}
                       </Link>
                       {isAdmin && (
-                        <Link href="/sync/admin" className="block px-4 py-2.5 text-sm hover:bg-white/5 transition-colors" style={{ color: 'var(--sync-yellow)' }} onClick={() => setShowUserMenu(false)}>
+                        <Link href="/admin" className="block px-4 py-2.5 text-sm hover:bg-white/5 transition-colors" style={{ color: 'var(--sync-yellow)' }} onClick={() => setShowUserMenu(false)}>
                           {lang === 'ar' ? 'إدارة المتجر' : 'Admin Panel'}
                         </Link>
                       )}
@@ -122,7 +123,7 @@ export default function SyncNavbar() {
                 )}
               </div>
             ) : (
-              <Link href="/sync/auth/login" className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold transition-all hover:scale-105" style={{ background: 'var(--sync-yellow)', color: '#0B132B' }}>
+              <Link href="/auth/login" className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold transition-all hover:scale-105" style={{ background: 'var(--sync-yellow)', color: '#0B132B' }}>
                 {lang === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
               </Link>
             )}
@@ -140,8 +141,9 @@ export default function SyncNavbar() {
           </div>
         </div>
       </div>
+    </nav>
 
-      {/* Mobile Sidebar */}
+    {/* Mobile Sidebar */}
       {showMobileMenu && (
         <div className="md:hidden fixed inset-0 z-[100] flex" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowMobileMenu(false)} />
@@ -155,10 +157,10 @@ export default function SyncNavbar() {
             
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-6">
               <div className="flex flex-col gap-4">
-                <a href="#deals" onClick={() => setShowMobileMenu(false)} className="font-semibold text-lg hover:text-(--sync-yellow) transition-colors">{t.navDeals}</a>
-                <a href="#how-it-works" onClick={() => setShowMobileMenu(false)} className="font-semibold text-lg hover:text-(--sync-yellow) transition-colors">{t.navHowItWorks}</a>
-                <a href="#why-sync" onClick={() => setShowMobileMenu(false)} className="font-semibold text-lg hover:text-(--sync-yellow) transition-colors">{t.navWhySync}</a>
-                <a href="#faq" onClick={() => setShowMobileMenu(false)} className="font-semibold text-lg hover:text-(--sync-yellow) transition-colors">{t.navFAQ}</a>
+                <a href="/#deals" onClick={() => setShowMobileMenu(false)} className="font-semibold text-lg hover:text-(--sync-yellow) transition-colors">{t.navDeals}</a>
+                <a href="/#how-it-works" onClick={() => setShowMobileMenu(false)} className="font-semibold text-lg hover:text-(--sync-yellow) transition-colors">{t.navHowItWorks}</a>
+                <a href="/#why-sync" onClick={() => setShowMobileMenu(false)} className="font-semibold text-lg hover:text-(--sync-yellow) transition-colors">{t.navWhySync}</a>
+                <a href="/#faq" onClick={() => setShowMobileMenu(false)} className="font-semibold text-lg hover:text-(--sync-yellow) transition-colors">{t.navFAQ}</a>
               </div>
               
               <div className="h-px w-full bg-white/10" />
@@ -177,18 +179,18 @@ export default function SyncNavbar() {
                     </div>
                     
                     {profile && (
-                      <Link href="/sync/dashboard" onClick={() => setShowMobileMenu(false)} className="flex items-center gap-2 font-mono text-sm p-3 rounded-xl bg-black/20 border border-white/5">
+                      <Link href="/dashboard" onClick={() => setShowMobileMenu(false)} className="flex items-center gap-2 font-mono text-sm p-3 rounded-xl bg-black/20 border border-white/5">
                         <Wallet className="w-4 h-4 text-(--sync-yellow)" />
                         <span className="text-(--sync-yellow) font-bold">Balance: ${Number(profile.balance || 0).toFixed(2)}</span>
                       </Link>
                     )}
                     
-                    <Link href="/sync/dashboard" onClick={() => setShowMobileMenu(false)} className="font-semibold p-3 rounded-xl hover:bg-white/5 transition-colors">
+                    <Link href="/dashboard" onClick={() => setShowMobileMenu(false)} className="font-semibold p-3 rounded-xl hover:bg-white/5 transition-colors">
                       {lang === 'ar' ? 'لوحة التحكم' : 'Dashboard'}
                     </Link>
                     
                     {isAdmin && (
-                      <Link href="/sync/admin" onClick={() => setShowMobileMenu(false)} className="font-semibold text-(--sync-yellow) p-3 rounded-xl hover:bg-white/5 transition-colors">
+                      <Link href="/admin" onClick={() => setShowMobileMenu(false)} className="font-semibold text-(--sync-yellow) p-3 rounded-xl hover:bg-white/5 transition-colors">
                         {lang === 'ar' ? 'إدارة المتجر' : 'Admin Panel'}
                       </Link>
                     )}
@@ -198,7 +200,7 @@ export default function SyncNavbar() {
                     </button>
                   </>
                 ) : (
-                  <Link href="/sync/auth/login" onClick={() => setShowMobileMenu(false)} className="flex items-center justify-center w-full py-4 rounded-xl font-bold transition-all shadow-lg" style={{ background: 'var(--sync-yellow)', color: '#0B132B' }}>
+                  <Link href="/auth/login" onClick={() => setShowMobileMenu(false)} className="flex items-center justify-center w-full py-4 rounded-xl font-bold transition-all shadow-lg" style={{ background: 'var(--sync-yellow)', color: '#0B132B' }}>
                     {lang === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
                   </Link>
                 )}
@@ -207,6 +209,6 @@ export default function SyncNavbar() {
           </div>
         </div>
       )}
-    </nav>
+    </>
   );
 }

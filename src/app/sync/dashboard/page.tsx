@@ -163,7 +163,7 @@ export default function UserDashboard() {
   const statusColor: Record<string, string> = {
     pending_payment: '#f59e0b',
     confirmed: '#22c55e',
-    processing: '#3b82f6',
+    processing: '#22c55e', // Changed to green
     delivered: '#8b5cf6',
     cancelled: '#ef4444',
   };
@@ -286,8 +286,8 @@ export default function UserDashboard() {
                               </div>
                               <div className="text-right">
                                 <p className="font-bold" style={{ color: 'var(--sync-yellow)' }}>${Number(order.total_usd).toFixed(2)}</p>
-                                <span className="text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: `${statusColor[order.status] || '#666'}20`, color: statusColor[order.status] || '#666' }}>
-                                  {order.status.replace('_', ' ')}
+                                <span className="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider" style={{ background: `${statusColor[order.status] || '#666'}20`, color: statusColor[order.status] || '#666' }}>
+                                  {order.status === 'processing' ? (lang === 'ar' ? 'تم الموافقة' : 'APPROVED') : order.status.replace('_', ' ')}
                                 </span>
                               </div>
                             </div>
@@ -316,8 +316,8 @@ export default function UserDashboard() {
                             <p className="text-xs opacity-50">{new Date(selectedOrder.created_at).toLocaleString()}</p>
                           </div>
                           <div className="ml-auto">
-                            <span className="text-[12px] px-3 py-1 rounded-full font-bold" style={{ background: `${statusColor[selectedOrder.status] || '#666'}20`, color: statusColor[selectedOrder.status] || '#666' }}>
-                              {selectedOrder.status.replace('_', ' ').toUpperCase()}
+                            <span className="text-[12px] px-3 py-1 rounded-full font-bold uppercase tracking-wider" style={{ background: `${statusColor[selectedOrder.status] || '#666'}20`, color: statusColor[selectedOrder.status] || '#666' }}>
+                              {selectedOrder.status === 'processing' ? (lang === 'ar' ? 'تم الموافقة' : 'APPROVED') : selectedOrder.status.replace('_', ' ').toUpperCase()}
                             </span>
                           </div>
                         </div>
@@ -481,8 +481,8 @@ export default function UserDashboard() {
                                 </div>
                                 <div className="text-right flex flex-col items-end gap-1">
                                   <p className="font-black text-lg" style={{ color: 'var(--sync-yellow)' }}>${Number(order.total_usd).toFixed(2)}</p>
-                                  <span className="text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: `${statusColor[order.status] || '#666'}20`, color: statusColor[order.status] || '#666' }}>
-                                    {order.status.replace('_', ' ')}
+                                  <span className="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider" style={{ background: `${statusColor[order.status] || '#666'}20`, color: statusColor[order.status] || '#666' }}>
+                                    {order.status === 'processing' ? (lang === 'ar' ? 'تم الموافقة' : 'APPROVED') : order.status.replace('_', ' ')}
                                   </span>
                                 </div>
                               </div>
