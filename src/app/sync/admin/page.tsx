@@ -7,13 +7,15 @@ import { createSyncClient } from '@/lib/sync/supabase-client';
 import { 
   LayoutDashboard, Package, Users, ShoppingCart, CreditCard, 
   Tag, Bell, Settings, LogOut, Loader2, TrendingUp, 
-  DollarSign, UserCheck, ShoppingBag, ChevronRight, Eye, CheckCircle, X, Plus, AlertCircle, Image as ImageIcon
+  DollarSign, UserCheck, ShoppingBag, ChevronRight, Eye, CheckCircle, X, Plus, AlertCircle, Image as ImageIcon, Bot
 } from 'lucide-react';
 import AdminProductsTab from '@/components/sync/admin/AdminProductsTab';
 import AdminCurrenciesTab from '@/components/sync/admin/AdminCurrenciesTab';
 import AdminFinanceTab from '@/components/sync/admin/AdminFinanceTab';
 import AdminUserModal from '@/components/sync/admin/AdminUserModal';
 import AdminPaymentSettingsTab from '@/components/sync/admin/AdminPaymentSettingsTab';
+import AdminAgentBuilderTab from '@/components/sync/admin/AdminAgentBuilderTab';
+import AdminGiftsTab from '@/components/sync/admin/AdminGiftsTab';
 
 interface DashboardStats {
   totalProducts: number;
@@ -24,7 +26,7 @@ interface DashboardStats {
   totalRevenue: number;
 }
 
-type ActiveTab = 'overview' | 'products' | 'users' | 'orders' | 'currencies' | 'finance' | 'payment_settings';
+type ActiveTab = 'overview' | 'products' | 'users' | 'orders' | 'currencies' | 'finance' | 'payment_settings' | 'agent_builder' | 'gift_links';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -324,6 +326,8 @@ export default function AdminDashboard() {
     { id: 'users' as const, label: 'Users', icon: Users },
     { id: 'orders' as const, label: 'Orders', icon: ShoppingCart },
     { id: 'payment_settings' as const, label: 'Payment Settings', icon: Settings },
+    { id: 'agent_builder' as const, label: 'AI Agent Builder', icon: Bot },
+    { id: 'gift_links' as const, label: 'Gift Links', icon: Tag },
   ];
 
   const statCards = [
@@ -443,6 +447,12 @@ export default function AdminDashboard() {
 
             {/* Payment Settings Tab */}
             {activeTab === 'payment_settings' && <AdminPaymentSettingsTab />}
+
+            {/* AI Agent Builder Tab */}
+            {activeTab === 'agent_builder' && <AdminAgentBuilderTab />}
+
+            {/* Gift Links Tab */}
+            {activeTab === 'gift_links' && <AdminGiftsTab />}
 
             {/* Users Tab */}
             {activeTab === 'users' && (

@@ -54,7 +54,11 @@ export function SyncProviders({ children }: { children: React.ReactNode }) {
     <SyncContext.Provider value={{ lang, setLang, theme, setTheme, t }}>
       <SyncAuthProvider>
         <SyncCartProvider>
-          <div data-theme={theme} className="sync-wrapper w-full h-full text-left font-sans" dir="ltr">
+          <div 
+            data-theme={theme} 
+            className={`sync-wrapper w-full h-full font-sans ${lang === 'ar' ? 'text-right' : 'text-left'}`} 
+            dir={lang === 'ar' ? 'rtl' : 'ltr'}
+          >
             {children}
           </div>
         </SyncCartProvider>
