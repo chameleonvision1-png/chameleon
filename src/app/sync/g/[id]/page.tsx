@@ -107,7 +107,7 @@ export default function ClaimGiftPage() {
   if (loading || authLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-[#060b18]">
-        <Loader2 className="w-12 h-12 animate-spin text-[color:var(--sync-yellow)]" />
+        <Loader2 className="w-12 h-12 animate-spin text-(--sync-yellow)" />
         <p className="mt-4 text-white/50 font-medium">
           {lang === 'ar' ? 'جاري التحقق من الهدية...' : 'Checking gift...'}
         </p>
@@ -145,13 +145,13 @@ export default function ClaimGiftPage() {
           {!isClaimed ? (
             <>
               <div className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-8 transform rotate-3 animate-pulse opacity-20" style={{ backgroundColor: 'var(--sync-yellow)' }}>
-                <Gift className="w-10 h-10 text-[color:var(--sync-yellow)]" />
+                <Gift className="w-10 h-10 text-(--sync-yellow)" />
               </div>
               
               <h1 className="text-4xl font-black text-white mb-2 tracking-tight">
                 {translations.ar.giftCongratulations}
               </h1>
-              <h2 className="text-xl font-bold text-[color:var(--sync-yellow)] mb-6">
+              <h2 className="text-xl font-bold text-(--sync-yellow) mb-6">
                 {translations.en.giftCongratulations}
               </h2>
               
@@ -162,7 +162,7 @@ export default function ClaimGiftPage() {
               <button 
                 onClick={handleClaim}
                 disabled={claiming}
-                className="w-full py-5 rounded-2xl bg-[color:var(--sync-yellow)] text-[#0B132B] font-black text-xl flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 transition-all shadow-[0_0_40px_rgba(255,194,26,0.3)]"
+                className="w-full py-5 rounded-2xl bg-(--sync-yellow) text-[#0B132B] font-black text-xl flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 transition-all shadow-[0_0_40px_rgba(255,194,26,0.3)]"
               >
                 {claiming ? <Loader2 className="w-6 h-6 animate-spin" /> : <PartyPopper className="w-6 h-6" />}
                 {user ? t.giftClaimBtn : t.giftLoginToClaim}
@@ -186,7 +186,7 @@ export default function ClaimGiftPage() {
                   {t.giftRewardLabel}
                 </p>
                 <div className="flex items-center gap-3">
-                  <div className="flex-1 font-mono text-sm text-[color:var(--sync-yellow)] truncate bg-black/40 p-3 rounded-lg border border-white/5">
+                  <div className="flex-1 font-mono text-sm text-(--sync-yellow) truncate bg-black/40 p-3 rounded-lg border border-white/5">
                     {gift.reward_url}
                   </div>
                   {isSafeUrl(gift.reward_url) ? (
@@ -194,7 +194,7 @@ export default function ClaimGiftPage() {
                       href={gift.reward_url} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="p-3 rounded-lg bg-[color:var(--sync-yellow)] text-[#0B132B] hover:opacity-90 transition-all"
+                      className="p-3 rounded-lg bg-(--sync-yellow) text-[#0B132B] hover:opacity-90 transition-all"
                     >
                       <ExternalLink className="w-5 h-5" />
                     </a>

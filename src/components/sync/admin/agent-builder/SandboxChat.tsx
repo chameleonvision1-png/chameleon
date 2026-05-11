@@ -59,7 +59,7 @@ export function SandboxChat({ nodes }: SandboxChatProps) {
   return (
     <div className="flex-1 rounded-2xl border border-white/5 bg-[#0d1530] p-4 flex flex-col h-[350px]">
       <div className="flex items-center gap-2 mb-4 border-b border-white/5 pb-2">
-        <MessageSquare className="w-5 h-5 text-[color:var(--sync-yellow)]" />
+        <MessageSquare className="w-5 h-5 text-(--sync-yellow)" />
         <h3 className="font-bold">Sandbox Test Chat</h3>
       </div>
       
@@ -79,8 +79,8 @@ export function SandboxChat({ nodes }: SandboxChatProps) {
           messages.map(m => (
             <div key={m.id} className={`flex gap-3 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               {m.role === 'assistant' && (
-                <div className="w-8 h-8 rounded-full bg-[color:var(--sync-yellow)]/20 flex shrink-0 items-center justify-center border border-[color:var(--sync-yellow)]/30">
-                  <Bot className="w-4 h-4 text-[color:var(--sync-yellow)]" />
+                <div className="w-8 h-8 rounded-full bg-(--sync-yellow)/20 flex shrink-0 items-center justify-center border border-(--sync-yellow)/30">
+                  <Bot className="w-4 h-4 text-(--sync-yellow)" />
                 </div>
               )}
               <div className={`p-3 rounded-xl max-w-[85%] text-sm ${
@@ -100,11 +100,11 @@ export function SandboxChat({ nodes }: SandboxChatProps) {
         )}
         {isLoading && (
           <div className="flex gap-3 justify-start">
-            <div className="w-8 h-8 rounded-full bg-[color:var(--sync-yellow)]/20 flex items-center justify-center border border-[color:var(--sync-yellow)]/30">
-              <Bot className="w-4 h-4 text-[color:var(--sync-yellow)]" />
+            <div className="w-8 h-8 rounded-full bg-(--sync-yellow)/20 flex items-center justify-center border border-(--sync-yellow)/30">
+              <Bot className="w-4 h-4 text-(--sync-yellow)" />
             </div>
             <div className="p-3 rounded-xl bg-black/40 border border-white/5 rounded-tl-none flex items-center">
-              <Loader2 className="w-4 h-4 animate-spin text-[color:var(--sync-yellow)]" />
+              <Loader2 className="w-4 h-4 animate-spin text-(--sync-yellow)" />
             </div>
           </div>
         )}
@@ -116,14 +116,14 @@ export function SandboxChat({ nodes }: SandboxChatProps) {
           onChange={(e) => setInput(e.target.value)}
           placeholder="Test message..."
           aria-label="Message input"
-          className="flex-1 bg-black/40 border border-white/10 rounded-xl p-2 text-sm text-white focus:outline-none focus:border-[color:var(--sync-yellow)]/50"
+          className="flex-1 bg-black/40 border border-white/10 rounded-xl p-2 text-sm text-white focus:outline-none focus:border-(--sync-yellow)/50"
         />
         <button 
           type="submit" 
           aria-label="Send message"
           aria-disabled={isLoading || !input?.trim()}
           disabled={isLoading || !input?.trim()}
-          className="p-2 bg-[color:var(--sync-yellow)] text-black rounded-xl hover:bg-[color:var(--sync-yellow)]/90 transition-colors disabled:opacity-50 flex items-center justify-center w-10"
+          className="p-2 bg-(--sync-yellow) text-black rounded-xl hover:bg-(--sync-yellow)/90 transition-colors disabled:opacity-50 flex items-center justify-center w-10"
         >
           <Send className="w-4 h-4" />
         </button>
