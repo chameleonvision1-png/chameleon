@@ -145,7 +145,7 @@ export default function SyncNavbar() {
 
     {/* Mobile Sidebar */}
       {showMobileMenu && (
-        <div className="md:hidden fixed inset-0 z-[100] flex" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="md:hidden fixed inset-0 z-100 flex" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowMobileMenu(false)} />
           <div className="relative w-64 sm:w-80 h-full shadow-2xl flex flex-col" style={{ background: 'var(--sync-surface)', borderRight: lang === 'en' ? '1px solid rgba(255,255,255,0.05)' : 'none', borderLeft: lang === 'ar' ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
             <div className="flex items-center justify-between p-4 border-b border-white/5">

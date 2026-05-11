@@ -64,13 +64,10 @@ export const translations = {
 
     // Gift Links
     giftCongratulations: "Congratulations! You Won",
-    giftArabicCongrat: "مبروك! كسبت معانا",
     giftClaimDesc: "You have been selected to receive a special gift from SYNC. Click the button below to claim your reward now.",
-    giftClaimArDesc: "لقد تم اختيارك للحصول على هدية خاصة من SYNC. اضغط على الزر أدناه لاستلام هديتك الآن.",
     giftClaimBtn: "Claim Gift Now",
     giftLoginToClaim: "Login to Claim",
     giftClaimedTitle: "Gift Claimed Successfully",
-    giftClaimedArTitle: "تم استلام الهدية بنجاح!",
     giftRewardLabel: "Your Gift is Here:",
     giftRewardNote: "Open the account you want to activate the gift on. If you are asked for a payment method, don't worry, it's a precautionary measure from Google and they won't deduct anything. Our support team is with you on Facebook if you need help with any steps!",
     giftGoDashboard: "Go to Dashboard",
@@ -138,14 +135,11 @@ export const translations = {
     senderNumberPlaceholder: "اكتب الرقم أو الحساب الذي حولت منه",
 
     // Gift Links
-    giftCongratulations: "Congratulations! You Won",
-    giftArabicCongrat: "مبروك! كسبت معانا",
-    giftClaimDesc: "You have been selected to receive a special gift from SYNC. Click the button below to claim your reward now.",
-    giftClaimArDesc: "لقد تم اختيارك للحصول على هدية خاصة من SYNC. اضغط على الزر أدناه لاستلام هديتك الآن.",
+    giftCongratulations: "مبروك! كسبت معانا",
+    giftClaimDesc: "لقد تم اختيارك للحصول على هدية خاصة من SYNC. اضغط على الزر أدناه لاستلام هديتك الآن.",
     giftClaimBtn: "استلم الهدية الآن",
     giftLoginToClaim: "سجل دخول للاستلام",
-    giftClaimedTitle: "Gift Claimed Successfully",
-    giftClaimedArTitle: "تم استلام الهدية بنجاح!",
+    giftClaimedTitle: "تم استلام الهدية بنجاح!",
     giftRewardLabel: "هديتك هنا:",
     giftRewardNote: "افتح الحساب اللي حابب تفعل عليه الهدية، ولو طلبوا منك أي وسيلة دفع متقلقش علشان دا إجراء احترازي من شركة جوجل مش هيخصموا أي حاجة، وتيم الدعم معاك على فيسبوك لو احتجت مساعدة في أي خطوات!",
     giftGoDashboard: "الذهاب للوحة التحكم",

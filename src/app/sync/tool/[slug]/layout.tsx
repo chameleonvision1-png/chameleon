@@ -39,8 +39,9 @@ const TOOLS_DATA: Record<string, any> = {
   }
 };
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const tool = TOOLS_DATA[params.slug];
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const tool = TOOLS_DATA[slug];
   
   if (!tool) {
     return {

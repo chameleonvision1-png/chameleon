@@ -140,6 +140,39 @@ export type Database = {
         }
         Relationships: []
       }
+      gift_links: {
+        Row: {
+          id: string
+          created_at: string
+          created_by: string
+          reward_url: string
+          details: string | null
+          is_used: boolean
+          used_by: string | null
+          used_at: string | null
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          created_by: string
+          reward_url: string
+          details?: string | null
+          is_used?: boolean
+          used_by?: string | null
+          used_at?: string | null
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          created_by?: string
+          reward_url?: string
+          details?: string | null
+          is_used?: boolean
+          used_by?: string | null
+          used_at?: string | null
+        }
+        Relationships: []
+      }
       exchange_rates: {
         Row: {
           currency_code: string

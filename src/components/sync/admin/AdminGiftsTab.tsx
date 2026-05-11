@@ -43,12 +43,17 @@ export default function AdminGiftsTab() {
       const supabase = createSyncClient();
       const { data: userData } = await supabase.auth.getUser();
       
+      if (!userData.user) {
+        alert('Authentication error: User not found.');
+        return;
+      }
+
       const { error } = await supabase
         .from('gift_links')
         .insert({
           reward_url: rewardUrl,
           details: details,
-          created_by: userData.user?.id
+          created_by: userData.user.id
         });
 
       if (error) throw error;
@@ -59,7 +64,6 @@ export default function AdminGiftsTab() {
     } catch (err: any) {
       alert('Error generating link: ' + err.message);
     } finally {
-      setIsGenerating(true); // Wait, I should set it to false
       setIsGenerating(false);
     }
   };
@@ -83,9 +87,15 @@ export default function AdminGiftsTab() {
       : 'https://sync.chameleon.vision';
     const link = `${baseUrl}/g/${id}`;
     
-    navigator.clipboard.writeText(link);
-    setCopyStatus(id);
-    setTimeout(() => setCopyStatus(null), 2000);
+    navigator.clipboard.writeText(link)
+      .then(() => {
+        setCopyStatus(id);
+        setTimeout(() => setCopyStatus(null), 2000);
+      })
+      .catch(() => {
+        setCopyStatus('error');
+        setTimeout(() => setCopyStatus(null), 2000);
+      });
   };
 
   return (
@@ -106,7 +116,7 @@ export default function AdminGiftsTab() {
       {/* Generate Form */}
       <div className="bg-[#0d1530] border border-white/5 rounded-2xl p-6 shadow-2xl">
         <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-          <Plus className="w-5 h-5 text-(--sync-yellow)" />
+          <Plus className="w-5 h-5 text-[color:var(--sync-yellow)]" />
           Generate New Gift Link
         </h3>
         <form onSubmit={handleGenerate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -118,7 +128,7 @@ export default function AdminGiftsTab() {
               required
               value={rewardUrl}
               onChange={(e) => setRewardUrl(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-[#060b18]"
+              className="w-full px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[color:var(--sync-yellow)] bg-[#060b18] focus:border-opacity-50"
             />
           </div>
           <div className="space-y-2">
@@ -128,7 +138,7 @@ export default function AdminGiftsTab() {
               placeholder="مبروك كسبت معانا! سجل هنا..." 
               value={details}
               onChange={(e) => setDetails(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-[#060b18]"
+              className="w-full px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-[color:var(--sync-yellow)] bg-[#060b18] focus:border-opacity-50"
             />
           </div>
           <div className="md:col-span-2 flex justify-end">

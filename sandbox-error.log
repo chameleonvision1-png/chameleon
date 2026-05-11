@@ -1,0 +1,5 @@
+2026-05-11T01:41:26.375Z: error:1E08010C:DECODER routines::unsupported
+Key length: 1698, has real newline: true, has literal \n: false
+Formatted key length: 1698, starts with: -----BEGIN PRIVATE KEY-----
+MI
+2026-05-11T01:48:00.635Z: error:1E08010C:DECODER routines::unsupported
