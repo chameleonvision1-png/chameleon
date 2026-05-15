@@ -9,12 +9,18 @@ interface SandboxChatProps {
 }
 
 export function SandboxChat({ nodes }: SandboxChatProps) {
+  const modelNode = nodes.find(n => n.type === 'model');
   const personaNode = nodes.find(n => n.type === 'persona');
   const guardrailsNode = nodes.find(n => n.type === 'guardrails');
   const knowledgeNode = nodes.find(n => n.type === 'knowledge');
   const policiesNode = nodes.find(n => n.type === 'policies');
 
+  const DEFAULT_MODEL = 'gemini-3.1-pro-preview';
+  const rawModelName = modelNode?.data?.modelName;
+  const modelId = typeof rawModelName === 'string' && rawModelName.trim() ? rawModelName.trim() : DEFAULT_MODEL;
+
   const currentConfig = {
+    model: modelId,
     persona: `Role: ${personaNode?.data?.role || ''}\nTone: ${personaNode?.data?.tone || ''}`,
     guardrails: (guardrailsNode?.data?.rules || '') + (policiesNode?.data?.policies ? `\n\n[POLICIES & RULES]\n${policiesNode.data.policies}` : ''),
     knowledge_base: knowledgeNode?.data?.context || ''
@@ -25,7 +31,7 @@ export function SandboxChat({ nodes }: SandboxChatProps) {
   const transport = useMemo(() => new DefaultChatTransport({
     api: '/sync/api/agent/sandbox',
     body: { config: currentConfig }
-  }), [currentConfig.persona, currentConfig.guardrails, currentConfig.knowledge_base]);
+  }), [modelId, currentConfig.persona, currentConfig.guardrails, currentConfig.knowledge_base]);
 
   const { messages, status, sendMessage } = useChat({
     transport

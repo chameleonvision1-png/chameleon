@@ -41,3 +41,8 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+
+# credential / service-account key files
+sa-*.json
+*-key.json
+*-credentials.json
