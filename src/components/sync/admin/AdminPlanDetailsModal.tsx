@@ -2,10 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { createSyncClient } from '@/lib/sync/supabase-client';
 import { X, Loader2, Save } from 'lucide-react';
 
+interface PlanRow {
+  id: string;
+  title_en: string;
+  title_ar: string;
+  custom_details_ar?: string | null;
+  custom_details_en?: string | null;
+  custom_activation_ar?: string | null;
+  custom_activation_en?: string | null;
+  custom_policies_ar?: string | null;
+  custom_policies_en?: string | null;
+}
+
 interface AdminPlanDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  plan: any;
+  plan: PlanRow | null;
   onSuccess: () => void;
 }
 

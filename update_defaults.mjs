@@ -1,6 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SYNC_SUPABASE_URL, process.env.NEXT_PUBLIC_SYNC_SUPABASE_ANON_KEY);
+const supabaseUrl = process.env.NEXT_PUBLIC_SYNC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SYNC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  console.error('Missing required env vars: NEXT_PUBLIC_SYNC_SUPABASE_URL and/or NEXT_PUBLIC_SYNC_SUPABASE_ANON_KEY');
+  process.exit(1);
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const default_policies_en = `⚠️ **Sync Platform Terms & Conditions**:
 - All products and accounts offered are 100% genuine and brand new digital products.

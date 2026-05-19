@@ -1,6 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SYNC_SUPABASE_URL, process.env.NEXT_PUBLIC_SYNC_SUPABASE_ANON_KEY);
+const supabaseUrl = process.env.NEXT_PUBLIC_SYNC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SYNC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  console.error('Missing required env vars: NEXT_PUBLIC_SYNC_SUPABASE_URL and/or NEXT_PUBLIC_SYNC_SUPABASE_ANON_KEY');
+  process.exit(1);
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const custom_activation_en = `**Format**: Gmail | Password | 2FA | Phone number | SMSLinkCode
 - Sign in using Google Authenticator option.
@@ -42,7 +50,7 @@ async function updatePlans() {
 
   const { data: plans, error: fetchError } = await supabase
     .from('plans')
-    .select('id, duration_days, product_id')
+    .select('id, title_en, duration_days, product_id')
     .in('product_id', productIds)
     .in('duration_days', [365, 540]);
 
@@ -65,9 +73,9 @@ async function updatePlans() {
       .eq('id', plan.id);
 
     if (updateError) {
-      console.error('Update Error for', plan.name_en, updateError);
+      console.error('Update Error for', plan.title_en, updateError);
     } else {
-      console.log('Successfully updated:', plan.name_en);
+      console.log('Successfully updated:', plan.title_en);
     }
   }
 }
