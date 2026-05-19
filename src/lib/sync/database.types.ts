@@ -491,6 +491,12 @@ export type Database = {
           title_ar: string
           title_en: string
           mini_card_url: string | null
+          custom_activation_ar: string | null
+          custom_activation_en: string | null
+          custom_details_ar: string | null
+          custom_details_en: string | null
+          custom_policies_ar: string | null
+          custom_policies_en: string | null
           units_sold: number
         }
         Insert: {
@@ -512,6 +518,12 @@ export type Database = {
           title_ar: string
           title_en: string
           mini_card_url?: string | null
+          custom_activation_ar?: string | null
+          custom_activation_en?: string | null
+          custom_details_ar?: string | null
+          custom_details_en?: string | null
+          custom_policies_ar?: string | null
+          custom_policies_en?: string | null
           units_sold?: number
         }
         Update: {
@@ -533,6 +545,12 @@ export type Database = {
           title_ar?: string
           title_en?: string
           mini_card_url?: string | null
+          custom_activation_ar?: string | null
+          custom_activation_en?: string | null
+          custom_details_ar?: string | null
+          custom_details_en?: string | null
+          custom_policies_ar?: string | null
+          custom_policies_en?: string | null
           units_sold?: number
         }
         Relationships: [
