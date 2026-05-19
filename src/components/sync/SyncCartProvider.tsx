@@ -10,6 +10,7 @@ export interface CartItem {
   planTitle: string;
   priceUsd: number;
   originalPriceUsd: number | null;
+  storeOriginalPriceUsd: number | null;
   durationDays: number;
   quantity: number;
   coverImageUrl: string | null;

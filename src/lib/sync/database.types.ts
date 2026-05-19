@@ -484,6 +484,7 @@ export type Database = {
           is_highlighted: boolean
           max_accounts: number
           original_price_usd: number | null
+          store_original_price_usd: number | null
           price_usd: number
           product_id: string
           sort_order: number
@@ -511,6 +512,7 @@ export type Database = {
           is_highlighted?: boolean
           max_accounts?: number
           original_price_usd?: number | null
+          store_original_price_usd?: number | null
           price_usd: number
           product_id: string
           sort_order?: number
@@ -538,6 +540,7 @@ export type Database = {
           is_highlighted?: boolean
           max_accounts?: number
           original_price_usd?: number | null
+          store_original_price_usd?: number | null
           price_usd?: number
           product_id?: string
           sort_order?: number

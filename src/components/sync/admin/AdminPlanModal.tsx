@@ -13,11 +13,14 @@ interface AdminPlanModalProps {
 export default function AdminPlanModal({ isOpen, onClose, product, plan, onSuccess }: AdminPlanModalProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [hasOriginalPrice, setHasOriginalPrice] = useState(false);
+  const [hasStoreOldPrice, setHasStoreOldPrice] = useState(false);
   const [formData, setFormData] = useState({
     title_en: '',
     title_ar: '',
     price_usd: 0,
     original_price_usd: '',
+    store_original_price_usd: '',
     duration_days: 30,
     discount_label: '',
     mini_card_url: '',
@@ -39,11 +42,14 @@ export default function AdminPlanModal({ isOpen, onClose, product, plan, onSucce
 
   useEffect(() => {
     if (plan) {
+      setHasOriginalPrice(plan.original_price_usd != null);
+      setHasStoreOldPrice(plan.store_original_price_usd != null);
       setFormData({
         title_en: plan.title_en || '',
         title_ar: plan.title_ar || '',
         price_usd: plan.price_usd || 0,
-        original_price_usd: plan.original_price_usd || '',
+        original_price_usd: plan.original_price_usd ?? '',
+        store_original_price_usd: plan.store_original_price_usd ?? '',
         duration_days: plan.duration_days || 30,
         discount_label: plan.discount_label || '',
         mini_card_url: plan.mini_card_url || '',
@@ -61,11 +67,14 @@ export default function AdminPlanModal({ isOpen, onClose, product, plan, onSucce
         custom_policies_ar: plan.custom_policies_ar || ''
       });
     } else {
+      setHasOriginalPrice(false);
+      setHasStoreOldPrice(false);
       setFormData({
         title_en: '',
         title_ar: '',
         price_usd: 0,
         original_price_usd: '',
+        store_original_price_usd: '',
         duration_days: 30,
         discount_label: '',
         mini_card_url: '',
@@ -126,6 +135,7 @@ export default function AdminPlanModal({ isOpen, onClose, product, plan, onSucce
       const payload = {
         ...formData,
         original_price_usd: formData.original_price_usd ? parseFloat(formData.original_price_usd as string) : null,
+        store_original_price_usd: formData.store_original_price_usd ? parseFloat(formData.store_original_price_usd as string) : null,
         product_id: product.id,
         delivery_type: formData.delivery_type as any
       };
@@ -188,8 +198,74 @@ export default function AdminPlanModal({ isOpen, onClose, product, plan, onSucce
               <input required type="number" step="0.01" value={formData.price_usd} onChange={e => setFormData({...formData, price_usd: parseFloat(e.target.value)})} className="w-full px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow) bg-[#060b18] font-bold" />
             </div>
             <div>
-              <label className="text-xs font-bold opacity-60 block mb-2">Original Price (opt)</label>
-              <input type="number" step="0.01" value={formData.original_price_usd} onChange={e => setFormData({...formData, original_price_usd: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-[#060b18]" />
+              <label className="flex items-center gap-2 cursor-pointer mb-2 h-[16px]">
+                <div className="relative inline-block w-8 h-4 shrink-0">
+                  <input 
+                    type="checkbox" 
+                    checked={hasStoreOldPrice}
+                    onChange={e => {
+                      setHasStoreOldPrice(e.target.checked);
+                      if (!e.target.checked) {
+                        setFormData({...formData, store_original_price_usd: ''});
+                      }
+                    }} 
+                    className="opacity-0 w-0 h-0 peer absolute" 
+                  />
+                  <span className="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-white/10 transition-all duration-300 rounded-full peer-checked:bg-[var(--sync-yellow)]"></span>
+                  <span className="absolute cursor-pointer left-[2px] bottom-[2px] bg-white transition-all duration-300 rounded-full h-3 w-3 peer-checked:translate-x-4 peer-checked:bg-[#060b18]"></span>
+                </div>
+                <span className="text-xs font-bold opacity-90 text-[var(--sync-yellow)]">Store Old Price</span>
+              </label>
+              {hasStoreOldPrice ? (
+                <input 
+                  required
+                  type="number" 
+                  step="0.01" 
+                  value={formData.store_original_price_usd} 
+                  onChange={e => setFormData({...formData, store_original_price_usd: e.target.value})} 
+                  placeholder="e.g. 6.96"
+                  className="w-full px-4 py-3 rounded-xl border border-(--sync-yellow)/30 outline-none focus:border-(--sync-yellow) bg-[#060b18]" 
+                />
+              ) : (
+                <div className="w-full px-4 py-3 rounded-xl border border-white/5 bg-white/5 text-xs opacity-40 flex items-center justify-center h-[50px] cursor-not-allowed">
+                  Disabled
+                </div>
+              )}
+            </div>
+            <div>
+              <label className="flex items-center gap-2 cursor-pointer mb-2 h-[16px]">
+                <div className="relative inline-block w-8 h-4 shrink-0">
+                  <input 
+                    type="checkbox" 
+                    checked={hasOriginalPrice}
+                    onChange={e => {
+                      setHasOriginalPrice(e.target.checked);
+                      if (!e.target.checked) {
+                        setFormData({...formData, original_price_usd: ''});
+                      }
+                    }} 
+                    className="opacity-0 w-0 h-0 peer absolute" 
+                  />
+                  <span className="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-white/10 transition-all duration-300 rounded-full peer-checked:bg-red-500"></span>
+                  <span className="absolute cursor-pointer left-[2px] bottom-[2px] bg-white transition-all duration-300 rounded-full h-3 w-3 peer-checked:translate-x-4 peer-checked:bg-white"></span>
+                </div>
+                <span className="text-xs font-bold opacity-90 text-red-400">Retail Value</span>
+              </label>
+              {hasOriginalPrice ? (
+                <input 
+                  required
+                  type="number" 
+                  step="0.01" 
+                  value={formData.original_price_usd} 
+                  onChange={e => setFormData({...formData, original_price_usd: e.target.value})} 
+                  placeholder="e.g. 69.99"
+                  className="w-full px-4 py-3 rounded-xl border border-red-500/30 outline-none focus:border-red-500 bg-[#060b18]" 
+                />
+              ) : (
+                <div className="w-full px-4 py-3 rounded-xl border border-white/5 bg-white/5 text-xs opacity-40 flex items-center justify-center h-[50px] cursor-not-allowed">
+                  Disabled
+                </div>
+              )}
             </div>
             <div>
               <label className="text-xs font-bold opacity-60 block mb-2">Discount Label (e.g. 90% OFF)</label>
@@ -306,7 +382,10 @@ export default function AdminPlanModal({ isOpen, onClose, product, plan, onSucce
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" checked={formData.is_highlighted} onChange={e => setFormData({...formData, is_highlighted: e.target.checked})} className="w-5 h-5 rounded border-white/20 accent-(--sync-yellow) cursor-pointer" />
-              <span className="font-bold text-sm text-(--sync-yellow)">Highlight Package</span>
+              <div className="flex flex-col">
+                <span className="font-bold text-sm text-(--sync-yellow)">Highlight Package</span>
+                <span className="text-[10px] opacity-60">Enables "Extra Discount" fire badge</span>
+              </div>
             </label>
           </div>
 

@@ -21,6 +21,7 @@ interface Plan {
   title_ar: string;
   price_usd: number;
   original_price_usd: number | null;
+  store_original_price_usd: number | null;
   duration_days: number;
   is_highlighted: boolean;
   discount_label: string | null;
@@ -93,6 +94,7 @@ const GiftCard = ({ plan, tool, lang, currency, onAddToCart }: { plan: Plan; too
 
   const convertedPrice = (Number(plan.price_usd) * currency.rate).toFixed(2);
   const convertedOriginal = plan.original_price_usd ? (Number(plan.original_price_usd) * currency.rate).toFixed(2) : null;
+  const convertedStoreOld = plan.store_original_price_usd ? (Number(plan.store_original_price_usd) * currency.rate).toFixed(2) : null;
 
   // Parse features from jsonb
   const features: string[] = Array.isArray(plan.features) ? plan.features : [];
@@ -143,29 +145,50 @@ const GiftCard = ({ plan, tool, lang, currency, onAddToCart }: { plan: Plan; too
           </div>
 
           {/* Bottom Section */}
-          <div className="px-8 pb-8 pt-4 flex justify-between items-end mt-auto shrink-0">
+          <div className="px-8 pb-8 pt-4 flex justify-between items-center mt-auto shrink-0 relative gap-2">
             {convertedOriginal ? (
-              <div>
+              <div className="flex-1">
                 <p className="text-[10px] uppercase tracking-widest mb-1 font-bold" style={{ color: 'var(--sync-text-primary)', opacity: 0.7 }}>
                   {lang === 'ar' ? 'القيمة الأصلية' : 'ORIGINAL VALUE'}
                 </p>
-                <p className="text-2xl font-medium relative inline-block" style={{ color: 'var(--sync-text-primary)', opacity: 0.8 }}>
+                <p className="text-2xl font-medium relative inline-block self-start" style={{ color: 'var(--sync-text-primary)', opacity: 0.8 }}>
                   {currency.symbol}{convertedOriginal}
                   <span className="absolute top-1/2 left-0 w-full h-[2px] bg-red-500/80 -rotate-12"></span>
                 </p>
               </div>
-            ) : <div />}
-            <div className="text-right flex flex-col items-end">
-              <p className="text-[10px] uppercase tracking-widest mb-1 font-bold" style={{ color: 'var(--sync-yellow)' }}>
-                {lang === 'ar' ? 'فقط' : 'ONLY'}
-              </p>
+            ) : <div className="flex-1" />}
+            
+            {(plan.is_highlighted || convertedStoreOld) && (
+              <div className="shrink-0 flex flex-col items-center justify-center">
+                <div className="bg-red-500/10 border border-red-500/30 rounded px-2.5 py-1.5 flex flex-col items-center justify-center min-w-[90px]">
+                  <span className="text-red-500 text-[9px] font-black tracking-widest uppercase whitespace-nowrap mb-0.5">
+                    {convertedStoreOld 
+                      ? (lang === 'ar' ? 'سعرنا القديم' : 'OUR OLD PRICE') 
+                      : (lang === 'ar' ? 'خصم إضافي' : 'EXTRA DISCOUNT')}
+                  </span>
+                  {convertedStoreOld && (
+                    <span className="text-sm font-bold relative inline-block opacity-90 mt-0.5" style={{ color: 'var(--sync-text-primary)' }}>
+                      {currency.symbol}{convertedStoreOld}
+                      <span className="absolute top-1/2 left-0 w-full h-[1.5px] bg-red-500/80 -rotate-12"></span>
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            <div className="text-right flex flex-col items-end flex-1">
+              <div className="flex items-center gap-2 mb-1 justify-end w-full">
+                <p className="text-[10px] uppercase tracking-widest font-bold" style={{ color: plan.is_highlighted ? '#4ade80' : 'var(--sync-yellow)' }}>
+                  {lang === 'ar' ? 'فقط' : 'ONLY'}
+                </p>
+              </div>
               <div className="flex items-start">
-                <span className="text-xl md:text-2xl font-bold mt-1" style={{ color: 'var(--sync-yellow)' }}>{currency.symbol}</span>
-                <span className="text-4xl md:text-5xl font-black tracking-tighter" style={{ color: 'var(--sync-yellow)', lineHeight: '1' }}>
+                <span className="text-xl md:text-2xl font-bold mt-1" style={{ color: plan.is_highlighted ? '#4ade80' : 'var(--sync-yellow)' }}>{currency.symbol}</span>
+                <span className="text-4xl md:text-5xl font-black tracking-tighter" style={{ color: plan.is_highlighted ? '#4ade80' : 'var(--sync-yellow)', lineHeight: '1' }}>
                   {convertedPrice.split('.')[0]}
                 </span>
                 {convertedPrice.includes('.') && (
-                  <span className="text-xl md:text-2xl font-bold" style={{ color: 'var(--sync-yellow)' }}>
+                  <span className="text-xl md:text-2xl font-bold" style={{ color: plan.is_highlighted ? '#4ade80' : 'var(--sync-yellow)' }}>
                     .{convertedPrice.split('.')[1]}
                   </span>
                 )}
@@ -340,7 +363,7 @@ export default function ToolPage({ params }: { params: Promise<{ slug: string }>
           .from('products')
           .select(`
             id, slug, name, description_en, description_ar, cover_image_url,
-            plans(id, title_en, title_ar, price_usd, original_price_usd, duration_days, is_highlighted, discount_label, features, sort_order, delivery_type, stock_count, units_sold, mini_card_url)
+            plans(id, title_en, title_ar, price_usd, original_price_usd, store_original_price_usd, duration_days, is_highlighted, discount_label, features, sort_order, delivery_type, stock_count, units_sold, mini_card_url)
           `)
           .eq('slug', unwrappedParams.slug)
           .eq('is_active', true)
@@ -472,6 +495,7 @@ export default function ToolPage({ params }: { params: Promise<{ slug: string }>
                 planTitle: lang === 'ar' ? plan.title_ar : plan.title_en,
                 priceUsd: Number(plan.price_usd),
                 originalPriceUsd: plan.original_price_usd ? Number(plan.original_price_usd) : null,
+                storeOriginalPriceUsd: plan.store_original_price_usd ? Number(plan.store_original_price_usd) : null,
                 durationDays: plan.duration_days,
                 coverImageUrl: product.cover_image_url,
               })}
