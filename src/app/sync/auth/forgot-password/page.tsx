@@ -67,7 +67,7 @@ export default function SyncForgotPasswordPage() {
                 ? "لو الإيميل موجود عندنا، هتلاقي رسالة فيها رابط تغيير كلمة المرور."
                 : "If that email is registered, you'll receive a password reset link."}
             </p>
-            <Link href="/sync/auth/login" className="sync-auth-submit" style={{ textDecoration: "none", display: "flex", justifyContent: "center" }}>
+            <Link href="/auth/login" className="sync-auth-submit" style={{ textDecoration: "none", display: "flex", justifyContent: "center" }}>
               {isAr ? "الرجوع لتسجيل الدخول" : "Back to Sign In"}
             </Link>
           </>
@@ -130,7 +130,7 @@ export default function SyncForgotPasswordPage() {
             </form>
 
             <p className="sync-auth-footer-text">
-              <Link href="/sync/auth/login" className="sync-auth-link">
+              <Link href="/auth/login" className="sync-auth-link">
                 {isAr ? "← الرجوع لتسجيل الدخول" : "← Back to Sign In"}
               </Link>
             </p>

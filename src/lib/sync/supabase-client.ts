@@ -20,5 +20,13 @@ export function createSyncClient() {
     );
   }
 
-  return createBrowserClient<Database>(url, key);
+  return createBrowserClient<Database>(url, key, {
+    auth: {
+      // Disable the default navigator.locks helper which has known deadlock issues
+      // in certain mobile and multi-tab browser environments.
+      lock: async (name, acquireTimeout, fn) => {
+        return await fn();
+      },
+    },
+  });
 }

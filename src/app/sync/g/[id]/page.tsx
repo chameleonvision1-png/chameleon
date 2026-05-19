@@ -56,7 +56,7 @@ export default function ClaimGiftPage() {
 
   const handleClaim = async () => {
     if (!user) {
-      router.push(`/sync/auth/login?returnUrl=/sync/g/${id}`);
+      router.push(`/auth/login?returnUrl=/g/${id}`);
       return;
     }
 

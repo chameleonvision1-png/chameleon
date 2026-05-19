@@ -54,7 +54,7 @@ export default function AdminDashboard() {
   // Auth guard
   useEffect(() => {
     if (!authLoading && (!user || !isAdmin)) {
-      router.replace('/sync/auth/login');
+      router.replace('/auth/login');
     }
   }, [authLoading, user, isAdmin, router]);
 
@@ -111,7 +111,7 @@ export default function AdminDashboard() {
 
   const handleSignOut = async () => {
     await signOut();
-    router.replace('/sync/auth/login');
+    router.replace('/auth/login');
   };
 
   const handleApproveOrder = (order: any) => {

@@ -254,7 +254,7 @@ export default function SyncToolsGrid() {
                 return (
                   <Link 
                     key={product.id} 
-                    href={isAvailable ? `/sync/tool/${product.slug}` : `#`} 
+                    href={isAvailable ? `/tool/${product.slug}` : `#`} 
                     onClick={(e) => { if (!isAvailable) e.preventDefault() }}
                     className={`block relative group rounded-4xl overflow-hidden p-[2px] transition-all duration-500 hover:-translate-y-4 ${!isAvailable ? 'cursor-default' : ''}`}
                     style={{
