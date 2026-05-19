@@ -491,6 +491,7 @@ export type Database = {
           title_ar: string
           title_en: string
           mini_card_url: string | null
+          units_sold: number
         }
         Insert: {
           created_at?: string
@@ -511,6 +512,7 @@ export type Database = {
           title_ar: string
           title_en: string
           mini_card_url?: string | null
+          units_sold?: number
         }
         Update: {
           created_at?: string
@@ -531,6 +533,7 @@ export type Database = {
           title_ar?: string
           title_en?: string
           mini_card_url?: string | null
+          units_sold?: number
         }
         Relationships: [
           {

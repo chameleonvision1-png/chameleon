@@ -5,6 +5,8 @@ import { createSyncClient } from '@/lib/sync/supabase-client';
 import { Package, Plus, ChevronLeft, Edit, Trash2, Tag, Box, ArrowRight, Loader2, Image as ImageIcon, Sparkles } from 'lucide-react';
 import AdminPlanModal from './AdminPlanModal';
 import AdminInventoryModal from './AdminInventoryModal';
+import AdminPlanDetailsModal from './AdminPlanDetailsModal';
+import { FileText, TrendingUp } from 'lucide-react';
 
 export default function AdminProductsTab({ products, onRefresh }: { products: any[], onRefresh: () => void }) {
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
@@ -17,9 +19,12 @@ export default function AdminProductsTab({ products, onRefresh }: { products: an
   const [showPlanModal, setShowPlanModal] = useState(false);
   const [editingPlan, setEditingPlan] = useState<any>(null);
   const [showInventoryModal, setShowInventoryModal] = useState<any>(null);
+  const [showPlanDetailsModal, setShowPlanDetailsModal] = useState<any>(null);
 
   // Form states
   const [inventoryInput, setInventoryInput] = useState('');
+  const [unitsSoldInputs, setUnitsSoldInputs] = useState<Record<string, string>>({});
+  const [savingUnitsSold, setSavingUnitsSold] = useState<string | null>(null);
 
   const loadPlans = useCallback(async (productId: string) => {
     setIsLoadingPlans(true);
@@ -65,6 +70,25 @@ export default function AdminProductsTab({ products, onRefresh }: { products: an
   };
 
   // The handleSaveInventory logic is now inside AdminInventoryModal
+
+  const handleSaveUnitsSold = async (planId: string) => {
+    const val = unitsSoldInputs[planId];
+    if (val === undefined || val === '') return;
+    const num = parseInt(val, 10);
+    if (isNaN(num) || num < 0) { alert('Please enter a valid positive number.'); return; }
+    setSavingUnitsSold(planId);
+    try {
+      const supabase = createSyncClient();
+      const { error } = await supabase.from('plans').update({ units_sold: num }).eq('id', planId);
+      if (error) throw error;
+      await loadPlans(selectedProduct.id);
+      setUnitsSoldInputs(prev => { const n = { ...prev }; delete n[planId]; return n; });
+    } catch (err: any) {
+      alert('Error: ' + err.message);
+    } finally {
+      setSavingUnitsSold(null);
+    }
+  };
 
   if (selectedProduct) {
     return (
@@ -173,22 +197,54 @@ export default function AdminProductsTab({ products, onRefresh }: { products: an
                         {plan.delivery_type === 'user_provides_email' ? '∞' : (plan.stock_count || 0)}
                       </span>
                     </div>
+                    <div className="flex justify-between items-center pt-2 border-t border-white/5">
+                      <span className="opacity-50 flex items-center gap-1"><TrendingUp className="w-3 h-3" /> Sold</span>
+                      <div className="flex items-center gap-1.5">
+                        <input
+                          type="number"
+                          min="0"
+                          className="w-16 px-2 py-0.5 rounded-md text-xs font-bold text-right bg-white/5 border border-white/10 focus:border-[var(--sync-yellow)] focus:outline-none transition-colors"
+                          placeholder={String(plan.units_sold || 0)}
+                          value={unitsSoldInputs[plan.id] ?? ''}
+                          onChange={e => setUnitsSoldInputs(prev => ({ ...prev, [plan.id]: e.target.value }))}
+                          onKeyDown={e => { if (e.key === 'Enter') handleSaveUnitsSold(plan.id); }}
+                        />
+                        {unitsSoldInputs[plan.id] !== undefined && unitsSoldInputs[plan.id] !== '' && (
+                          <button
+                            onClick={() => handleSaveUnitsSold(plan.id)}
+                            disabled={savingUnitsSold === plan.id}
+                            className="px-2 py-0.5 rounded-md text-[10px] font-bold transition-colors hover:opacity-90 disabled:opacity-50"
+                            style={{ background: 'var(--sync-yellow)', color: '#0B132B' }}
+                          >
+                            {savingUnitsSold === plan.id ? '...' : 'Save'}
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
                   <div className="flex gap-2">
                     <button 
                       onClick={() => setShowInventoryModal(plan)}
-                      className="flex-2 py-2.5 rounded-xl text-xs font-bold bg-white/5 hover:bg-(--sync-yellow) hover:text-[#0B132B] transition-colors flex justify-center items-center gap-1 border border-white/10 hover:border-transparent"
+                      className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-white/5 hover:bg-(--sync-yellow) hover:text-[#0B132B] transition-colors flex justify-center items-center gap-1 border border-white/10 hover:border-transparent"
                     >
                       <Box className="w-4 h-4" /> Stock
                     </button>
                     <button 
+                      onClick={() => setShowPlanDetailsModal(plan)}
+                      className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-white/5 hover:bg-blue-400 hover:text-[#0B132B] transition-colors flex items-center justify-center gap-1 border border-white/10 hover:border-transparent"
+                      title="Details & Policies"
+                    >
+                      <FileText className="w-4 h-4" /> Info & Policy
+                    </button>
+                    <button 
                       onClick={() => { setEditingPlan(plan); setShowPlanModal(true); }}
-                      className="flex-1 p-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition-colors flex items-center justify-center border border-white/10"
+                      className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition-colors flex items-center justify-center border border-white/10"
+                      title="Edit Package"
                     >
                       <Edit className="w-4 h-4" />
                     </button>
-                    <button className="flex-1 p-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors flex items-center justify-center border border-red-500/20">
+                    <button className="p-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors flex items-center justify-center border border-red-500/20" title="Delete Package">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -213,6 +269,14 @@ export default function AdminProductsTab({ products, onRefresh }: { products: an
         product={selectedProduct} 
         plan={editingPlan} 
         onSuccess={() => loadPlans(selectedProduct.id)} 
+      />
+
+      {/* Plan Details Modal */}
+      <AdminPlanDetailsModal
+        isOpen={!!showPlanDetailsModal}
+        onClose={() => setShowPlanDetailsModal(null)}
+        plan={showPlanDetailsModal}
+        onSuccess={() => loadPlans(selectedProduct.id)}
       />
 
       </div>

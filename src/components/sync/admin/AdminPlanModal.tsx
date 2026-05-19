@@ -26,7 +26,13 @@ export default function AdminPlanModal({ isOpen, onClose, product, plan, onSucce
     is_highlighted: false,
     sort_order: 0,
     max_accounts: 1,
-    features: [] as string[]
+    features: [] as string[],
+    custom_details_en: '',
+    custom_details_ar: '',
+    custom_activation_en: '',
+    custom_activation_ar: '',
+    custom_policies_en: '',
+    custom_policies_ar: ''
   });
   
   const [featureInput, setFeatureInput] = useState('');
@@ -46,7 +52,13 @@ export default function AdminPlanModal({ isOpen, onClose, product, plan, onSucce
         is_highlighted: plan.is_highlighted ?? false,
         sort_order: plan.sort_order || 0,
         max_accounts: plan.max_accounts || 1,
-        features: Array.isArray(plan.features) ? plan.features : []
+        features: Array.isArray(plan.features) ? plan.features : [],
+        custom_details_en: plan.custom_details_en || '',
+        custom_details_ar: plan.custom_details_ar || '',
+        custom_activation_en: plan.custom_activation_en || '',
+        custom_activation_ar: plan.custom_activation_ar || '',
+        custom_policies_en: plan.custom_policies_en || '',
+        custom_policies_ar: plan.custom_policies_ar || ''
       });
     } else {
       setFormData({
@@ -62,7 +74,13 @@ export default function AdminPlanModal({ isOpen, onClose, product, plan, onSucce
         is_highlighted: false,
         sort_order: 0,
         max_accounts: 1,
-        features: []
+        features: [],
+        custom_details_en: '',
+        custom_details_ar: '',
+        custom_activation_en: '',
+        custom_activation_ar: '',
+        custom_policies_en: '',
+        custom_policies_ar: ''
       });
     }
     setFeatureInput('');
@@ -224,6 +242,43 @@ export default function AdminPlanModal({ isOpen, onClose, product, plan, onSucce
               <label className="text-xs font-bold opacity-60 block mb-2">Display Order (ترتيب الظهور)</label>
               <input required type="number" value={formData.sort_order} onChange={e => setFormData({...formData, sort_order: parseInt(e.target.value)})} className="w-full px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-[#060b18]" />
               <p className="text-[10px] opacity-40 mt-1">Controls the arrangement of packages. 1 shows first, 2 shows second, etc.</p>
+            </div>
+          </div>
+
+          <div className="border border-white/5 rounded-xl p-4 bg-[#060b18] space-y-4">
+            <h3 className="text-sm font-bold text-(--sync-yellow) border-b border-white/10 pb-2 mb-4">Custom Texts & Policies</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-bold opacity-60 block mb-2">Custom Details (English)</label>
+                <textarea rows={3} value={formData.custom_details_en} onChange={e => setFormData({...formData, custom_details_en: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-[#0a1128] text-sm" placeholder="Leave empty for default..." />
+              </div>
+              <div>
+                <label className="text-xs font-bold opacity-60 block mb-2">Custom Details (Arabic)</label>
+                <textarea rows={3} value={formData.custom_details_ar} onChange={e => setFormData({...formData, custom_details_ar: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-[#0a1128] text-sm text-right" dir="rtl" placeholder="اتركه فارغاً للنص الافتراضي..." />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-bold opacity-60 block mb-2">Activation Steps (English)</label>
+                <textarea rows={3} value={formData.custom_activation_en} onChange={e => setFormData({...formData, custom_activation_en: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-[#0a1128] text-sm" placeholder="Leave empty for default..." />
+              </div>
+              <div>
+                <label className="text-xs font-bold opacity-60 block mb-2">Activation Steps (Arabic)</label>
+                <textarea rows={3} value={formData.custom_activation_ar} onChange={e => setFormData({...formData, custom_activation_ar: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-[#0a1128] text-sm text-right" dir="rtl" placeholder="اتركه فارغاً للنص الافتراضي..." />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-bold opacity-60 block mb-2">Custom Policies (English)</label>
+                <textarea rows={3} value={formData.custom_policies_en} onChange={e => setFormData({...formData, custom_policies_en: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-[#0a1128] text-sm" placeholder="Leave empty for default..." />
+              </div>
+              <div>
+                <label className="text-xs font-bold opacity-60 block mb-2">Custom Policies (Arabic)</label>
+                <textarea rows={3} value={formData.custom_policies_ar} onChange={e => setFormData({...formData, custom_policies_ar: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-[#0a1128] text-sm text-right" dir="rtl" placeholder="اتركه فارغاً للنص الافتراضي..." />
+              </div>
             </div>
           </div>
 

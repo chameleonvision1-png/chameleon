@@ -27,7 +27,15 @@ interface Plan {
   features: string[];
   sort_order: number;
   stock_count: number | null;
+  units_sold: number;
   delivery_type: string;
+  mini_card_url: string | null;
+  custom_details_ar?: string | null;
+  custom_details_en?: string | null;
+  custom_activation_ar?: string | null;
+  custom_activation_en?: string | null;
+  custom_policies_ar?: string | null;
+  custom_policies_en?: string | null;
 }
 
 interface Product {
@@ -51,6 +59,7 @@ const GiftCard = ({ plan, tool, lang, currency, onAddToCart }: { plan: Plan; too
   const planTitle = lang === 'ar' ? plan.title_ar : plan.title_en;
 
   const modalTitles: any = {
+    details_activation: lang === 'ar' ? 'التفاصيل وطريقة التفعيل' : 'Details & Activation',
     details: lang === 'ar' ? 'معلومات تفصيلية' : 'Plan Details',
     policies: lang === 'ar' ? 'السياسات والشروط' : 'Policies & Terms',
     activation: lang === 'ar' ? 'تعليمات التفعيل' : 'Activation Setup',
@@ -58,9 +67,27 @@ const GiftCard = ({ plan, tool, lang, currency, onAddToCart }: { plan: Plan; too
   };
   
   const modalContents: any = {
-    details: lang === 'ar' ? `هذه الباقة مصممة خصيصاً لتوفر لك أفضل المميزات من ${tool.name}. احصل على كل ما تحتاجه للبدء فوراً وبأقصى كفاءة.` : `This plan is specifically designed to provide you with the best features of ${tool.name}. Get everything you need to start immediately with maximum efficiency.`,
-    policies: lang === 'ar' ? 'جميع الاشتراكات تخضع لشروط الاستخدام الخاصة بنا. لا يمكن استرداد المبلغ بعد تفعيل الباقة. يرجى التأكد من اختيار الباقة المناسبة.' : 'All subscriptions are subject to our terms of use. Refunds are not available after plan activation. Please ensure you select the appropriate plan.',
-    activation: lang === 'ar' ? 'بعد إتمام الدفع، سيصلك بريد إلكتروني يحتوي على مفتاح التفعيل ورابط مباشر لتحميل أو الوصول للأداة فوراً.' : 'After completing the payment, you will receive an email containing the activation key and a direct link to access the tool immediately.',
+    details_activation: (
+      <div className="space-y-6">
+        <div>
+          <h4 className="text-(--sync-yellow) font-bold mb-2 flex items-center gap-2">
+            <Info className="w-4 h-4" /> 
+            {lang === 'ar' ? 'معلومات تفصيلية' : 'Detailed Information'}
+          </h4>
+          <p>{lang === 'ar' ? (plan.custom_details_ar || `هذه الباقة مصممة خصيصاً لتوفر لك أفضل المميزات من ${tool.name}. احصل على كل ما تحتاجه للبدء فوراً وبأقصى كفاءة.`) : (plan.custom_details_en || `This plan is specifically designed to provide you with the best features of ${tool.name}. Get everything you need to start immediately with maximum efficiency.`)}</p>
+        </div>
+        <div className="border-t border-white/10 pt-4">
+          <h4 className="text-(--sync-yellow) font-bold mb-2 flex items-center gap-2">
+            <Sparkles className="w-4 h-4" />
+            {lang === 'ar' ? 'طريقة التفعيل' : 'Activation Method'}
+          </h4>
+          <p>{lang === 'ar' ? (plan.custom_activation_ar || 'بعد إتمام الدفع، سيصلك بريد إلكتروني يحتوي على مفتاح التفعيل ورابط مباشر لتحميل أو الوصول للأداة فوراً.') : (plan.custom_activation_en || 'After completing the payment, you will receive an email containing the activation key and a direct link to access the tool immediately.')}</p>
+        </div>
+      </div>
+    ),
+    details: lang === 'ar' ? (plan.custom_details_ar || `هذه الباقة مصممة خصيصاً لتوفر لك أفضل المميزات من ${tool.name}. احصل على كل ما تحتاجه للبدء فوراً وبأقصى كفاءة.`) : (plan.custom_details_en || `This plan is specifically designed to provide you with the best features of ${tool.name}. Get everything you need to start immediately with maximum efficiency.`),
+    policies: lang === 'ar' ? (plan.custom_policies_ar || 'تخضع جميع الاشتراكات والمنتجات الرقمية المباعة عبر منصة SYNC لشروط الاستخدام. لا يمكن استرداد المبلغ أو إلغاء الاشتراك بعد التفعيل واستلام بيانات الحساب أو مفتاح التفعيل. يرجى التأكد من قراءة مواصفات الباقة جيداً قبل إتمام عملية الدفع. في حال وجود أي مشكلة تقنية، الدعم الفني متاح لمساعدتك خلال فترة الضمان الموضحة.') : (plan.custom_policies_en || 'All subscriptions and digital products sold through the SYNC platform are subject to our terms of use. Refunds or cancellations are not available after activation and receipt of account details or activation keys. Please ensure you read the package specifications carefully before completing the payment. In case of any technical issues, technical support is available to assist you during the stated warranty period.'),
+    activation: lang === 'ar' ? (plan.custom_activation_ar || 'بعد إتمام الدفع، سيصلك بريد إلكتروني يحتوي على مفتاح التفعيل ورابط مباشر لتحميل أو الوصول للأداة فوراً.') : (plan.custom_activation_en || 'After completing the payment, you will receive an email containing the activation key and a direct link to access the tool immediately.'),
     payment: lang === 'ar' ? 'نحن ندعم وسائل الدفع الآمنة بما في ذلك البطاقات الائتمانية، باي بال، ووسائل الدفع المحلية حسب دولتك.' : 'We support secure payment methods including credit cards, PayPal, and local payment methods depending on your country.'
   };
 
@@ -111,7 +138,7 @@ const GiftCard = ({ plan, tool, lang, currency, onAddToCart }: { plan: Plan; too
                   background: '#04165d'
                 }}>
               <div className="absolute inset-0 opacity-20 mix-blend-overlay z-10" style={{ background: 'url("https://www.transparenttextures.com/patterns/carbon-fibre.png")', pointerEvents: 'none' }}></div>
-              <img src="/sync-covers/products-ticket.jpg" alt="Products" className="w-full h-full object-cover relative z-0" />
+              <img src={plan.mini_card_url || '/sync-covers/products-ticket.jpg'} alt="Products" className="w-full h-full object-cover relative z-0" />
             </div>
           </div>
 
@@ -168,65 +195,61 @@ const GiftCard = ({ plan, tool, lang, currency, onAddToCart }: { plan: Plan; too
               {isOutOfStock ? (lang === 'ar' ? 'نفذت الكمية' : 'Out of Stock') : (lang === 'ar' ? (plan.delivery_type !== 'user_provides_email' ? `متاح: ${availableStock}` : 'متاح دائماً') : (plan.delivery_type !== 'user_provides_email' ? `${availableStock} in Stock` : 'Always Available'))}
             </span>
           </div>
+          {/* Units Sold Badge */}
+          <div className="absolute top-4 right-4 z-20">
+            <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-[rgba(255,194,26,0.12)] border border-[rgba(255,194,26,0.25)]" style={{ color: 'var(--sync-yellow)' }}>
+              {lang === 'ar' ? `${plan.units_sold || 0} تم بيعها` : `${plan.units_sold || 0} Sold`}
+            </span>
+          </div>
 
           <div className="flex justify-center mt-6 mb-4">
             <img src="/sync-logo.png" alt="SYNC" className="h-8 w-auto object-contain opacity-50 grayscale" />
           </div>
           
-          {/* Options Toggle */}
-          <button 
-            type="button"
-            className="absolute top-4 right-4 z-60 p-3 rounded-full hover:bg-[rgba(255,255,255,0.05)] transition-all cursor-pointer group flex items-center justify-center"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setShowOptions(!showOptions);
-            }}
-            onPointerDown={(e) => e.stopPropagation()}
-          >
-            <HelpCircle className="w-6 h-6 opacity-80 transition-colors duration-300 pointer-events-none group-hover:text-[#ffc21a] text-white" />
-          </button>
+          <h4 className="text-xl font-bold text-center mb-4 uppercase tracking-widest" style={{ color: 'var(--sync-text-primary)' }}>{lang === 'ar' ? 'مميزات الباقة' : 'Plan Features'}</h4>
           
-          <h4 className="text-xl font-bold text-center mb-6 uppercase tracking-widest" style={{ color: 'var(--sync-text-primary)' }}>{lang === 'ar' ? 'مميزات الباقة' : 'Plan Features'}</h4>
-          
-          <div className="grow flex flex-col justify-center">
-            {showOptions ? (
-              <div className="grid grid-cols-2 gap-3 z-30 shrink-0 w-full animate-in fade-in zoom-in duration-300">
-                <button className="flex flex-col items-center justify-center p-3 md:p-4 rounded-xl transition-all duration-300 hover:scale-105 border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.05)] group"
-                  onClick={(e) => { e.stopPropagation(); setActiveModal('details'); }}>
-                  <Info className="w-6 h-6 mb-2 opacity-80 group-hover:scale-110 transition-transform" style={{ color: 'var(--sync-yellow)' }} />
-                  <span className="text-[11px] font-bold text-center opacity-80" style={{ color: 'var(--sync-text-primary)' }}>{lang === 'ar' ? 'معلومات تفصيلية' : 'Details'}</span>
-                </button>
-                <button className="flex flex-col items-center justify-center p-3 md:p-4 rounded-xl transition-all duration-300 hover:scale-105 border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.05)] group"
-                  onClick={(e) => { e.stopPropagation(); setActiveModal('policies'); }}>
-                  <FileText className="w-6 h-6 mb-2 opacity-80 group-hover:scale-110 transition-transform" style={{ color: 'var(--sync-yellow)' }} />
-                  <span className="text-[11px] font-bold text-center opacity-80" style={{ color: 'var(--sync-text-primary)' }}>{lang === 'ar' ? 'السياسات والشروط' : 'Policies & Terms'}</span>
-                </button>
-                <button className="flex flex-col items-center justify-center p-3 md:p-4 rounded-xl transition-all duration-300 hover:scale-105 border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.05)] group"
-                  onClick={(e) => { e.stopPropagation(); setActiveModal('activation'); }}>
-                  <Settings className="w-6 h-6 mb-2 opacity-80 group-hover:scale-110 transition-transform" style={{ color: 'var(--sync-yellow)' }} />
-                  <span className="text-[11px] font-bold text-center opacity-80" style={{ color: 'var(--sync-text-primary)' }}>{lang === 'ar' ? 'تعليمات التفعيل' : 'Activation Setup'}</span>
-                </button>
-                <button className="flex flex-col items-center justify-center p-3 md:p-4 rounded-xl transition-all duration-300 hover:scale-105 border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.05)] group"
-                  onClick={(e) => { e.stopPropagation(); setActiveModal('payment'); }}>
-                  <CreditCard className="w-6 h-6 mb-2 opacity-80 group-hover:scale-110 transition-transform" style={{ color: 'var(--sync-yellow)' }} />
-                  <span className="text-[11px] font-bold text-center opacity-80" style={{ color: 'var(--sync-text-primary)' }}>{lang === 'ar' ? 'الدفع وتفاصيله' : 'Payment Details'}</span>
-                </button>
-              </div>
-            ) : (
-              <ul className="space-y-4 animate-in fade-in zoom-in duration-300">
+          <div className="grow flex flex-col justify-start overflow-hidden">
+            <div className="overflow-y-auto pr-2 pb-2 mb-2" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.1) transparent' }}>
+              <ul className="space-y-3">
                 {features.map((feat: string, idx: number) => (
                   <li key={idx} className="flex items-start gap-3">
                     <div className="mt-1 p-1 rounded-full shrink-0" style={{ background: 'rgba(255,194,26,0.1)' }}>
-                      <CheckCircle className="w-4 h-4" style={{ color: 'var(--sync-yellow)' }} />
+                      <CheckCircle className="w-3 h-3" style={{ color: 'var(--sync-yellow)' }} />
                     </div>
-                    <span style={{ color: 'var(--sync-text-primary)' }} className="opacity-90 font-medium text-sm text-left">{feat}</span>
+                    <span style={{ color: 'var(--sync-text-primary)' }} className="opacity-90 font-medium text-xs text-left">{feat}</span>
                   </li>
                 ))}
               </ul>
-            )}
+            </div>
+            
+            <button 
+              type="button"
+              className="mt-auto shrink-0 w-full py-2.5 rounded-lg border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.05)] transition-all flex items-center justify-center gap-2 group"
+              onClick={(e) => { e.stopPropagation(); setActiveModal('details_activation'); }}
+            >
+              <Info className="w-4 h-4 opacity-80 group-hover:scale-110 transition-transform" style={{ color: 'var(--sync-yellow)' }} />
+              <span className="text-xs font-bold opacity-80" style={{ color: 'var(--sync-text-primary)' }}>
+                {lang === 'ar' ? 'التفاصيل وطريقة التفعيل' : 'Details & Activation Method'}
+              </span>
+            </button>
           </div>
           
+
+          {/* Policy Snippet */}
+          <div className="mt-4 mb-2 shrink-0 pt-3 border-t border-white/5 flex flex-col items-center">
+             <p className="text-[10px] opacity-70 mb-3 leading-relaxed text-center line-clamp-2" style={{ color: 'var(--sync-text-primary)' }}>
+               {lang === 'ar' ? (plan.custom_policies_ar || 'تخضع جميع الاشتراكات والمنتجات الرقمية المباعة عبر منصة SYNC لشروط الاستخدام. لا يمكن استرداد المبلغ أو إلغاء الاشتراك بعد التفعيل. يرجى التأكد من الباقة قبل الدفع.') : (plan.custom_policies_en || 'All subscriptions and digital products sold through SYNC are subject to our terms. Refunds are not available after activation. Please ensure you select the appropriate plan.')}
+             </p>
+             <button 
+               type="button" 
+               onClick={(e) => { e.stopPropagation(); setActiveModal('policies'); }} 
+               className="px-4 py-1.5 rounded-full text-[10px] font-bold flex items-center justify-center gap-1 transition-all border border-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.05)] w-fit cursor-pointer" 
+               style={{ color: 'var(--sync-text-primary)' }}
+             >
+               <FileText className="w-3 h-3" style={{ color: 'var(--sync-yellow)' }} />
+               {lang === 'ar' ? 'اقرأ السياسة الكاملة' : 'Read Full Policy'}
+             </button>
+          </div>
 
           {/* Action Button */}
           <button 
@@ -244,11 +267,17 @@ const GiftCard = ({ plan, tool, lang, currency, onAddToCart }: { plan: Plan; too
       {/* Modal Overlay */}
       {activeModal && (
         <div 
-          className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in"
+          className="fixed inset-0 z-100 flex items-center justify-center p-4 backdrop-blur-md animate-in fade-in"
+          style={{ background: 'rgba(8, 11, 20, 0.65)' }}
           onClick={(e) => { e.stopPropagation(); setActiveModal(null); }}
         >
           <div 
-            className="bg-[#0B132B] border border-[rgba(255,255,255,0.1)] rounded-2xl p-6 md:p-8 max-w-lg w-full shadow-2xl animate-in zoom-in-95"
+            className="rounded-2xl p-6 md:p-8 max-w-lg w-full animate-in zoom-in-95"
+            style={{ 
+              background: 'linear-gradient(145deg, #0d1530 0%, #0B132B 100%)',
+              border: '1px solid rgba(255, 194, 26, 0.15)',
+              boxShadow: '0 25px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 194, 26, 0.05)'
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-6">
@@ -311,7 +340,7 @@ export default function ToolPage({ params }: { params: Promise<{ slug: string }>
           .from('products')
           .select(`
             id, slug, name, description_en, description_ar, cover_image_url,
-            plans(id, title_en, title_ar, price_usd, original_price_usd, duration_days, is_highlighted, discount_label, features, sort_order, delivery_type, stock_count)
+            plans(id, title_en, title_ar, price_usd, original_price_usd, duration_days, is_highlighted, discount_label, features, sort_order, delivery_type, stock_count, units_sold, mini_card_url)
           `)
           .eq('slug', unwrappedParams.slug)
           .eq('is_active', true)
