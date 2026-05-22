@@ -37,10 +37,6 @@ export default function AdminPaymentSettingsTab() {
   const qrInputRef = useRef<HTMLInputElement>(null);
   const [activeQrUploadId, setActiveQrUploadId] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadSettings();
-  }, []);
-
   const loadSettings = async () => {
     setIsLoading(true);
     const supabase = createSyncClient();
@@ -56,6 +52,11 @@ export default function AdminPaymentSettingsTab() {
     }
     setIsLoading(false);
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadSettings();
+  }, []);
 
   const handleFieldChange = (id: string, field: string, value: any) => {
     setSettings(prev => prev.map(s => s.id === id ? { ...s, [field]: value } : s));
@@ -229,7 +230,7 @@ export default function AdminPaymentSettingsTab() {
               {/* Body */}
               <div className="p-6 space-y-6">
                 {/* Display Names */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs opacity-60 mb-1.5 font-bold uppercase tracking-wider">Display Name (EN)</label>
                     <input
@@ -253,7 +254,7 @@ export default function AdminPaymentSettingsTab() {
 
                 {/* Account / Wallet Info */}
                 {isVodafone ? (
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs opacity-60 mb-1.5 font-bold uppercase tracking-wider">Phone Number</label>
                       <input
@@ -277,7 +278,7 @@ export default function AdminPaymentSettingsTab() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-xs opacity-60 mb-1.5 font-bold uppercase tracking-wider">Wallet Address</label>
                         <input
@@ -305,7 +306,7 @@ export default function AdminPaymentSettingsTab() {
                       <label className="block text-xs opacity-60 mb-1.5 font-bold uppercase tracking-wider">
                         QR Code Image
                       </label>
-                      <div className="flex items-start gap-4">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                         {setting.qr_code_url ? (
                           <div className="relative group">
                             <img 
@@ -347,7 +348,7 @@ export default function AdminPaymentSettingsTab() {
                 )}
 
                 {/* Instructions */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs opacity-60 mb-1.5 font-bold uppercase tracking-wider">
                       Payment Instructions (EN)
@@ -383,7 +384,7 @@ export default function AdminPaymentSettingsTab() {
                       Admin Note — Shown to buyers during checkout
                     </span>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs opacity-50 mb-1">Note (EN)</label>
                       <textarea

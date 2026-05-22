@@ -113,7 +113,7 @@ export function SyncAuthProvider({ children }: { children: React.ReactNode }) {
       password,
       options: {
         data: { full_name: fullName },
-        emailRedirectTo: `${window.location.origin}/sync/auth/callback`,
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
     return { error: error ? new Error(error.message) : null };
@@ -123,7 +123,7 @@ export function SyncAuthProvider({ children }: { children: React.ReactNode }) {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/sync/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
     return { error: error ? new Error(error.message) : null };
@@ -138,7 +138,7 @@ export function SyncAuthProvider({ children }: { children: React.ReactNode }) {
 
   const resetPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/sync/auth/reset-password`,
+      redirectTo: `${window.location.origin}/auth/reset-password`,
     });
     return { error: error ? new Error(error.message) : null };
   };

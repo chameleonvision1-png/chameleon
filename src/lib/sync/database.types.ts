@@ -150,6 +150,10 @@ export type Database = {
           is_used: boolean
           used_by: string | null
           used_at: string | null
+          plan_id: string | null
+          plan_inventory_id: string | null
+          saved_by: string | null
+          saved_at: string | null
         }
         Insert: {
           id?: string
@@ -160,6 +164,10 @@ export type Database = {
           is_used?: boolean
           used_by?: string | null
           used_at?: string | null
+          plan_id?: string | null
+          plan_inventory_id?: string | null
+          saved_by?: string | null
+          saved_at?: string | null
         }
         Update: {
           id?: string
@@ -170,6 +178,10 @@ export type Database = {
           is_used?: boolean
           used_by?: string | null
           used_at?: string | null
+          plan_id?: string | null
+          plan_inventory_id?: string | null
+          saved_by?: string | null
+          saved_at?: string | null
         }
         Relationships: []
       }
@@ -794,6 +806,31 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      claim_gift_link: {
+        Args: {
+          p_gift_link_id: string
+          p_user_id: string
+        }
+        Returns: {
+          reward_url: string
+        }[]
+      }
+      save_gift_link: {
+        Args: {
+          p_gift_link_id: string
+          p_user_id: string
+        }
+        Returns: boolean
+      }
+      generate_service_gift_link: {
+        Args: {
+          p_plan_id: string
+          p_invite_link: string
+          p_details: string | null
+          p_admin_id: string
+        }
+        Returns: string
       }
     }
     Enums: {

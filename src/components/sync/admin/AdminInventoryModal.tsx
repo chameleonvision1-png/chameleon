@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createSyncClient } from '@/lib/sync/supabase-client';
-import { X, Loader2, Plus, Box, Link as LinkIcon, Users, CheckCircle, Clock, Eye, EyeOff } from 'lucide-react';
+import { X, Loader2, Plus, Box, Link as LinkIcon, Users, CheckCircle, Clock, Eye, EyeOff, Edit2, Trash2, Check } from 'lucide-react';
 
 interface AdminInventoryModalProps {
   isOpen: boolean;
@@ -16,6 +16,11 @@ export default function AdminInventoryModal({ isOpen, onClose, plan, onSuccess }
   // Link inputs
   const [newLinkUrl, setNewLinkUrl] = useState('');
   const [newLinkLimit, setNewLinkLimit] = useState(1);
+
+  // Link editing state
+  const [editingIdx, setEditingIdx] = useState<number | null>(null);
+  const [editLinkUrl, setEditLinkUrl] = useState('');
+  const [editLinkTotal, setEditLinkTotal] = useState(1);
 
   // Accounts form
   const [accEmail, setAccEmail] = useState('');
@@ -34,6 +39,9 @@ export default function AdminInventoryModal({ isOpen, onClose, plan, onSuccess }
   useEffect(() => {
     if (isOpen && plan) {
       loadInventoryStats();
+      setEditingIdx(null);
+      setEditLinkUrl('');
+      setEditLinkTotal(1);
     }
   }, [isOpen, plan]);
 
@@ -56,11 +64,12 @@ export default function AdminInventoryModal({ isOpen, onClose, plan, onSuccess }
         const grouped = items.reduce((acc: any, item: any) => {
           if (!item.invite_link) return acc;
           if (!acc[item.invite_link]) {
-            acc[item.invite_link] = { total: 0, sold: 0, used: 0 };
+            acc[item.invite_link] = { total: 0, sold: 0, used: 0, availableIds: [] };
           }
           acc[item.invite_link].total++;
           if (item.status === 'sold') acc[item.invite_link].sold++;
           if (item.used_at) acc[item.invite_link].used++;
+          if (item.status === 'available') acc[item.invite_link].availableIds.push(item.id);
           return acc;
         }, {});
         
@@ -76,6 +85,112 @@ export default function AdminInventoryModal({ isOpen, onClose, plan, onSuccess }
       console.error("Error loading stats:", err.message);
     } finally {
       setIsLoadingStats(false);
+    }
+  };
+
+  const handleStartEdit = (idx: number, stat: any) => {
+    setEditingIdx(idx);
+    setEditLinkUrl(stat.link);
+    setEditLinkTotal(stat.total);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingIdx(null);
+    setEditLinkUrl('');
+    setEditLinkTotal(1);
+  };
+
+  const handleSaveEdit = async (stat: any) => {
+    if (!editLinkUrl.trim() || editLinkTotal < stat.sold) {
+      alert(`Total stock cannot be less than sold quantity (${stat.sold}).`);
+      return;
+    }
+
+    setIsUpdating(true);
+    const supabase = createSyncClient();
+
+    try {
+      // 1. Update the URL if it changed
+      if (editLinkUrl.trim() !== stat.link) {
+        const { error: urlError } = await supabase
+          .from('plan_inventory')
+          .update({ invite_link: editLinkUrl.trim() })
+          .eq('plan_id', plan.id)
+          .eq('invite_link', stat.link);
+
+        if (urlError) throw urlError;
+      }
+
+      // 2. Adjust stock limit
+      const difference = editLinkTotal - stat.total;
+
+      if (difference > 0) {
+        // Add more stock slots
+        const inserts = [];
+        for (let i = 0; i < difference; i++) {
+          inserts.push({
+            plan_id: plan.id,
+            invite_link: editLinkUrl.trim(),
+            status: 'available'
+          });
+        }
+        const { error: insertError } = await supabase
+          .from('plan_inventory')
+          .insert(inserts);
+
+        if (insertError) throw insertError;
+      } else if (difference < 0) {
+        // Delete excess available stock slots
+        const numToDelete = Math.abs(difference);
+        const idsToDelete = stat.availableIds.slice(0, numToDelete);
+
+        if (idsToDelete.length > 0) {
+          const { error: deleteError } = await supabase
+            .from('plan_inventory')
+            .delete()
+            .in('id', idsToDelete);
+
+          if (deleteError) throw deleteError;
+        }
+      }
+
+      setEditingIdx(null);
+      loadInventoryStats();
+      onSuccess();
+    } catch (err: any) {
+      alert("Error saving edits: " + err.message);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleDeleteLinkGroup = async (stat: any) => {
+    const availableCount = stat.availableIds.length;
+    if (availableCount === 0) {
+      alert("No available slots to delete for this link.");
+      return;
+    }
+
+    const confirmMsg = `Are you sure you want to delete all ${availableCount} available stock slots for this link? This action cannot be undone.`;
+    if (!window.confirm(confirmMsg)) return;
+
+    setIsUpdating(true);
+    const supabase = createSyncClient();
+
+    try {
+      const { error } = await supabase
+        .from('plan_inventory')
+        .delete()
+        .in('id', stat.availableIds);
+
+      if (error) throw error;
+
+      loadInventoryStats();
+      onSuccess();
+    } catch (err: any) {
+      alert("Error deleting link stock: " + err.message);
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -180,24 +295,96 @@ export default function AdminInventoryModal({ isOpen, onClose, plan, onSuccess }
                     <div className="text-center p-8 bg-white/5 rounded-xl opacity-50 text-sm">No links added yet.</div>
                   ) : (
                     <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
-                      {linkStats.map((stat, idx) => (
-                        <div key={idx} className="bg-[#060b18] border border-white/5 p-4 rounded-xl flex items-center justify-between gap-4">
-                          <div className="flex-1 min-w-0">
-                            <p className="font-mono text-sm text-(--sync-yellow) truncate mb-2">{stat.link}</p>
-                            <div className="flex gap-4 text-xs font-bold">
-                              <span className="flex items-center gap-1 opacity-70"><Box className="w-3 h-3" /> Total: {stat.total}</span>
-                              <span className="flex items-center gap-1 text-green-400"><CheckCircle className="w-3 h-3" /> Sold: {stat.sold}</span>
-                              <span className="flex items-center gap-1 text-blue-400"><Users className="w-3 h-3" /> Used: {stat.used}</span>
-                            </div>
+                      {linkStats.map((stat, idx) => {
+                        const isEditing = editingIdx === idx;
+                        return (
+                          <div key={idx} className="bg-[#060b18] border border-white/5 p-4 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            {isEditing ? (
+                              <div className="flex-1 flex flex-col sm:flex-row gap-3 items-stretch sm:items-end w-full">
+                                <div className="flex-1">
+                                  <label className="block text-[10px] uppercase tracking-wider opacity-50 mb-1">Invite Link URL</label>
+                                  <input
+                                    type="url"
+                                    required
+                                    value={editLinkUrl}
+                                    onChange={e => setEditLinkUrl(e.target.value)}
+                                    className="w-full px-3 py-2 rounded-lg border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-black/40 text-sm font-mono text-white"
+                                  />
+                                </div>
+                                <div className="w-full sm:w-24">
+                                  <label className="block text-[10px] uppercase tracking-wider opacity-50 mb-1">Total Stock</label>
+                                  <input
+                                    type="number"
+                                    required
+                                    min={stat.sold}
+                                    value={editLinkTotal}
+                                    onChange={e => setEditLinkTotal(parseInt(e.target.value) || 0)}
+                                    className="w-full px-3 py-2 rounded-lg border border-white/10 outline-none focus:border-(--sync-yellow)/50 bg-black/40 text-sm font-bold text-center text-white"
+                                    title={`Must be at least ${stat.sold} (number of sold slots)`}
+                                  />
+                                </div>
+                                <div className="flex gap-2 shrink-0 pt-2 sm:pt-0 justify-end">
+                                  <button
+                                    onClick={() => handleSaveEdit(stat)}
+                                    disabled={isUpdating}
+                                    className="p-2 bg-green-500 hover:bg-green-600 rounded-lg text-[#060b18] transition-colors disabled:opacity-50"
+                                    title="Save changes"
+                                  >
+                                    {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                                  </button>
+                                  <button
+                                    onClick={handleCancelEdit}
+                                    disabled={isUpdating}
+                                    className="p-2 border border-white/15 hover:bg-white/5 rounded-lg text-gray-400 hover:text-white transition-colors disabled:opacity-50"
+                                    title="Cancel"
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <>
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-mono text-sm text-(--sync-yellow) truncate mb-2">{stat.link}</p>
+                                  <div className="flex gap-4 text-xs font-bold">
+                                    <span className="flex items-center gap-1 opacity-70"><Box className="w-3 h-3" /> Total: {stat.total}</span>
+                                    <span className="flex items-center gap-1 text-green-400"><CheckCircle className="w-3 h-3" /> Sold: {stat.sold}</span>
+                                    <span className="flex items-center gap-1 text-blue-400"><Users className="w-3 h-3" /> Used: {stat.used}</span>
+                                  </div>
+                                </div>
+                                
+                                <div className="flex items-center gap-4 shrink-0 justify-between md:justify-end w-full md:w-auto">
+                                  {/* Progress bar visual */}
+                                  <div className="w-32 h-2 bg-white/10 rounded-full overflow-hidden flex shrink-0">
+                                    <div className="h-full bg-blue-500" style={{ width: `${stat.total > 0 ? (stat.used / stat.total) * 100 : 0}%` }}></div>
+                                    <div className="h-full bg-green-500 opacity-50" style={{ width: `${stat.total > 0 ? ((stat.sold - stat.used) / stat.total) * 100 : 0}%` }}></div>
+                                  </div>
+
+                                  {/* Edit/Delete Actions */}
+                                  <div className="flex items-center gap-1 shrink-0">
+                                    <button
+                                      onClick={() => handleStartEdit(idx, stat)}
+                                      disabled={isUpdating}
+                                      className="p-2 hover:bg-white/5 rounded-lg text-gray-400 hover:text-white transition-colors disabled:opacity-50"
+                                      title="Edit link or stock"
+                                    >
+                                      <Edit2 className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeleteLinkGroup(stat)}
+                                      disabled={isUpdating || stat.availableIds.length === 0}
+                                      className="p-2 hover:bg-white/5 rounded-lg text-gray-400 hover:text-red-400 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                                      title={stat.availableIds.length === 0 ? "No available slots to delete" : "Delete available stock"}
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </button>
+                                  </div>
+                                </div>
+                              </>
+                            )}
                           </div>
-                          
-                          {/* Progress bar visual */}
-                          <div className="w-32 h-2 bg-white/10 rounded-full overflow-hidden flex shrink-0">
-                            <div className="h-full bg-blue-500" style={{ width: `${(stat.used / stat.total) * 100}%` }}></div>
-                            <div className="h-full bg-green-500 opacity-50" style={{ width: `${((stat.sold - stat.used) / stat.total) * 100}%` }}></div>
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </div>

@@ -122,7 +122,7 @@ export default function AdminAgentBuilderTab() {
 
   return (
     <div className="space-y-6 h-full flex flex-col">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-black flex items-center gap-3">
             <Bot className="w-8 h-8 text-(--sync-yellow)" />
@@ -131,16 +131,16 @@ export default function AdminAgentBuilderTab() {
           <p className="opacity-60 text-sm mt-1">Visually configure the AI Assistant for Facebook/WhatsApp.</p>
         </div>
         
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-start md:justify-end">
           {statusMessage && (
-            <span className={`text-xs font-bold ${statusMessage.type === 'success' ? 'text-green-400' : 'text-red-400'}`}>
+            <span className={`text-xs font-bold w-full md:w-auto ${statusMessage.type === 'success' ? 'text-green-400' : 'text-red-400'}`}>
               {statusMessage.text}
             </span>
           )}
           
           <button 
             onClick={toggleStatus}
-            className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all ${isActive ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}
+            className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all flex-1 md:flex-initial ${isActive ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}
           >
             {isActive ? <PlayCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
             {isActive ? 'Agent Active' : 'Agent Offline'}
@@ -149,7 +149,7 @@ export default function AdminAgentBuilderTab() {
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="px-6 py-2 rounded-xl text-sm font-black flex items-center gap-2 bg-(--sync-yellow) text-black hover:bg-(--sync-yellow)/90 transition-all disabled:opacity-50"
+            className="px-6 py-2 rounded-xl text-sm font-black flex items-center justify-center gap-2 bg-(--sync-yellow) text-black hover:bg-(--sync-yellow)/90 transition-all disabled:opacity-50 flex-1 md:flex-initial"
           >
             {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             Save Agent
@@ -157,9 +157,9 @@ export default function AdminAgentBuilderTab() {
         </div>
       </div>
 
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-250px)] min-h-[600px]">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 h-auto lg:h-[calc(100vh-250px)] min-h-[600px]">
         {/* Canvas Area - 2/3 width */}
-        <div className="lg:col-span-2 rounded-2xl border border-white/5 relative bg-[#0d1530] overflow-hidden">
+        <div className="lg:col-span-2 rounded-2xl border border-white/5 relative bg-[#0d1530] overflow-hidden h-[450px] lg:h-auto">
           <AgentCanvas 
             initialState={nodes.length > 0 ? { nodes, edges } : undefined} 
             onStateChange={(n, e) => { setNodes(n); setEdges(e); }} 

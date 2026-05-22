@@ -2,15 +2,21 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useSync } from './SyncProviders';
 import { useSyncAuth } from './SyncAuthProvider';
 import { useSyncCart } from './SyncCartProvider';
 import { Moon, Sun, Globe, ShoppingCart, User, LogOut, Wallet, Menu, X } from 'lucide-react';
 
 export default function SyncNavbar() {
+  const pathname = usePathname();
   const { lang, setLang, theme, setTheme, t } = useSync();
   const { user, profile, isAdmin, signOut } = useSyncAuth();
   const { totalItems, setIsCartOpen } = useSyncCart();
+
+  const isAdminPage = pathname === '/admin' || pathname.startsWith('/admin/') || pathname === '/sync/admin' || pathname.startsWith('/sync/admin/');
+
+  if (isAdminPage) return null;
   const [isScrolled, setIsScrolled] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);

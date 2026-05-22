@@ -249,6 +249,28 @@ export default function CheckoutPage() {
     }
   };
 
+  // Poll for order status updates on the success screen
+  useEffect(() => {
+    if (!orderSuccess || !completedOrder?.id || paymentMethod === 'balance') return;
+    
+    if (completedOrder.status === 'payment_review' || (completedOrder.status as any) === 'pending' || (completedOrder.status as any) === 'pending_payment') {
+      const interval = setInterval(async () => {
+        const supabase = createSyncClient();
+        const { data } = await supabase
+          .from('orders')
+          .select('*, order_items(*, plan:plans(title_en, title_ar, delivery_type), inventory:plan_inventory(id, invite_link, account_email, account_password, backup_email, backup_password, two_fa_secret, status, used_at))')
+          .eq('id', completedOrder.id)
+          .single();
+          
+        if (data && data.status !== 'payment_review' && (data.status as any) !== 'pending' && (data.status as any) !== 'pending_payment') {
+          setCompletedOrder(data);
+        }
+      }, 3000); // Polling every 3 seconds for a snappier experience
+      
+      return () => clearInterval(interval);
+    }
+  }, [orderSuccess, completedOrder?.id, completedOrder?.status, paymentMethod]);
+
   // Not logged in
   if (!user) {
     return (
@@ -292,27 +314,6 @@ export default function CheckoutPage() {
     });
   };
 
-  // Poll for order status updates on the success screen
-  useEffect(() => {
-    if (!orderSuccess || !completedOrder?.id || paymentMethod === 'balance') return;
-    
-    if (completedOrder.status === 'payment_review' || (completedOrder.status as any) === 'pending' || (completedOrder.status as any) === 'pending_payment') {
-      const interval = setInterval(async () => {
-        const supabase = createSyncClient();
-        const { data } = await supabase
-          .from('orders')
-          .select('*, order_items(*, plan:plans(title_en, title_ar, delivery_type), inventory:plan_inventory(id, invite_link, account_email, account_password, backup_email, backup_password, two_fa_secret, status, used_at))')
-          .eq('id', completedOrder.id)
-          .single();
-          
-        if (data && data.status !== 'payment_review' && (data.status as any) !== 'pending' && (data.status as any) !== 'pending_payment') {
-          setCompletedOrder(data);
-        }
-      }, 3000); // Polling every 3 seconds for a snappier experience
-      
-      return () => clearInterval(interval);
-    }
-  }, [orderSuccess, completedOrder?.id, completedOrder?.status, paymentMethod]);
 
   // Order success
   if (orderSuccess) {

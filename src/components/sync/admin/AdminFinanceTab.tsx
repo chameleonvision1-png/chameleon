@@ -215,7 +215,7 @@ export default function AdminFinanceTab({ onViewUser }: AdminFinanceTabProps) {
 
               {/* Details */}
               <div className="flex-1 flex flex-col">
-                <div className="flex justify-between items-start mb-4">
+                <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4 mb-4">
                   <div>
                     <h3 className="font-bold text-lg text-[#ffc21a]">${tx.amount.toFixed(2)} Top-Up</h3>
                     <p className="text-sm opacity-70">via {tx.payment_method}</p>
@@ -224,7 +224,7 @@ export default function AdminFinanceTab({ onViewUser }: AdminFinanceTabProps) {
                       <p className="text-xs mt-2 p-2 bg-white/5 rounded-lg italic">Note: {tx.admin_note}</p>
                     )}
                   </div>
-                  <div className="text-right flex flex-col items-end">
+                  <div className="text-left sm:text-right flex flex-col items-start sm:items-end">
                     <p className="font-bold text-lg">{tx.user?.full_name || 'Unknown User'}</p>
                     <p className="text-xs opacity-50 mb-1">{tx.user?.user_code} {tx.user?.phone ? `• ${tx.user?.phone}` : ''}</p>
                     <div className="flex items-center gap-2 mb-2">

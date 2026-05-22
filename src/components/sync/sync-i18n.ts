@@ -63,15 +63,18 @@ export const translations = {
     senderNumberPlaceholder: "Enter the number or account you transferred from",
 
     // Gift Links
-    giftCongratulations: "Congratulations! You Won",
-    giftClaimDesc: "You have been selected to receive a special gift from SYNC. Click the button below to claim your reward now.",
-    giftClaimBtn: "Claim Gift Now",
-    giftLoginToClaim: "Login to Claim",
-    giftClaimedTitle: "Gift Claimed Successfully",
-    giftRewardLabel: "Your Gift is Here:",
-    giftRewardNote: "Open the account you want to activate the gift on. If you are asked for a payment method, don't worry, it's a precautionary measure from Google and they won't deduct anything. Our support team is with you on Facebook if you need help with any steps!",
+    giftCongratulations: "Activate Your Subscription",
+    giftClaimDesc: "Your premium subscription link is ready. Click the button below to activate your access now.",
+    giftClaimBtn: "Activate Subscription Now",
+    giftLoginToClaim: "Login to Activate",
+    giftClaimedTitle: "Subscription Activated Successfully",
+    giftRewardLabel: "Your Link:",
+    giftRewardNote: "Open the account you want to activate the subscription on. If you are asked for a payment method, don't worry, it's a precautionary measure from Google and they won't deduct anything. Our support team is with you on Facebook if you need help with any steps!",
     giftGoDashboard: "Go to Dashboard",
-    giftInvalid: "Invalid or expired gift link.",
+    giftInvalid: "Invalid or expired activation link.",
+    giftSaveBtn: "Save to My Account",
+    giftSavedBtn: "Saved to Account",
+    giftSaveSuccess: "Subscription saved successfully! You can activate it anytime from your dashboard.",
   },
   ar: {
     // Navbar
@@ -135,14 +138,17 @@ export const translations = {
     senderNumberPlaceholder: "اكتب الرقم أو الحساب الذي حولت منه",
 
     // Gift Links
-    giftCongratulations: "مبروك! كسبت معانا",
-    giftClaimDesc: "لقد تم اختيارك للحصول على هدية خاصة من SYNC. اضغط على الزر أدناه لاستلام هديتك الآن.",
-    giftClaimBtn: "استلم الهدية الآن",
-    giftLoginToClaim: "سجل دخول للاستلام",
-    giftClaimedTitle: "تم استلام الهدية بنجاح!",
-    giftRewardLabel: "هديتك هنا:",
-    giftRewardNote: "افتح الحساب اللي حابب تفعل عليه الهدية، ولو طلبوا منك أي وسيلة دفع متقلقش علشان دا إجراء احترازي من شركة جوجل مش هيخصموا أي حاجة، وتيم الدعم معاك على فيسبوك لو احتجت مساعدة في أي خطوات!",
+    giftCongratulations: "تفعيل اشتراكك",
+    giftClaimDesc: "رابط الاشتراك البريميوم الخاص بك جاهز. اضغط على الزر أدناه لتفعيل حسابك الآن.",
+    giftClaimBtn: "تفعيل الاشتراك الآن",
+    giftLoginToClaim: "سجل دخول للتفعيل",
+    giftClaimedTitle: "تم تفعيل الاشتراك بنجاح!",
+    giftRewardLabel: "رابط التفعيل الخاص بك:",
+    giftRewardNote: "افتح الحساب اللي حابب تفعل عليه الاشتراك، ولو طلبوا منك أي وسيلة دفع متقلقش علشان دا إجراء احترازي من شركة جوجل مش هيخصموا أي حاجة، وتيم الدعم معاك على فيسبوك لو احتجت مساعدة في أي خطوات!",
     giftGoDashboard: "الذهاب للوحة التحكم",
-    giftInvalid: "رابط هدية غير صالح أو منتهي الصلاحية.",
+    giftInvalid: "رابط تفعيل غير صالح أو منتهي الصلاحية.",
+    giftSaveBtn: "حفظ في حسابي",
+    giftSavedBtn: "تم الحفظ في الحساب",
+    giftSaveSuccess: "تم حفظ الاشتراك في حسابك بنجاح! يمكنك تفعيله في أي وقت من لوحة التحكم.",
   }
 };

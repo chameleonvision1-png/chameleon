@@ -29,7 +29,7 @@ export function SandboxChat({ nodes }: SandboxChatProps) {
   const [input, setInput] = useState('');
 
   const transport = useMemo(() => new DefaultChatTransport({
-    api: '/sync/api/agent/sandbox',
+    api: '/api/agent/sandbox',
     body: { config: currentConfig }
   }), [modelId, currentConfig.persona, currentConfig.guardrails, currentConfig.knowledge_base]);
 

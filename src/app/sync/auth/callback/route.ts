@@ -4,7 +4,7 @@ import { createSyncServerClient } from "@/lib/sync/supabase-server";
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/sync";
+  const next = searchParams.get("next") ?? "/";
 
   if (code) {
     const supabase = await createSyncServerClient();
@@ -15,5 +15,5 @@ export async function GET(request: Request) {
   }
 
   // Return to login page on error
-  return NextResponse.redirect(`${origin}/sync/auth/login?error=auth_callback_error`);
+  return NextResponse.redirect(`${origin}/auth/login?error=auth_callback_error`);
 }

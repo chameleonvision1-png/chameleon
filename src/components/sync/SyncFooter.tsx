@@ -1,11 +1,17 @@
 "use client";
 
 import React from 'react';
+import { usePathname } from 'next/navigation';
 import { useSync } from './SyncProviders';
 import { ArrowUpRight } from 'lucide-react';
 
 export default function SyncFooter() {
+  const pathname = usePathname();
   const { t } = useSync();
+
+  const isAdminPage = pathname === '/admin' || pathname.startsWith('/admin/') || pathname === '/sync/admin' || pathname.startsWith('/sync/admin/');
+
+  if (isAdminPage) return null;
 
   return (
     <footer className="relative z-10 pt-16 pb-8 border-t border-(--sync-border)" style={{ borderTopColor: 'rgba(255,255,255,0.05)', backgroundColor: 'var(--sync-surface)' }}>

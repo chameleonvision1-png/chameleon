@@ -115,14 +115,14 @@ export default function AdminProductsTab({ products, onRefresh }: { products: an
           </div>
         </div>
 
-        <div className="flex items-center justify-between mt-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-8">
           <h3 className="text-xl font-bold flex items-center gap-2">
             <Tag className="w-5 h-5" style={{ color: 'var(--sync-yellow)' }} /> 
             Packages & Pricing
           </h3>
           <button 
             onClick={() => { setEditingPlan(null); setShowPlanModal(true); }}
-            className="px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:opacity-90 transition-transform hover:scale-105 shadow-[0_0_20px_rgba(255,194,26,0.2)]"
+            className="px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:opacity-90 transition-transform hover:scale-105 shadow-[0_0_20px_rgba(255,194,26,0.2)] w-full sm:w-auto justify-center"
             style={{ background: 'var(--sync-yellow)', color: '#060b18' }}
           >
             <Plus className="w-4 h-4" /> Add Package
@@ -203,7 +203,7 @@ export default function AdminProductsTab({ products, onRefresh }: { products: an
                         <input
                           type="number"
                           min="0"
-                          className="w-16 px-2 py-0.5 rounded-md text-xs font-bold text-right bg-white/5 border border-white/10 focus:border-[var(--sync-yellow)] focus:outline-none transition-colors"
+                          className="w-16 px-2 py-0.5 rounded-md text-xs font-bold text-right bg-white/5 border border-white/10 focus:border-(--sync-yellow) focus:outline-none transition-colors"
                           placeholder={String(plan.units_sold || 0)}
                           value={unitsSoldInputs[plan.id] ?? ''}
                           onChange={e => setUnitsSoldInputs(prev => ({ ...prev, [plan.id]: e.target.value }))}
@@ -223,28 +223,28 @@ export default function AdminProductsTab({ products, onRefresh }: { products: an
                     </div>
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <button 
                       onClick={() => setShowInventoryModal(plan)}
-                      className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-white/5 hover:bg-(--sync-yellow) hover:text-[#0B132B] transition-colors flex justify-center items-center gap-1 border border-white/10 hover:border-transparent"
+                      className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-white/5 hover:bg-(--sync-yellow) hover:text-[#0B132B] transition-colors flex justify-center items-center gap-1 border border-white/10 hover:border-transparent min-w-[80px]"
                     >
                       <Box className="w-4 h-4" /> Stock
                     </button>
                     <button 
                       onClick={() => setShowPlanDetailsModal(plan)}
-                      className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-white/5 hover:bg-blue-400 hover:text-[#0B132B] transition-colors flex items-center justify-center gap-1 border border-white/10 hover:border-transparent"
+                      className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-white/5 hover:bg-blue-400 hover:text-[#0B132B] transition-colors flex items-center justify-center gap-1 border border-white/10 hover:border-transparent min-w-[100px]"
                       title="Details & Policies"
                     >
                       <FileText className="w-4 h-4" /> Info & Policy
                     </button>
                     <button 
                       onClick={() => { setEditingPlan(plan); setShowPlanModal(true); }}
-                      className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition-colors flex items-center justify-center border border-white/10"
+                      className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition-colors flex items-center justify-center border border-white/10 shrink-0"
                       title="Edit Package"
                     >
                       <Edit className="w-4 h-4" />
                     </button>
-                    <button className="p-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors flex items-center justify-center border border-red-500/20" title="Delete Package">
+                    <button className="p-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors flex items-center justify-center border border-red-500/20 shrink-0" title="Delete Package">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -286,10 +286,10 @@ export default function AdminProductsTab({ products, onRefresh }: { products: an
   // Main Products Grid
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h1 className="text-3xl font-black">Services & Products</h1>
         <button 
-          className="px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:opacity-90"
+          className="px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:opacity-90 w-full sm:w-auto justify-center"
           style={{ background: 'var(--sync-yellow)', color: '#060b18' }}
         >
           <Plus className="w-4 h-4" /> New Service

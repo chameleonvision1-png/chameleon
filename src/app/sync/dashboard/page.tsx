@@ -8,7 +8,7 @@ import { createSyncClient } from '@/lib/sync/supabase-client';
 import { 
   ShoppingBag, Wallet, Clock, Package, Settings, Bell, 
   LogOut, ChevronRight, Loader2, User, Copy, CheckCircle,
-  AlertCircle, MessageSquare, ArrowLeft, CreditCard, PlusCircle
+  AlertCircle, MessageSquare, ArrowLeft, CreditCard, PlusCircle, Key
 } from 'lucide-react';
 import RechargeModal from '@/components/sync/RechargeModal';
 
@@ -56,6 +56,8 @@ export default function UserDashboard() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isActivating, setIsActivating] = useState(false);
   const [isRechargeModalOpen, setIsRechargeModalOpen] = useState(false);
+  const [savedLinks, setSavedLinks] = useState<any[]>([]);
+  const [activatingLinkId, setActivatingLinkId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -63,7 +65,7 @@ export default function UserDashboard() {
     const supabase = createSyncClient();
 
     const load = async () => {
-      const [ordersRes, txRes, notifRes] = await Promise.all([
+      const [ordersRes, txRes, notifRes, savedLinksRes] = await Promise.all([
         supabase.from('orders')
           .select('*, order_items(*, plan:plans(*), inventory:plan_inventory(*))')
           .eq('user_id', user.id)
@@ -71,11 +73,16 @@ export default function UserDashboard() {
           .limit(20),
         supabase.from('balance_transactions').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(20),
         supabase.from('notifications').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(20),
+        supabase.from('gift_links')
+          .select('*, plan:plans(*)')
+          .or(`saved_by.eq.${user.id},used_by.eq.${user.id}`)
+          .order('created_at', { ascending: false }),
       ]);
 
       if (ordersRes.data) setOrders(ordersRes.data);
       if (txRes.data) setTransactions(txRes.data);
       if (notifRes.data) setNotifications(notifRes.data);
+      if (savedLinksRes.data) setSavedLinks(savedLinksRes.data);
       setIsDataLoading(false);
     };
 
@@ -133,8 +140,40 @@ export default function UserDashboard() {
       window.open(link, '_blank');
     } catch (err: any) {
       alert("Error activating link: " + err.message);
+    }
+  };
+
+  const handleActivateSavedLink = async (linkId: string, rewardUrl: string) => {
+    if (!user) return;
+    setActivatingLinkId(linkId);
+    const supabase = createSyncClient();
+    try {
+      const { data, error } = await supabase
+        .rpc('claim_gift_link', {
+          p_gift_link_id: linkId,
+          p_user_id: user.id
+        });
+
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
+        throw new Error(lang === 'ar' ? 'عذراً، هذا الرابط تم استخدامه بالفعل.' : 'Sorry, this link has already been used.');
+      }
+
+      const now = new Date().toISOString();
+      setSavedLinks(prev => 
+        prev.map(link => 
+          link.id === linkId 
+            ? { ...link, is_used: true, used_by: user.id, used_at: now } 
+            : link
+        )
+      );
+
+      window.open(rewardUrl, '_blank');
+    } catch (err: any) {
+      alert(lang === 'ar' ? 'حدث خطأ أثناء تفعيل الاشتراك: ' + err.message : 'Error activating subscription: ' + err.message);
     } finally {
-      setIsActivating(false);
+      setActivatingLinkId(null);
     }
   };
 
@@ -171,6 +210,7 @@ export default function UserDashboard() {
   const tabs: { key: TabKey; icon: React.ReactNode; label: string }[] = [
     { key: 'overview', icon: <Package className="w-4 h-4" />, label: lang === 'ar' ? 'نظرة عامة' : 'Overview' },
     { key: 'orders', icon: <ShoppingBag className="w-4 h-4" />, label: lang === 'ar' ? 'طلباتي' : 'My Orders' },
+    { key: 'subscriptions', icon: <CreditCard className="w-4 h-4" />, label: lang === 'ar' ? 'اشتراكاتي' : 'My Subscriptions' },
     { key: 'balance', icon: <Wallet className="w-4 h-4" />, label: lang === 'ar' ? 'رصيدي' : 'Balance' },
     { key: 'notifications', icon: <Bell className="w-4 h-4" />, label: lang === 'ar' ? 'الإشعارات' : 'Notifications' },
     { key: 'support', icon: <MessageSquare className="w-4 h-4" />, label: lang === 'ar' ? 'الدعم' : 'Support' },
@@ -494,6 +534,110 @@ export default function UserDashboard() {
                   </div>
                 )}
 
+                {/* SUBSCRIPTIONS */}
+                {activeTab === 'subscriptions' && (
+                  <div className="space-y-6">
+                    <div className="rounded-xl border border-white/10 p-6" style={{ background: '#0d1530' }}>
+                      <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--sync-text-primary)' }}>
+                        {lang === 'ar' ? 'اشتراكاتي المحفوظة' : 'My Saved Subscriptions'}
+                      </h2>
+                      <p className="text-sm opacity-50">
+                        {lang === 'ar' 
+                          ? 'هنا تجد روابط الاشتراكات التي قمت بحفظها لحسابك لتفعيلها لاحقاً. يرجى العلم أن كل رابط يعمل لمرة واحدة فقط.' 
+                          : 'Here you can find subscription links saved to your account to activate later. Please note that each link works only once.'}
+                      </p>
+                    </div>
+
+                    {savedLinks.length === 0 ? (
+                      <div className="rounded-xl border border-white/10 p-12 text-center" style={{ background: '#0d1530' }}>
+                        <CreditCard className="w-16 h-16 mx-auto mb-4 opacity-20" />
+                        <p className="text-sm opacity-40">{lang === 'ar' ? 'لا توجد اشتراكات محفوظة بعد' : 'No saved subscriptions yet'}</p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {savedLinks.map(link => {
+                          const isLinkUsed = link.is_used;
+                          return (
+                            <div 
+                              key={link.id} 
+                              className={`rounded-xl border p-5 transition-all flex flex-col justify-between ${
+                                isLinkUsed 
+                                  ? 'border-white/5 bg-[#0d1530]/40 opacity-70' 
+                                  : 'border-(--sync-yellow)/20 bg-[#0d1530] shadow-[0_0_20px_rgba(255,194,26,0.05)] hover:border-(--sync-yellow)/40'
+                              }`}
+                            >
+                              <div>
+                                <div className="flex items-center justify-between mb-4">
+                                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
+                                    isLinkUsed 
+                                      ? 'bg-red-500/10 text-red-400' 
+                                      : 'bg-green-500/10 text-green-400'
+                                  }`}>
+                                    {isLinkUsed 
+                                      ? (lang === 'ar' ? 'تم التفعيل' : 'Activated') 
+                                      : (lang === 'ar' ? 'محفوظ / غير نشط' : 'Saved / Inactive')}
+                                  </span>
+                                  <span className="text-xs opacity-40 font-mono">
+                                    ID: {link.id.substring(0, 8)}...
+                                  </span>
+                                </div>
+                                <h3 className="font-bold text-lg mb-2" style={{ color: 'var(--sync-text-primary)' }}>
+                                  {link.plan?.title_en || (lang === 'ar' ? 'رابط خدمة / هدية' : 'Service / Gift Link')}
+                                </h3>
+                                <p className="text-sm opacity-60 mb-4 line-clamp-2">
+                                  {link.details || (lang === 'ar' ? 'لا توجد تفاصيل إضافية.' : 'No additional details.')}
+                                </p>
+                                {link.used_at && (
+                                  <p className="text-xs text-white/40 mb-4">
+                                    {lang === 'ar' ? 'تاريخ التفعيل:' : 'Activated at:'} {new Date(link.used_at).toLocaleString(lang === 'ar' ? 'ar-EG' : 'en-US')}
+                                  </p>
+                                )}
+                              </div>
+                              
+                              <div className="pt-4 border-t border-white/5 flex gap-2">
+                                {isLinkUsed ? (
+                                  <button
+                                    disabled
+                                    className="w-full py-2.5 rounded-xl font-bold text-xs bg-white/5 text-white/30 cursor-not-allowed"
+                                  >
+                                    {lang === 'ar' ? 'تم الاستخدام بالفعل' : 'Already Claimed'}
+                                  </button>
+                                ) : (
+                                  <>
+                                    <button
+                                      disabled={activatingLinkId === link.id}
+                                      onClick={() => handleActivateSavedLink(link.id, link.reward_url)}
+                                      className="flex-1 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1.5 hover:scale-[1.02] active:scale-95 text-[#0B132B]"
+                                      style={{ background: 'var(--sync-yellow)' }}
+                                    >
+                                      {activatingLinkId === link.id ? (
+                                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                      ) : (
+                                        <Key className="w-3.5 h-3.5" />
+                                      )}
+                                      {lang === 'ar' ? 'تفعيل الآن' : 'Activate Now'}
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        navigator.clipboard.writeText(`${window.location.origin}/g/${link.id}`);
+                                        alert(lang === 'ar' ? 'تم نسخ رابط الاشتراك' : 'Subscription link copied');
+                                      }}
+                                      className="px-3 py-2.5 rounded-xl border border-white/10 hover:bg-white/5 transition-all text-white flex items-center justify-center"
+                                      title={lang === 'ar' ? 'نسخ الرابط' : 'Copy Link'}
+                                    >
+                                      <Copy className="w-3.5 h-3.5" />
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* BALANCE */}
                 {activeTab === 'balance' && (
                   <div className="space-y-6">
@@ -594,11 +738,10 @@ export default function UserDashboard() {
                       {lang === 'ar' ? 'الدعم الفني' : 'Support'}
                     </h3>
                     <p className="text-sm opacity-50 mb-6">
-                      {lang === 'ar' ? 'للمساعدة تواصل معنا عبر الواتساب أو التلجرام' : 'Contact us via WhatsApp or Telegram for help'}
+                      {lang === 'ar' ? 'للمساعدة تواصل معنا عبر صفحتنا على الفيسبوك' : 'Contact us via our Facebook page for help'}
                     </p>
                     <div className="flex gap-4 justify-center">
-                      <a href="https://wa.me/201000000000" target="_blank" rel="noopener noreferrer" className="px-6 py-3 rounded-xl font-bold text-sm transition-all hover:scale-105" style={{ background: '#25d366', color: 'white' }}>WhatsApp</a>
-                      <a href="https://t.me/chameleonvision" target="_blank" rel="noopener noreferrer" className="px-6 py-3 rounded-xl font-bold text-sm transition-all hover:scale-105" style={{ background: '#0088cc', color: 'white' }}>Telegram</a>
+                      <a href="https://www.facebook.com/share/1CS5uwBHrd/" target="_blank" rel="noopener noreferrer" className="px-6 py-3 rounded-xl font-bold text-sm transition-all hover:scale-105" style={{ background: '#1877f2', color: 'white' }}>Facebook</a>
                     </div>
                   </div>
                 )}

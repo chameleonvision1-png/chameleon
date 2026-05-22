@@ -402,7 +402,7 @@ export default function ToolPage({ params }: { params: Promise<{ slug: string }>
       <div className="min-h-screen flex flex-col items-center justify-center pt-20">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4" style={{ color: 'var(--sync-text-primary)' }}>Tool Not Found</h1>
-          <Link href="/sync" className="px-6 py-3 rounded-full font-bold transition-all hover:scale-105 inline-block" style={{ background: 'var(--sync-yellow)', color: '#0B132B' }}>
+          <Link href="/" className="px-6 py-3 rounded-full font-bold transition-all hover:scale-105 inline-block" style={{ background: 'var(--sync-yellow)', color: '#0B132B' }}>
             {lang === 'ar' ? 'الرجوع للعروض' : 'Return Home'}
           </Link>
         </div>
@@ -426,7 +426,7 @@ export default function ToolPage({ params }: { params: Promise<{ slug: string }>
       <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-12 2xl:px-24 relative z-10">
         
         {/* Back Button */}
-        <Link href="/sync" className="inline-flex items-center gap-2 mb-8 px-4 py-2 rounded-full border border-white/10 hover:border-white/30 transition-all backdrop-blur-md relative z-20" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--sync-text-primary)' }}>
+        <Link href="/" className="inline-flex items-center gap-2 mb-8 px-4 py-2 rounded-full border border-white/10 hover:border-white/30 transition-all backdrop-blur-md relative z-20" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--sync-text-primary)' }}>
           {lang === 'ar' ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />}
           <span className="font-semibold text-sm">{lang === 'ar' ? 'الرجوع للعروض' : 'Back to Deals'}</span>
         </Link>

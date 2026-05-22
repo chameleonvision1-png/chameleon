@@ -67,7 +67,10 @@ export default function SyncHero() {
 
         </div>
         
-        <button className="sync-button-primary px-8 py-4 text-lg inline-flex items-center gap-2 mb-16">
+        <button 
+          onClick={() => document.getElementById('deals')?.scrollIntoView({ behavior: 'smooth' })}
+          className="sync-button-primary px-8 py-4 text-lg inline-flex items-center gap-2 mb-16"
+        >
           {t.heroCta} <ChevronRight className={`w-5 h-5 ${lang === 'ar' ? 'rotate-180' : ''}`} />
         </button>
         
@@ -95,7 +98,18 @@ export default function SyncHero() {
   );
 }
 
-function GiftCard({ name, price, original, discount, period, image, featured = false, height = '420px' }: any) {
+interface GiftCardProps {
+  name: string;
+  price: string;
+  original: string;
+  discount: string;
+  period: string;
+  image?: string;
+  featured?: boolean;
+  height?: string;
+}
+
+function GiftCard({ name, price, original, discount, period, image, featured = false, height = '420px' }: GiftCardProps) {
   return (
     <div className={`w-[240px] md:w-[320px] rounded-2xl overflow-hidden shadow-2xl flex flex-col justify-between backdrop-blur-md`} 
          style={{ 

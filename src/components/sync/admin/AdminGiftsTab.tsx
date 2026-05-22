@@ -11,6 +11,8 @@ export default function AdminGiftsTab() {
   const [rewardUrl, setRewardUrl] = useState('');
   const [details, setDetails] = useState('');
   const [copyStatus, setCopyStatus] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'saved' | 'claimed'>('all');
 
   const fetchLinks = async () => {
     setIsLoading(true);
@@ -18,7 +20,11 @@ export default function AdminGiftsTab() {
       const supabase = createSyncClient();
       const { data, error } = await supabase
         .from('gift_links')
-        .select('*')
+        .select(`
+          *,
+          used_by_profile:profiles!gift_links_used_by_fkey(id, full_name, user_code, phone),
+          saved_by_profile:profiles!gift_links_saved_by_fkey(id, full_name, user_code, phone)
+        `)
         .order('created_at', { ascending: false });
       
       if (error) throw error;
@@ -33,6 +39,42 @@ export default function AdminGiftsTab() {
   useEffect(() => {
     fetchLinks();
   }, []);
+
+  const filteredLinks = links.filter(link => {
+    // 1. Status Filter
+    if (filterStatus === 'active') {
+      if (link.is_used || link.saved_by) return false;
+    } else if (filterStatus === 'saved') {
+      if (link.is_used || !link.saved_by) return false;
+    } else if (filterStatus === 'claimed') {
+      if (!link.is_used) return false;
+    }
+
+    // 2. Search Query Filter
+    if (!searchQuery.trim()) return true;
+    
+    const query = searchQuery.toLowerCase();
+    
+    if (link.id.toLowerCase().includes(query)) return true;
+    if (link.reward_url.toLowerCase().includes(query)) return true;
+    if (link.details && link.details.toLowerCase().includes(query)) return true;
+
+    const usedProfile = link.used_by_profile;
+    if (usedProfile) {
+      if (usedProfile.full_name?.toLowerCase().includes(query)) return true;
+      if (usedProfile.user_code?.toLowerCase().includes(query)) return true;
+      if (usedProfile.phone?.toLowerCase().includes(query)) return true;
+    }
+
+    const savedProfile = link.saved_by_profile;
+    if (savedProfile) {
+      if (savedProfile.full_name?.toLowerCase().includes(query)) return true;
+      if (savedProfile.user_code?.toLowerCase().includes(query)) return true;
+      if (savedProfile.phone?.toLowerCase().includes(query)) return true;
+    }
+
+    return false;
+  });
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -155,73 +197,142 @@ export default function AdminGiftsTab() {
         </form>
       </div>
 
+      {/* Search & Filter Controls */}
+      <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-[#0d1530] border border-white/5 rounded-2xl p-4">
+        {/* Filter Tabs */}
+        <div className="flex gap-2 w-full md:w-auto overflow-x-auto">
+          {(['all', 'active', 'saved', 'claimed'] as const).map((status) => (
+            <button
+              key={status}
+              onClick={() => setFilterStatus(status)}
+              className={`px-4 py-2 rounded-xl text-xs font-bold capitalize transition-all whitespace-nowrap ${
+                filterStatus === status 
+                  ? 'bg-(--sync-yellow) text-[#0B132B]' 
+                  : 'bg-white/5 hover:bg-white/10 text-white'
+              }`}
+            >
+              {status === 'all' ? 'All' : status === 'active' ? 'Active (Unclaimed)' : status === 'saved' ? 'Saved' : 'Claimed'}
+              {` (${
+                status === 'all' 
+                  ? links.length 
+                  : status === 'active' 
+                    ? links.filter(l => !l.is_used && !l.saved_by).length 
+                    : status === 'saved' 
+                      ? links.filter(l => !l.is_used && l.saved_by).length 
+                      : links.filter(l => l.is_used).length
+              })`}
+            </button>
+          ))}
+        </div>
+
+        {/* Search Bar */}
+        <div className="relative w-full md:w-80">
+          <input 
+            type="text"
+            placeholder="Search by user, code, ID or URL..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-white/10 outline-none focus:border-(--sync-yellow) bg-[#060b18] text-sm"
+          />
+          <svg className="w-4 h-4 absolute right-3.5 top-3.5 opacity-40 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+      </div>
+
       {/* Links List */}
       <div className="bg-[#0d1530] border border-white/5 rounded-2xl overflow-hidden">
-        <table className="w-full text-sm text-left">
-          <thead>
-            <tr className="border-b border-white/5 opacity-60">
-              <th className="p-4 font-semibold">Status</th>
-              <th className="p-4 font-semibold">Reward Link</th>
-              <th className="p-4 font-semibold">Details</th>
-              <th className="p-4 font-semibold">Created</th>
-              <th className="p-4 font-semibold text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
-              <tr>
-                <td colSpan={5} className="p-12 text-center">
-                  <Loader2 className="w-8 h-8 animate-spin mx-auto opacity-20" />
-                </td>
+        <div className="overflow-x-auto w-full">
+          <table className="w-full min-w-[700px] text-sm text-left">
+            <thead>
+              <tr className="border-b border-white/5 opacity-60">
+                <th className="p-4 font-semibold">Status</th>
+                <th className="p-4 font-semibold">Reward Link</th>
+                <th className="p-4 font-semibold">Details</th>
+                <th className="p-4 font-semibold">User Account</th>
+                <th className="p-4 font-semibold">Created</th>
+                <th className="p-4 font-semibold text-right">Actions</th>
               </tr>
-            ) : links.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="p-12 text-center opacity-50 italic">
-                  No gift links generated yet.
-                </td>
-              </tr>
-            ) : links.map((link) => (
-              <tr key={link.id} className="border-b border-white/5 hover:bg-white/2 transition-colors">
-                <td className="p-4">
-                  {link.is_used ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-red-500/10 text-red-400 text-[10px] font-bold uppercase">
-                      <XCircle className="w-3 h-3" /> Used
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-green-500/10 text-green-400 text-[10px] font-bold uppercase">
-                      <CheckCircle className="w-3 h-3" /> Active
-                    </span>
-                  )}
-                </td>
-                <td className="p-4 max-w-[200px] truncate opacity-80">
-                  {link.reward_url}
-                </td>
-                <td className="p-4 max-w-[200px] truncate opacity-60">
-                  {link.details || '—'}
-                </td>
-                <td className="p-4 opacity-50 text-xs">
-                  {new Date(link.created_at).toLocaleDateString()}
-                </td>
-                <td className="p-4 text-right flex items-center justify-end gap-2">
-                  <button 
-                    onClick={() => copyToClipboard(link.id)}
-                    className={`p-2 rounded-lg transition-all ${copyStatus === link.id ? 'bg-green-500/20 text-green-400' : 'bg-white/5 hover:bg-white/10'}`}
-                    title="Copy Share Link"
-                  >
-                    {copyStatus === link.id ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                  </button>
-                  <button 
-                    onClick={() => handleDelete(link.id)}
-                    className="p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-all"
-                    title="Delete"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {isLoading ? (
+                <tr>
+                  <td colSpan={6} className="p-12 text-center">
+                    <Loader2 className="w-8 h-8 animate-spin mx-auto opacity-20" />
+                  </td>
+                </tr>
+              ) : filteredLinks.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="p-12 text-center opacity-50 italic">
+                    No matching gift links found.
+                  </td>
+                </tr>
+              ) : filteredLinks.map((link) => (
+                <tr key={link.id} className="border-b border-white/5 hover:bg-white/2 transition-colors">
+                  <td className="p-4">
+                    {link.is_used ? (
+                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-red-500/10 text-red-400 text-[10px] font-bold uppercase">
+                        <XCircle className="w-3 h-3" /> Claimed
+                      </span>
+                    ) : link.saved_by ? (
+                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-blue-500/10 text-blue-400 text-[10px] font-bold uppercase">
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                        </svg> Saved
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-green-500/10 text-green-400 text-[10px] font-bold uppercase">
+                        <CheckCircle className="w-3 h-3" /> Active
+                      </span>
+                    )}
+                  </td>
+                  <td className="p-4 max-w-[200px] truncate opacity-80" title={link.reward_url}>
+                    {link.reward_url}
+                  </td>
+                  <td className="p-4 max-w-[200px] truncate opacity-60" title={link.details || ''}>
+                    {link.details || '—'}
+                  </td>
+                  <td className="p-4">
+                    {link.is_used && link.used_by_profile ? (
+                      <div className="space-y-0.5">
+                        <p className="font-bold text-white/90">{link.used_by_profile.full_name}</p>
+                        <p className="text-xs font-mono text-(--sync-yellow)">{link.used_by_profile.user_code}</p>
+                        {link.used_by_profile.phone && <p className="text-[10px] opacity-40">{link.used_by_profile.phone}</p>}
+                      </div>
+                    ) : link.saved_by && link.saved_by_profile ? (
+                      <div className="space-y-0.5">
+                        <p className="font-bold text-white/80">{link.saved_by_profile.full_name}</p>
+                        <p className="text-xs font-mono text-blue-400">{link.saved_by_profile.user_code}</p>
+                        {link.saved_by_profile.phone && <p className="text-[10px] opacity-40">{link.saved_by_profile.phone}</p>}
+                      </div>
+                    ) : (
+                      <span className="opacity-30">—</span>
+                    )}
+                  </td>
+                  <td className="p-4 opacity-50 text-xs">
+                    {new Date(link.created_at).toLocaleDateString()}
+                  </td>
+                  <td className="p-4 text-right flex items-center justify-end gap-2">
+                    <button 
+                      onClick={() => copyToClipboard(link.id)}
+                      className={`p-2 rounded-lg transition-all ${copyStatus === link.id ? 'bg-green-500/20 text-green-400' : 'bg-white/5 hover:bg-white/10'}`}
+                      title="Copy Share Link"
+                    >
+                      {copyStatus === link.id ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(link.id)}
+                      className="p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-all"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

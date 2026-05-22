@@ -7,7 +7,7 @@ import { createSyncClient } from '@/lib/sync/supabase-client';
 import { 
   LayoutDashboard, Package, Users, ShoppingCart, CreditCard, 
   Tag, Bell, Settings, LogOut, Loader2, TrendingUp, 
-  DollarSign, UserCheck, ShoppingBag, ChevronRight, Eye, CheckCircle, X, Plus, AlertCircle, Image as ImageIcon, Bot
+  DollarSign, UserCheck, ShoppingBag, ChevronRight, Eye, CheckCircle, X, Plus, AlertCircle, Image as ImageIcon, Bot, Link as LinkIcon
 } from 'lucide-react';
 import AdminProductsTab from '@/components/sync/admin/AdminProductsTab';
 import AdminCurrenciesTab from '@/components/sync/admin/AdminCurrenciesTab';
@@ -16,6 +16,7 @@ import AdminUserModal from '@/components/sync/admin/AdminUserModal';
 import AdminPaymentSettingsTab from '@/components/sync/admin/AdminPaymentSettingsTab';
 import AdminAgentBuilderTab from '@/components/sync/admin/AdminAgentBuilderTab';
 import AdminGiftsTab from '@/components/sync/admin/AdminGiftsTab';
+import AdminServiceLinksTab from '@/components/sync/admin/AdminServiceLinksTab';
 
 interface DashboardStats {
   totalProducts: number;
@@ -26,7 +27,7 @@ interface DashboardStats {
   totalRevenue: number;
 }
 
-type ActiveTab = 'overview' | 'products' | 'users' | 'orders' | 'currencies' | 'finance' | 'payment_settings' | 'agent_builder' | 'gift_links';
+type ActiveTab = 'overview' | 'products' | 'users' | 'orders' | 'currencies' | 'finance' | 'payment_settings' | 'agent_builder' | 'gift_links' | 'service_links';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -37,6 +38,7 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState<any[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
   const [isDataLoading, setIsDataLoading] = useState(true);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // Modals
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
@@ -328,6 +330,7 @@ export default function AdminDashboard() {
     { id: 'payment_settings' as const, label: 'Payment Settings', icon: Settings },
     { id: 'agent_builder' as const, label: 'AI Agent Builder', icon: Bot },
     { id: 'gift_links' as const, label: 'Gift Links', icon: Tag },
+    { id: 'service_links' as const, label: 'Service Links', icon: LinkIcon },
   ];
 
   const statCards = [
@@ -340,9 +343,34 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="min-h-screen flex" style={{ background: '#060b18', color: '#e2e8f0', paddingTop: '80px' }}>
+    <div className="min-h-screen flex flex-col lg:flex-row" style={{ background: '#060b18', color: '#e2e8f0' }}>
+      {/* Mobile Top Bar */}
+      <div className="lg:hidden flex items-center justify-between p-4 border-b border-white/5 bg-[#0a1128] fixed top-0 left-0 right-0 z-40 h-14">
+        <h2 className="text-md font-black tracking-wider" style={{ color: 'var(--sync-yellow)' }}>SYNC ADMIN</h2>
+        <button 
+          onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+          className="p-2 hover:bg-white/5 rounded-xl transition-colors text-white"
+        >
+          {isMobileSidebarOpen ? <X className="w-6 h-6" /> : <LayoutDashboard className="w-6 h-6" />}
+        </button>
+      </div>
+
+      {/* Mobile Sidebar Backdrop */}
+      {isMobileSidebarOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-black/50 backdrop-blur-xs z-30" 
+          style={{ top: '56px' }}
+          onClick={() => setIsMobileSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 shrink-0 border-r border-white/5 p-6 flex flex-col gap-2 sticky top-[80px] h-[calc(100vh-80px)]" style={{ background: '#0a1128' }}>
+      <aside 
+        className={`w-64 shrink-0 border-r border-white/5 p-6 flex flex-col gap-2 fixed lg:sticky top-[56px] lg:top-0 left-0 h-[calc(100vh-56px)] lg:h-screen z-40 transition-transform duration-300 lg:translate-x-0 ${
+          isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+        style={{ background: '#0a1128' }}
+      >
         <div className="mb-6">
           <h2 className="text-lg font-black tracking-wider" style={{ color: 'var(--sync-yellow)' }}>SYNC ADMIN</h2>
           <p className="text-xs opacity-50 mt-1">{user?.email}</p>
@@ -354,7 +382,10 @@ export default function AdminDashboard() {
         {sidebarItems.map(item => (
           <button
             key={item.id}
-            onClick={() => setActiveTab(item.id)}
+            onClick={() => {
+              setActiveTab(item.id);
+              setIsMobileSidebarOpen(false);
+            }}
             className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 w-full text-left ${
               activeTab === item.id 
                 ? 'bg-[rgba(255,194,26,0.1)] text-[#ffc21a]' 
@@ -375,7 +406,7 @@ export default function AdminDashboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-8 overflow-y-auto">
+      <main className="flex-1 p-4 lg:p-8 pt-20 lg:pt-8 overflow-y-auto">
         {isDataLoading ? (
           <div className="flex items-center justify-center h-96">
             <Loader2 className="w-8 h-8 animate-spin" style={{ color: 'var(--sync-yellow)' }} />
@@ -388,7 +419,7 @@ export default function AdminDashboard() {
                 <h1 className="text-3xl font-black">Dashboard Overview</h1>
                 
                 {/* Stats Grid */}
-                <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {statCards.map(card => (
                     <div key={card.label} className="rounded-2xl p-6 border border-white/5 relative overflow-hidden" style={{ background: '#0d1530' }}>
                       <div className="absolute top-4 right-4 w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${card.color}15` }}>
@@ -411,22 +442,24 @@ export default function AdminDashboard() {
                   {orders.length === 0 ? (
                     <p className="p-6 text-center opacity-50">No orders yet</p>
                   ) : (
-                    <table className="w-full text-sm">
-                      <thead><tr className="border-b border-white/5 text-left opacity-60">
-                        <th className="p-4 font-semibold">Order</th><th className="p-4">User</th><th className="p-4">Amount</th><th className="p-4">Status</th><th className="p-4">Date</th>
-                      </tr></thead>
-                      <tbody>
-                        {orders.slice(0, 5).map((order: any) => (
-                          <tr key={order.id} className="border-b border-white/5 hover:bg-white/2">
-                            <td className="p-4 font-mono text-xs">#{order.order_number || order.id.slice(0,8)}</td>
-                            <td className="p-4">{(order.user as any)?.full_name || '—'}</td>
-                            <td className="p-4 font-bold" style={{ color: 'var(--sync-yellow)' }}>${Number(order.total_usd).toFixed(2)}</td>
-                            <td className="p-4"><StatusBadge status={order.status} /></td>
-                            <td className="p-4 opacity-60">{new Date(order.created_at).toLocaleDateString()}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                    <div className="overflow-x-auto w-full">
+                      <table className="w-full min-w-[600px] text-sm">
+                        <thead><tr className="border-b border-white/5 text-left opacity-60">
+                          <th className="p-4 font-semibold">Order</th><th className="p-4">User</th><th className="p-4">Amount</th><th className="p-4">Status</th><th className="p-4">Date</th>
+                        </tr></thead>
+                        <tbody>
+                          {orders.slice(0, 5).map((order: any) => (
+                            <tr key={order.id} className="border-b border-white/5 hover:bg-white/2">
+                              <td className="p-4 font-mono text-xs">#{order.order_number || order.id.slice(0,8)}</td>
+                              <td className="p-4">{(order.user as any)?.full_name || '—'}</td>
+                              <td className="p-4 font-bold" style={{ color: 'var(--sync-yellow)' }}>${Number(order.total_usd).toFixed(2)}</td>
+                              <td className="p-4"><StatusBadge status={order.status} /></td>
+                              <td className="p-4 opacity-60">{new Date(order.created_at).toLocaleDateString()}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   )}
                 </div>
               </div>
@@ -454,31 +487,42 @@ export default function AdminDashboard() {
             {/* Gift Links Tab */}
             {activeTab === 'gift_links' && <AdminGiftsTab />}
 
+            {/* Service Links Tab */}
+            {activeTab === 'service_links' && <AdminServiceLinksTab />}
+
             {/* Users Tab */}
             {activeTab === 'users' && (
               <div className="space-y-6">
                 <h1 className="text-3xl font-black">Users ({users.length})</h1>
                 <div className="rounded-2xl border border-white/5 overflow-hidden" style={{ background: '#0d1530' }}>
-                  <table className="w-full text-sm">
-                    <thead><tr className="border-b border-white/5 text-left opacity-60">
-                      <th className="p-4">Name</th><th className="p-4">Role</th><th className="p-4">Balance</th><th className="p-4">Joined</th><th className="p-4 text-right">Actions</th>
-                    </tr></thead>
-                    <tbody>
-                      {users.map((u: any) => (
-                        <tr key={u.id} className="border-b border-white/5 hover:bg-white/5 cursor-pointer transition-colors" onClick={() => setSelectedUser(u)}>
-                          <td className="p-4 font-bold">{u.full_name || '—'}</td>
-                          <td className="p-4"><RoleBadge role={u.role} /></td>
-                          <td className="p-4 font-bold" style={{ color: 'var(--sync-yellow)' }}>${Number(u.balance || 0).toFixed(2)}</td>
-                          <td className="p-4 opacity-60">{new Date(u.created_at).toLocaleDateString()}</td>
-                          <td className="p-4 text-right">
-                            <button onClick={() => setSelectedUser(u)} className="px-3 py-1.5 rounded-lg text-xs font-bold transition-colors bg-white/5 hover:bg-white/10 inline-flex items-center gap-1">
-                              <Plus className="w-3 h-3" /> Details / Balance
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  <div className="overflow-x-auto w-full">
+                    <table className="w-full min-w-[600px] text-sm">
+                      <thead><tr className="border-b border-white/5 text-left opacity-60">
+                        <th className="p-4">Name</th><th className="p-4">Role</th><th className="p-4">Balance</th><th className="p-4">Joined</th><th className="p-4 text-right">Actions</th>
+                      </tr></thead>
+                      <tbody>
+                        {users.map((u: any) => (
+                          <tr key={u.id} className="border-b border-white/5 hover:bg-white/5 cursor-pointer transition-colors" onClick={() => setSelectedUser(u)}>
+                            <td className="p-4 font-bold">{u.full_name || '—'}</td>
+                            <td className="p-4"><RoleBadge role={u.role} /></td>
+                            <td className="p-4 font-bold" style={{ color: 'var(--sync-yellow)' }}>${Number(u.balance || 0).toFixed(2)}</td>
+                            <td className="p-4 opacity-60">{new Date(u.created_at).toLocaleDateString()}</td>
+                            <td className="p-4 text-right">
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedUser(u);
+                                }} 
+                                className="px-3 py-1.5 rounded-lg text-xs font-bold transition-colors bg-white/5 hover:bg-white/10 inline-flex items-center gap-1"
+                              >
+                                <Plus className="w-3 h-3" /> Details / Balance
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             )}
@@ -494,27 +538,29 @@ export default function AdminDashboard() {
                   </div>
                 ) : (
                   <div className="rounded-2xl border border-white/5 overflow-hidden" style={{ background: '#0d1530' }}>
-                    <table className="w-full text-sm">
-                      <thead><tr className="border-b border-white/5 text-left opacity-60">
-                        <th className="p-4">ID</th><th className="p-4">User</th><th className="p-4">Amount</th><th className="p-4">Method</th><th className="p-4">Status</th><th className="p-4 text-right">Actions</th>
-                      </tr></thead>
-                      <tbody>
-                        {orders.map((order: any) => (
-                          <tr key={order.id} className="border-b border-white/5 hover:bg-white/2">
-                            <td className="p-4 font-mono text-xs">#{order.order_number || order.id.slice(0, 8)}</td>
-                            <td className="p-4">{(order.user as any)?.full_name || '—'}</td>
-                            <td className="p-4 font-bold" style={{ color: 'var(--sync-yellow)' }}>${Number(order.total_usd).toFixed(2)}</td>
-                            <td className="p-4 opacity-60 capitalize">{order.payment_method}</td>
-                            <td className="p-4"><StatusBadge status={order.status} /></td>
-                            <td className="p-4 text-right">
-                              <button onClick={() => setSelectedOrder(order)} className="px-3 py-1.5 rounded-lg text-xs font-bold transition-colors bg-white/5 hover:bg-(--sync-yellow)/20 hover:text-(--sync-yellow) inline-flex">
-                                View Details
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                    <div className="overflow-x-auto w-full">
+                      <table className="w-full min-w-[700px] text-sm">
+                        <thead><tr className="border-b border-white/5 text-left opacity-60">
+                          <th className="p-4">ID</th><th className="p-4">User</th><th className="p-4">Amount</th><th className="p-4">Method</th><th className="p-4">Status</th><th className="p-4 text-right">Actions</th>
+                        </tr></thead>
+                        <tbody>
+                          {orders.map((order: any) => (
+                            <tr key={order.id} className="border-b border-white/5 hover:bg-white/2">
+                              <td className="p-4 font-mono text-xs">#{order.order_number || order.id.slice(0, 8)}</td>
+                              <td className="p-4">{(order.user as any)?.full_name || '—'}</td>
+                              <td className="p-4 font-bold" style={{ color: 'var(--sync-yellow)' }}>${Number(order.total_usd).toFixed(2)}</td>
+                              <td className="p-4 opacity-60 capitalize">{order.payment_method}</td>
+                              <td className="p-4"><StatusBadge status={order.status} /></td>
+                              <td className="p-4 text-right">
+                                <button onClick={() => setSelectedOrder(order)} className="px-3 py-1.5 rounded-lg text-xs font-bold transition-colors bg-white/5 hover:bg-(--sync-yellow)/20 hover:text-(--sync-yellow) inline-flex">
+                                  View Details
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 )}
               </div>
