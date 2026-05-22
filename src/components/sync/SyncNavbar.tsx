@@ -16,7 +16,6 @@ export default function SyncNavbar() {
 
   const isAdminPage = pathname === '/admin' || pathname.startsWith('/admin/') || pathname === '/sync/admin' || pathname.startsWith('/sync/admin/');
 
-  if (isAdminPage) return null;
   const [isScrolled, setIsScrolled] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -45,6 +44,8 @@ export default function SyncNavbar() {
       document.body.style.overflow = '';
     }
   }, [showMobileMenu]);
+
+  if (isAdminPage) return null;
 
   return (
     <>

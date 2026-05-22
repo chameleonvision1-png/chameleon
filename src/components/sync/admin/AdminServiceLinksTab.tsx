@@ -1,19 +1,59 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
 import { createSyncClient } from '@/lib/sync/supabase-client';
 import { 
   Gift, Loader2, Plus, Copy, CheckCircle, XCircle, Trash2, 
   RefreshCw, Link as LinkIcon, Box, Tag, BarChart2, ExternalLink 
 } from 'lucide-react';
 
+interface Profile {
+  id: string;
+  full_name: string | null;
+  user_code: string | null;
+  phone: string | null;
+}
+
+interface Plan {
+  id: string;
+  title_en: string;
+  title_ar: string;
+  product?: { name: string } | null;
+}
+
+interface GiftLink {
+  id: string;
+  plan_id: string;
+  plan_inventory_id: string | null;
+  reward_url: string;
+  details: string | null;
+  is_used: boolean;
+  used_by: string | null;
+  used_at: string | null;
+  saved_by: string | null;
+  saved_at: string | null;
+  created_at: string;
+  plan?: Plan | null;
+  used_by_profile?: Profile | null;
+  saved_by_profile?: Profile | null;
+}
+
+interface InviteLinkStat {
+  invite_link: string;
+  available: number;
+  sold: number;
+  used: number;
+  total: number;
+}
+
 export default function AdminServiceLinksTab() {
-  const [links, setLinks] = useState<any[]>([]);
-  const [plans, setPlans] = useState<any[]>([]);
+  const [links, setLinks] = useState<GiftLink[]>([]);
+  const [plans, setPlans] = useState<Plan[]>([]);
   const [availableInviteLinks, setAvailableInviteLinks] = useState<string[]>([]);
   
   // Stats and Filters
-  const [totalAvailableStock, setTotalAvailableStock] = useState(0);
-  const [inviteLinkStats, setInviteLinkStats] = useState<any[]>([]);
+  const [totalAvailableStock, setTotalAvailableStock] = useState<number>(0);
+  const [inviteLinkStats, setInviteLinkStats] = useState<InviteLinkStat[]>([]);
   const [isLoadingStats, setIsLoadingStats] = useState(false);
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'saved' | 'claimed'>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -44,9 +84,10 @@ export default function AdminServiceLinksTab() {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      setLinks(data || []);
+      setLinks((data as any) || []);
     } catch (err: any) {
-      alert('Error fetching service links: ' + err.message);
+      toast.error('Error fetching service links: ' + err.message);
+      console.error(err);
     } finally {
       setIsLoading(false);
     }
@@ -62,9 +103,9 @@ export default function AdminServiceLinksTab() {
         .eq('is_active', true);
 
       if (error) throw error;
-      setPlans(data || []);
+      setPlans((data as any) || []);
     } catch (err: any) {
-      console.error('Error fetching plans:', err.message);
+      console.error(err);
     }
   };
 
@@ -80,7 +121,7 @@ export default function AdminServiceLinksTab() {
       if (error) throw error;
       setTotalAvailableStock(count || 0);
     } catch (err: any) {
-      console.error('Error fetching total available stock:', err.message);
+      console.error(err);
     }
   };
 
@@ -101,7 +142,7 @@ export default function AdminServiceLinksTab() {
       if (error) throw error;
 
       const uniqueLinks = Array.from(
-        new Set((data || []).map((item: any) => item.invite_link).filter(Boolean))
+        new Set((data || []).map((item: { invite_link: string | null }) => item.invite_link).filter(Boolean))
       ) as string[];
 
       setAvailableInviteLinks(uniqueLinks);
@@ -109,7 +150,7 @@ export default function AdminServiceLinksTab() {
         setSelectedInviteLink(uniqueLinks[0]);
       }
     } catch (err: any) {
-      console.error('Error loading inventory links:', err.message);
+      console.error(err);
     } finally {
       setIsLoadingInv(false);
     }
@@ -132,8 +173,9 @@ export default function AdminServiceLinksTab() {
       if (error) throw error;
 
       const groups: Record<string, { invite_link: string; available: number; sold: number; used: number; total: number }> = {};
-      (data || []).forEach((item: any) => {
+      (data || []).forEach((item: { invite_link: string | null; status: string | null }) => {
         const link = item.invite_link;
+        if (!link) return;
         if (!groups[link]) {
           groups[link] = { invite_link: link, available: 0, sold: 0, used: 0, total: 0 };
         }
@@ -150,7 +192,7 @@ export default function AdminServiceLinksTab() {
       const statsArray = Object.values(groups).sort((a, b) => b.available - a.available);
       setInviteLinkStats(statsArray);
     } catch (err: any) {
-      console.error('Error loading invite link stats:', err.message);
+      console.error(err);
     } finally {
       setIsLoadingStats(false);
     }
@@ -189,7 +231,7 @@ export default function AdminServiceLinksTab() {
       const { data: userData } = await supabase.auth.getUser();
       
       if (!userData.user) {
-        alert('Authentication error: User not found.');
+        toast.error('Authentication error: User not found.');
         return;
       }
 
@@ -203,12 +245,14 @@ export default function AdminServiceLinksTab() {
 
       if (error) throw error;
 
+      toast.success('Service link generated successfully!');
       setDetails('');
       setSelectedPlanId('');
       setSelectedInviteLink('');
       refreshData();
     } catch (err: any) {
-      alert('Error generating service link: ' + err.message);
+      toast.error('Error generating service link: ' + err.message);
+      console.error(err);
     } finally {
       setIsGenerating(false);
     }
@@ -221,9 +265,11 @@ export default function AdminServiceLinksTab() {
       const supabase = createSyncClient();
       const { error } = await supabase.from('gift_links').delete().eq('id', id);
       if (error) throw error;
+      toast.success('Service link deleted successfully!');
       refreshData();
     } catch (err: any) {
-      alert('Error deleting link: ' + err.message);
+      toast.error('Error deleting link: ' + err.message);
+      console.error(err);
     }
   };
 
@@ -284,6 +330,7 @@ export default function AdminServiceLinksTab() {
 
   return (
     <div className="space-y-8">
+      <Toaster position="top-right" />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -464,7 +511,7 @@ export default function AdminServiceLinksTab() {
                             type="button"
                             onClick={() => {
                               navigator.clipboard.writeText(stat.invite_link);
-                              alert('Link copied to clipboard!');
+                              toast.success('Link copied to clipboard!');
                             }}
                             className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-white/60 hover:text-white"
                             title="Copy Invite Link"

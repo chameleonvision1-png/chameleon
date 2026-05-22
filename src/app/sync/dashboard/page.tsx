@@ -143,7 +143,7 @@ export default function UserDashboard() {
     }
   };
 
-  const handleActivateSavedLink = async (linkId: string, rewardUrl: string) => {
+  const handleActivateSavedLink = async (linkId: string) => {
     if (!user) return;
     setActivatingLinkId(linkId);
     const supabase = createSyncClient();
@@ -169,7 +169,7 @@ export default function UserDashboard() {
         )
       );
 
-      window.open(rewardUrl, '_blank');
+      window.open(data[0].reward_url, '_blank');
     } catch (err: any) {
       alert(lang === 'ar' ? 'حدث خطأ أثناء تفعيل الاشتراك: ' + err.message : 'Error activating subscription: ' + err.message);
     } finally {
@@ -606,7 +606,7 @@ export default function UserDashboard() {
                                   <>
                                     <button
                                       disabled={activatingLinkId === link.id}
-                                      onClick={() => handleActivateSavedLink(link.id, link.reward_url)}
+                                      onClick={() => handleActivateSavedLink(link.id)}
                                       className="flex-1 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1.5 hover:scale-[1.02] active:scale-95 text-[#0B132B]"
                                       style={{ background: 'var(--sync-yellow)' }}
                                     >

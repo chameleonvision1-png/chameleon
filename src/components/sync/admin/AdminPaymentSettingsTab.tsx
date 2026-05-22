@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createSyncClient } from '@/lib/sync/supabase-client';
 import { 
   Loader2, Save, AlertCircle, CheckCircle, 
@@ -37,8 +37,7 @@ export default function AdminPaymentSettingsTab() {
   const qrInputRef = useRef<HTMLInputElement>(null);
   const [activeQrUploadId, setActiveQrUploadId] = useState<string | null>(null);
 
-  const loadSettings = async () => {
-    setIsLoading(true);
+  const loadSettings = useCallback(async () => {
     const supabase = createSyncClient();
     const { data, error } = await supabase
       .from('payment_settings')
@@ -51,12 +50,12 @@ export default function AdminPaymentSettingsTab() {
       setSettings(data || []);
     }
     setIsLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadSettings();
-  }, []);
+  }, [loadSettings]);
 
   const handleFieldChange = (id: string, field: string, value: any) => {
     setSettings(prev => prev.map(s => s.id === id ? { ...s, [field]: value } : s));
