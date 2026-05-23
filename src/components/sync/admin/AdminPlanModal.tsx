@@ -214,10 +214,10 @@ export default function AdminPlanModal({ isOpen, onClose, product, plan, onSucce
                     }} 
                     className="opacity-0 w-0 h-0 peer absolute" 
                   />
-                  <span className="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-white/10 transition-all duration-300 rounded-full peer-checked:bg-[var(--sync-yellow)]"></span>
+                  <span className="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-white/10 transition-all duration-300 rounded-full peer-checked:bg-(--sync-yellow)"></span>
                   <span className="absolute cursor-pointer left-[2px] bottom-[2px] bg-white transition-all duration-300 rounded-full h-3 w-3 peer-checked:translate-x-4 peer-checked:bg-[#060b18]"></span>
                 </div>
-                <span className="text-xs font-bold opacity-90 text-[var(--sync-yellow)]">Store Old Price</span>
+                <span className="text-xs font-bold opacity-90 text-(--sync-yellow)">Store Old Price</span>
               </label>
               {hasStoreOldPrice ? (
                 <input 
