@@ -96,7 +96,7 @@ export default function SyncNavbar() {
             {/* User */}
             {user ? (
               <div className="relative hidden md:block">
-                <button onClick={() => setShowUserMenu(!showUserMenu)} className="p-2 hover:text-(--sync-yellow) transition-colors rounded-full border border-white/10">
+                <button onClick={() => setShowUserMenu(!showUserMenu)} className="p-2 hover:text-(--sync-yellow) transition-colors rounded-full border border-(--sync-border)">
                   <User className="w-4 h-4" />
                 </button>
                 {showUserMenu && (
@@ -109,16 +109,16 @@ export default function SyncNavbar() {
                       role="button"
                       aria-label="Close user menu"
                     />
-                    <div className="absolute right-0 mt-2 w-48 rounded-xl border border-white/10 shadow-2xl z-50 overflow-hidden" style={{ background: '#0d1530' }}>
-                      <div className="p-3 border-b border-white/10">
+                    <div className="absolute right-0 mt-2 w-48 rounded-xl border border-(--sync-border) shadow-2xl z-50 overflow-hidden" style={{ background: 'var(--sync-surface)' }}>
+                      <div className="p-3 border-b border-(--sync-border)">
                         <p className="text-xs font-bold truncate">{profile?.full_name || 'User'}</p>
                         <p className="text-[10px] opacity-50 truncate">{user?.email}</p>
                       </div>
-                      <Link href="/dashboard" className="block px-4 py-2.5 text-sm hover:bg-white/5 transition-colors" onClick={() => setShowUserMenu(false)}>
+                      <Link href="/dashboard" className="block px-4 py-2.5 text-sm hover:bg-(--sync-bg-elevated) transition-colors" onClick={() => setShowUserMenu(false)}>
                         {lang === 'ar' ? 'لوحة التحكم' : 'Dashboard'}
                       </Link>
                       {isAdmin && (
-                        <Link href="/admin" className="block px-4 py-2.5 text-sm hover:bg-white/5 transition-colors" style={{ color: 'var(--sync-yellow)' }} onClick={() => setShowUserMenu(false)}>
+                        <Link href="/admin" className="block px-4 py-2.5 text-sm hover:bg-(--sync-bg-elevated) transition-colors" style={{ color: 'var(--sync-yellow)' }} onClick={() => setShowUserMenu(false)}>
                           {lang === 'ar' ? 'إدارة المتجر' : 'Admin Panel'}
                         </Link>
                       )}
@@ -154,8 +154,8 @@ export default function SyncNavbar() {
       {showMobileMenu && (
         <div className="md:hidden fixed inset-0 z-100 flex" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowMobileMenu(false)} />
-          <div className="relative w-64 sm:w-80 h-full shadow-2xl flex flex-col" style={{ background: 'var(--sync-surface)', borderRight: lang === 'en' ? '1px solid rgba(255,255,255,0.05)' : 'none', borderLeft: lang === 'ar' ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
-            <div className="flex items-center justify-between p-4 border-b border-white/5">
+          <div className="relative w-64 sm:w-80 h-full shadow-2xl flex flex-col animate-in slide-in-from-left duration-300" style={{ background: 'var(--sync-surface)', borderRight: lang === 'en' ? '1px solid var(--sync-border)' : 'none', borderLeft: lang === 'ar' ? '1px solid var(--sync-border)' : 'none' }}>
+            <div className="flex items-center justify-between p-4 border-b border-(--sync-border)">
               <img src="/sync-logo.png" alt="SYNC" className="h-8 w-auto object-contain" />
               <button onClick={() => setShowMobileMenu(false)} className="p-2 hover:text-(--sync-yellow) transition-colors">
                 <X className="w-6 h-6" />
@@ -170,12 +170,12 @@ export default function SyncNavbar() {
                 <a href="/#faq" onClick={() => setShowMobileMenu(false)} className="font-semibold text-lg hover:text-(--sync-yellow) transition-colors">{t.navFAQ}</a>
               </div>
               
-              <div className="h-px w-full bg-white/10" />
+              <div className="h-px w-full bg-(--sync-border)" />
               
               <div className="flex flex-col gap-4">
                 {user ? (
                   <>
-                    <div className="flex items-center gap-3 mb-2 p-3 rounded-xl bg-black/20 border border-white/5">
+                    <div className="flex items-center gap-3 mb-2 p-3 rounded-xl bg-(--sync-bg-elevated) border border-(--sync-border)">
                       <div className="w-10 h-10 shrink-0 rounded-full bg-(--sync-bg) flex items-center justify-center border border-(--sync-yellow)/30">
                         <User className="w-5 h-5 text-(--sync-yellow)" />
                       </div>
@@ -186,18 +186,18 @@ export default function SyncNavbar() {
                     </div>
                     
                     {profile && (
-                      <Link href="/dashboard" onClick={() => setShowMobileMenu(false)} className="flex items-center gap-2 font-mono text-sm p-3 rounded-xl bg-black/20 border border-white/5">
+                      <Link href="/dashboard" onClick={() => setShowMobileMenu(false)} className="flex items-center gap-2 font-mono text-sm p-3 rounded-xl bg-(--sync-bg-elevated) border border-(--sync-border)">
                         <Wallet className="w-4 h-4 text-(--sync-yellow)" />
                         <span className="text-(--sync-yellow) font-bold">Balance: ${Number(profile.balance || 0).toFixed(2)}</span>
                       </Link>
                     )}
                     
-                    <Link href="/dashboard" onClick={() => setShowMobileMenu(false)} className="font-semibold p-3 rounded-xl hover:bg-white/5 transition-colors">
+                    <Link href="/dashboard" onClick={() => setShowMobileMenu(false)} className="font-semibold p-3 rounded-xl hover:bg-(--sync-bg-elevated) transition-colors">
                       {lang === 'ar' ? 'لوحة التحكم' : 'Dashboard'}
                     </Link>
                     
                     {isAdmin && (
-                      <Link href="/admin" onClick={() => setShowMobileMenu(false)} className="font-semibold text-(--sync-yellow) p-3 rounded-xl hover:bg-white/5 transition-colors">
+                      <Link href="/admin" onClick={() => setShowMobileMenu(false)} className="font-semibold text-(--sync-yellow) p-3 rounded-xl hover:bg-(--sync-bg-elevated) transition-colors">
                         {lang === 'ar' ? 'إدارة المتجر' : 'Admin Panel'}
                       </Link>
                     )}

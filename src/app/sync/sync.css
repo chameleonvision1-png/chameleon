@@ -10,26 +10,33 @@
   --sync-yellow-soft: #FFE8B2;
   --sync-text: #F5F7FA;
   --sync-text-dim: #94a3b8;
+  --sync-text-primary: #FFFFFF;
   --sync-border: rgba(59,130,246,0.15);
   --sync-glow: rgba(59,130,246,0.25);
+  --sync-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  --sync-shadow-featured: 0 20px 50px rgba(255, 194, 26, 0.15);
+  --sync-text-on-yellow: #0B132B;
   color-scheme: dark;
 }
 
 [data-theme="sync-light"] {
   --sync-bg: #3B82F6; /* Electric Blue Background */
-  --sync-bg-elevated: #2563EB;
-  --sync-surface: #0B132B; /* Navy Cards */
-  --sync-surface-hover: #111d3a;
-  --sync-blue: #0B132B; /* Inverse blue elements to Navy */
+  --sync-bg-elevated: #2563EB; /* Vibrant Blue-600 */
+  --sync-surface: #60a5fa; /* Brand Light Blue */
+  --sync-surface-hover: #93c5fd; /* Softer light blue hover */
+  --sync-blue: #0B132B; /* Dark Navy for contrast */
   --sync-blue-bright: #1E3A8A;
-  --sync-yellow: #FFC21A;
+  --sync-yellow: #FFC21A; /* Brand Yellow */
   --sync-yellow-soft: #FFF3CC;
-  --sync-text: rgba(255, 255, 255, 0.9);
-  --sync-text-dim: rgba(255, 255, 255, 0.7);
-  --sync-text-primary: #FFFFFF;
-  --sync-border: rgba(255, 255, 255, 0.15);
-  --sync-glow: rgba(11, 19, 43, 0.25);
-  color-scheme: dark;
+  --sync-text: #0B132B; /* Navy text on light blue */
+  --sync-text-dim: #1E3A8A;
+  --sync-text-primary: #0B132B;
+  --sync-border: rgba(11, 19, 43, 0.15); /* Navy borders */
+  --sync-glow: rgba(255, 255, 255, 0.15);
+  --sync-shadow: 0 20px 40px rgba(11, 19, 43, 0.12);
+  --sync-shadow-featured: 0 20px 50px rgba(255, 194, 26, 0.25);
+  --sync-text-on-yellow: #0B132B;
+  color-scheme: light;
 }
 
 .sync-wrapper {
@@ -101,4 +108,25 @@
 }
 .sync-subtext {
   color: var(--sync-text-dim);
+}
+
+/* Image filter for light mode to convert dark background images to matching light background images */
+[data-theme="sync-light"] .sync-light-image-filter {
+  filter: invert(0.63) brightness(1.10) contrast(1.70) saturate(1.90) hue-rotate(175deg);
+}
+
+.sync-back-link {
+  transition: all 0.3s ease;
+}
+.sync-back-link:hover {
+  border-color: rgba(255, 194, 26, 0.3) !important;
+}
+
+.sync-modal-close-btn {
+  color: var(--sync-text-dim);
+  transition: all 0.2s ease;
+}
+.sync-modal-close-btn:hover:not(:disabled) {
+  background-color: var(--sync-surface);
+  color: var(--sync-text-primary);
 }

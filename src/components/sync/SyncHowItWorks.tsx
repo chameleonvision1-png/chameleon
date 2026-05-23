@@ -8,7 +8,7 @@ export default function SyncHowItWorks() {
   const { t } = useSync();
 
   return (
-    <section id="how-it-works" className="py-24 relative z-10" style={{ background: 'rgba(11, 19, 43, 0.5)' }}>
+    <section id="how-it-works" className="py-24 relative z-10" style={{ background: 'var(--sync-bg-elevated)' }}>
       <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-12 2xl:px-24">
         <h2 className="sync-heading text-4xl md:text-5xl text-center mb-20">{t.howItWorksTitle}</h2>
         

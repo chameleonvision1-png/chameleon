@@ -35,16 +35,16 @@ export default function SyncCartDrawer() {
       />
       
       {/* Drawer */}
-      <div className="fixed top-0 right-0 h-full w-full max-w-md bg-[#0a1128] border-l border-white/10 shadow-2xl z-100 flex flex-col transform transition-transform duration-300 ease-out">
+      <div className="fixed top-0 right-0 h-full w-full max-w-md bg-(--sync-surface) border-l border-(--sync-border) shadow-2xl z-100 flex flex-col transform transition-transform duration-300 ease-out">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-white/10">
+        <div className="flex items-center justify-between p-6 border-b border-(--sync-border)">
           <div className="flex items-center gap-3">
             <ShoppingBag className="w-5 h-5" style={{ color: 'var(--sync-yellow)' }} />
-            <h2 className="text-lg font-black text-white tracking-wider">
+            <h2 className="text-lg font-black text-(--sync-text-primary) tracking-wider">
               {lang === 'ar' ? 'السلة' : 'Cart'} ({totalItems})
             </h2>
           </div>
-          <button onClick={() => setIsCartOpen(false)} className="p-2 rounded-xl hover:bg-white/5 text-white/50 hover:text-white transition-colors">
+          <button onClick={() => setIsCartOpen(false)} className="p-2 rounded-xl hover:bg-(--sync-bg-elevated) text-(--sync-text-dim) hover:text-(--sync-text-primary) transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -58,10 +58,10 @@ export default function SyncCartDrawer() {
             </div>
           ) : (
             items.map(item => (
-              <div key={item.planId} className="rounded-xl border border-white/10 p-4 space-y-3" style={{ background: '#0d1530' }}>
+              <div key={item.planId} className="rounded-xl border border-(--sync-border) p-4 space-y-3" style={{ background: 'var(--sync-bg-elevated)' }}>
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-white truncate">{item.productName}</p>
+                    <p className="text-sm font-bold text-(--sync-text-primary) truncate">{item.productName}</p>
                     <p className="text-xs opacity-60 mt-1">{item.planTitle}</p>
                     <p className="text-xs opacity-40">{item.durationDays} {lang === 'ar' ? 'يوم' : 'days'}</p>
                   </div>
@@ -70,12 +70,12 @@ export default function SyncCartDrawer() {
                   </button>
                 </div>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 rounded-xl border border-white/10 overflow-hidden">
-                    <button onClick={() => updateQuantity(item.planId, item.quantity - 1)} className="p-2 hover:bg-white/5 transition-colors">
+                  <div className="flex items-center gap-2 rounded-xl border border-(--sync-border) overflow-hidden">
+                    <button onClick={() => updateQuantity(item.planId, item.quantity - 1)} className="p-2 hover:bg-(--sync-surface) transition-colors">
                       <Minus className="w-3 h-3" />
                     </button>
                     <span className="text-sm font-bold w-6 text-center">{item.quantity}</span>
-                    <button onClick={() => updateQuantity(item.planId, item.quantity + 1)} className="p-2 hover:bg-white/5 transition-colors">
+                    <button onClick={() => updateQuantity(item.planId, item.quantity + 1)} className="p-2 hover:bg-(--sync-surface) transition-colors">
                       <Plus className="w-3 h-3" />
                     </button>
                   </div>
@@ -90,7 +90,7 @@ export default function SyncCartDrawer() {
 
         {/* Footer */}
         {items.length > 0 && (
-          <div className="border-t border-white/10 p-6 space-y-4">
+          <div className="border-t border-(--sync-border) p-6 space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-sm opacity-60">{lang === 'ar' ? 'الإجمالي' : 'Total'}</span>
               <span className="text-2xl font-black" style={{ color: 'var(--sync-yellow)' }}>${totalUsd.toFixed(2)}</span>

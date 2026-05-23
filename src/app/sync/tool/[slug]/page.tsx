@@ -111,11 +111,11 @@ const GiftCard = ({ plan, tool, lang, currency, onAddToCart }: { plan: Plan; too
       >
         {/* Front Face */}
         <div 
-          className="absolute inset-0 w-full rounded-4xl overflow-hidden flex flex-col"
+          className="absolute inset-0 w-full rounded-4xl overflow-hidden flex flex-col transition-all duration-500"
           style={{
-            background: 'linear-gradient(180deg, #161e31 0%, #080b14 100%)',
-            border: plan.is_highlighted ? '2px solid var(--sync-yellow)' : '1px solid rgba(255,255,255,0.1)',
-            boxShadow: plan.is_highlighted ? '0 20px 50px rgba(255, 194, 26, 0.15)' : '0 20px 40px rgba(0,0,0,0.4)',
+            background: 'linear-gradient(180deg, var(--sync-surface) 0%, var(--sync-bg-elevated) 100%)',
+            border: plan.is_highlighted ? '2px solid var(--sync-yellow)' : '1px solid var(--sync-border)',
+            boxShadow: plan.is_highlighted ? 'var(--sync-shadow-featured)' : 'var(--sync-shadow)',
             backfaceVisibility: 'hidden',
             WebkitBackfaceVisibility: 'hidden',
             pointerEvents: isFlipped ? 'none' : 'auto'
@@ -142,7 +142,7 @@ const GiftCard = ({ plan, tool, lang, currency, onAddToCart }: { plan: Plan; too
                   background: '#04165d'
                 }}>
               <div className="absolute inset-0 opacity-20 mix-blend-overlay z-10" style={{ background: 'url("https://www.transparenttextures.com/patterns/carbon-fibre.png")', pointerEvents: 'none' }}></div>
-              <img src={plan.mini_card_url || '/sync-covers/products-ticket.jpg'} alt="Products" className="w-full h-full object-cover relative z-0" />
+              <img src={plan.mini_card_url || '/sync-covers/products-ticket.jpg'} alt="Products" className="w-full h-full object-cover relative z-0 sync-light-image-filter" />
             </div>
           </div>
 
@@ -201,11 +201,11 @@ const GiftCard = ({ plan, tool, lang, currency, onAddToCart }: { plan: Plan; too
 
         {/* Back Face */}
         <div 
-          className="absolute inset-0 w-full rounded-4xl overflow-hidden flex flex-col p-8"
+          className="absolute inset-0 w-full rounded-4xl overflow-hidden flex flex-col p-8 transition-all duration-500"
           style={{
-            background: 'linear-gradient(180deg, #080b14 0%, #161e31 100%)',
-            border: plan.is_highlighted ? '2px solid var(--sync-yellow)' : '1px solid rgba(255,255,255,0.1)',
-            boxShadow: plan.is_highlighted ? '0 20px 50px rgba(255, 194, 26, 0.15)' : '0 20px 40px rgba(0,0,0,0.4)',
+            background: 'linear-gradient(180deg, var(--sync-bg-elevated) 0%, var(--sync-surface) 100%)',
+            border: plan.is_highlighted ? '2px solid var(--sync-yellow)' : '1px solid var(--sync-border)',
+            boxShadow: plan.is_highlighted ? 'var(--sync-shadow-featured)' : 'var(--sync-shadow)',
             backfaceVisibility: 'hidden',
             WebkitBackfaceVisibility: 'hidden',
             transform: 'rotateY(180deg)',
@@ -249,7 +249,7 @@ const GiftCard = ({ plan, tool, lang, currency, onAddToCart }: { plan: Plan; too
             
             <button 
               type="button"
-              className="mt-auto shrink-0 w-full py-2.5 rounded-lg border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.05)] transition-all flex items-center justify-center gap-2 group"
+              className="mt-auto shrink-0 w-full py-2.5 rounded-lg border border-(--sync-border) bg-black/5 hover:bg-black/10 transition-all flex items-center justify-center gap-2 group"
               onClick={(e) => { e.stopPropagation(); setActiveModal('details_activation'); }}
             >
               <Info className="w-4 h-4 opacity-80 group-hover:scale-110 transition-transform" style={{ color: 'var(--sync-yellow)' }} />
@@ -268,7 +268,7 @@ const GiftCard = ({ plan, tool, lang, currency, onAddToCart }: { plan: Plan; too
              <button 
                type="button" 
                onClick={(e) => { e.stopPropagation(); setActiveModal('policies'); }} 
-               className="px-4 py-1.5 rounded-full text-[10px] font-bold flex items-center justify-center gap-1 transition-all border border-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.05)] w-fit cursor-pointer" 
+               className="px-4 py-1.5 rounded-full text-[10px] font-bold flex items-center justify-center gap-1 transition-all border border-(--sync-border) hover:bg-black/5 w-fit cursor-pointer" 
                style={{ color: 'var(--sync-text-primary)' }}
              >
                <FileText className="w-3 h-3" style={{ color: 'var(--sync-yellow)' }} />
@@ -303,25 +303,24 @@ const GiftCard = ({ plan, tool, lang, currency, onAddToCart }: { plan: Plan; too
           onClick={(e) => { e.stopPropagation(); setActiveModal(null); }}
         >
           <div 
-            className="rounded-2xl p-6 md:p-8 max-w-lg w-full animate-in zoom-in-95"
+            className="rounded-2xl p-6 md:p-8 max-w-lg w-full animate-in zoom-in-95 border border-(--sync-border)"
             style={{ 
-              background: 'linear-gradient(145deg, #0d1530 0%, #0B132B 100%)',
-              border: '1px solid rgba(255, 194, 26, 0.15)',
-              boxShadow: '0 25px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 194, 26, 0.05)'
+              background: 'linear-gradient(145deg, var(--sync-surface) 0%, var(--sync-bg-elevated) 100%)',
+              boxShadow: 'var(--sync-shadow)'
             }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold text-white tracking-wider">{modalTitles[activeModal]}</h3>
-              <button onClick={(e) => { e.stopPropagation(); setActiveModal(null); }} className="text-white/50 hover:text-white transition-colors">
+              <h3 className="text-xl font-bold text-(--sync-text-primary) tracking-wider">{modalTitles[activeModal]}</h3>
+              <button onClick={(e) => { e.stopPropagation(); setActiveModal(null); }} className="text-(--sync-text-dim) hover:text-(--sync-text-primary) transition-colors">
                 <X className="w-6 h-6" />
               </button>
             </div>
-            <div className="text-white/80 leading-relaxed text-sm md:text-base">
+            <div className="text-(--sync-text) leading-relaxed text-sm md:text-base">
                {modalContents[activeModal]}
             </div>
             <button 
-              className="w-full mt-8 py-3 rounded-xl font-bold transition-colors bg-(--sync-yellow) text-[#0B132B] hover:bg-white"
+              className="w-full mt-8 py-3 rounded-xl font-bold transition-colors bg-(--sync-yellow) text-[#0B132B] hover:bg-(--sync-bg-elevated) border border-(--sync-border)"
               onClick={(e) => { e.stopPropagation(); setActiveModal(null); }}
             >
               {lang === 'ar' ? 'حسناً، فهمت' : 'Got it'}
@@ -427,7 +426,7 @@ export default function ToolPage({ params }: { params: Promise<{ slug: string }>
         <div className="absolute top-0 left-0 right-0 h-[60vh] z-0 overflow-hidden pointer-events-none">
           <div className="absolute inset-0 z-10" style={{ background: 'linear-gradient(to bottom, rgba(11, 19, 43, 0.4) 0%, var(--sync-bg) 100%)' }} />
           <div className="absolute inset-0 z-10 opacity-60" style={{ background: 'var(--sync-bg)' }} />
-          <img src={product.cover_image_url} alt={product.name} className="w-full h-full object-cover opacity-50 mix-blend-screen blur-[2px]" />
+          <img src={product.cover_image_url} alt={product.name} className="w-full h-full object-cover opacity-50 mix-blend-screen blur-[2px] sync-light-image-filter" />
         </div>
       ) : (
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-96 opacity-20 pointer-events-none blur-[120px]" style={{ background: 'radial-gradient(circle, var(--sync-yellow) 0%, transparent 70%)' }} />
@@ -436,7 +435,7 @@ export default function ToolPage({ params }: { params: Promise<{ slug: string }>
       <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-12 2xl:px-24 relative z-10">
         
         {/* Back Button */}
-        <Link href="/" className="inline-flex items-center gap-2 mb-8 px-4 py-2 rounded-full border border-white/10 hover:border-white/30 transition-all backdrop-blur-md relative z-20" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--sync-text-primary)' }}>
+        <Link href="/" className="inline-flex items-center gap-2 mb-8 px-4 py-2 rounded-full transition-all backdrop-blur-md relative z-20 sync-back-link" style={{ background: 'var(--sync-bg-elevated)', color: 'var(--sync-text-primary)', border: '1px solid var(--sync-border)' }}>
           {lang === 'ar' ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />}
           <span className="font-semibold text-sm">{lang === 'ar' ? 'الرجوع للعروض' : 'Back to Deals'}</span>
         </Link>
@@ -469,15 +468,15 @@ export default function ToolPage({ params }: { params: Promise<{ slug: string }>
                 onChange={(e) => setSelectedCurrency(currencies.find(c => c.code === e.target.value) || currencies[0])}
                 className="appearance-none outline-none py-3 px-6 pr-12 rounded-xl font-bold cursor-pointer transition-all duration-300 hover:scale-105"
                 style={{ 
-                  background: 'rgba(11, 19, 43, 0.8)', 
-                  color: 'var(--sync-yellow)',
-                  border: '1px solid rgba(255,194,26,0.3)',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                  background: 'var(--sync-surface)', 
+                  color: 'var(--sync-text-primary)',
+                  border: '1px solid var(--sync-border)',
+                  boxShadow: 'var(--sync-shadow)',
                   backdropFilter: 'blur(10px)'
                 }}
               >
                 {currencies.map(c => (
-                  <option key={c.code} value={c.code} style={{ background: '#080b14', color: 'var(--sync-yellow)' }}>
+                  <option key={c.code} value={c.code} style={{ background: 'var(--sync-bg-elevated)', color: 'var(--sync-text-primary)' }}>
                     {c.label}
                   </option>
                 ))}

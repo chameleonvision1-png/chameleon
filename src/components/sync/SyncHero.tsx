@@ -111,16 +111,16 @@ interface GiftCardProps {
 
 function GiftCard({ name, price, original, discount, period, image, featured = false, height = '420px' }: GiftCardProps) {
   return (
-    <div className={`w-[240px] md:w-[320px] rounded-2xl overflow-hidden shadow-2xl flex flex-col justify-between backdrop-blur-md`} 
+    <div className={`w-[240px] md:w-[320px] rounded-2xl overflow-hidden flex flex-col justify-between backdrop-blur-md transition-all duration-500`} 
          style={{ 
            backgroundColor: 'var(--sync-surface)', 
            border: featured ? '2px solid var(--sync-yellow)' : '1px solid var(--sync-border)',
            height: height,
-           boxShadow: featured ? '0 20px 50px rgba(255, 194, 26, 0.15)' : '0 20px 40px rgba(0,0,0,0.5)'
+           boxShadow: featured ? 'var(--sync-shadow-featured)' : 'var(--sync-shadow)'
          }}>
       
       {/* Top section */}
-      <div className="p-6 pb-2 border-b border-(--sync-border) relative" style={{ borderBottomColor: 'rgba(255,255,255,0.1)' }}>
+      <div className="p-6 pb-2 border-b border-(--sync-border) relative">
         <div className="flex justify-between items-start mb-4">
           <img src="/sync-logo.png" alt="SYNC" className="h-12 w-auto object-contain scale-[1.7] -ml-2 -mt-2" />
           <span className="font-bold text-lg" style={{ color: 'var(--sync-yellow)' }}>{discount}</span>
@@ -140,7 +140,7 @@ function GiftCard({ name, price, original, discount, period, image, featured = f
                background: featured ? 'linear-gradient(135deg, rgba(255,194,26,0.1) 0%, transparent 100%)' : 'linear-gradient(135deg, rgba(59,130,246,0.1) 0%, transparent 100%)'
              }}>
           {image ? (
-            <img src={image} alt={name} className="absolute inset-0 w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-700 opacity-90" />
+            <img src={image} alt={name} className="absolute inset-0 w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-700 opacity-90 sync-light-image-filter" />
           ) : (
             <>
               <span className="text-xs opacity-60 mb-2 uppercase tracking-widest" style={{ color: 'var(--sync-text-primary)' }}>Premium Access</span>
@@ -158,7 +158,7 @@ function GiftCard({ name, price, original, discount, period, image, featured = f
       </div>
 
       {/* Bottom section */}
-      <div className="p-6 pt-4 flex justify-between items-end border-t border-(--sync-border)" style={{ borderTopColor: 'rgba(255,255,255,0.1)' }}>
+      <div className="p-6 pt-4 flex justify-between items-end border-t border-(--sync-border)">
         <div>
           <p className="text-[10px] opacity-60 uppercase tracking-widest mb-1" style={{ color: 'var(--sync-text-primary)' }}>Original Value</p>
           <p className="line-through opacity-50" style={{ color: 'var(--sync-text-primary)' }}>{original}</p>

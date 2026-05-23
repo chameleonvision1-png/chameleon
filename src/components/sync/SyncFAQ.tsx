@@ -28,7 +28,7 @@ export default function SyncFAQ() {
   ];
 
   return (
-    <section id="faq" className="py-24 relative z-10" style={{ background: 'rgba(11, 19, 43, 0.3)' }}>
+    <section id="faq" className="py-24 relative z-10" style={{ background: 'var(--sync-bg-elevated)' }}>
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="sync-heading text-4xl md:text-5xl text-center mb-16">{t.navFAQ}</h2>
         

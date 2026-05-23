@@ -174,10 +174,10 @@ export default function SyncToolsGrid() {
           <div className="flex flex-wrap justify-center xl:justify-start gap-2">
             <button
               onClick={() => handleCategoryChange('All')}
-              className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 shadow-sm ${
+              className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 shadow-sm border ${
                 activeCategory === 'All' 
-                  ? 'bg-(--sync-yellow) text-[#0B132B] shadow-[0_0_15px_rgba(255,194,26,0.4)]' 
-                  : 'bg-[rgba(255,255,255,0.03)] text-(--sync-text-primary) hover:bg-[rgba(255,255,255,0.1)]'
+                  ? 'bg-(--sync-yellow) text-[#0B132B] border-transparent shadow-[0_0_15px_rgba(255,194,26,0.4)]' 
+                  : 'bg-(--sync-bg-elevated) text-(--sync-text-primary) border-(--sync-border) hover:bg-(--sync-surface)'
               }`}
             >
               {lang === 'ar' ? 'الكل' : 'All'}
@@ -186,10 +186,10 @@ export default function SyncToolsGrid() {
               <button
                 key={cat.slug}
                 onClick={() => handleCategoryChange(cat.slug)}
-                className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 shadow-sm ${
+                className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 shadow-sm border ${
                   activeCategory === cat.slug 
-                    ? 'bg-(--sync-yellow) text-[#0B132B] shadow-[0_0_15px_rgba(255,194,26,0.4)]' 
-                    : 'bg-[rgba(255,255,255,0.03)] text-(--sync-text-primary) hover:bg-[rgba(255,255,255,0.1)]'
+                    ? 'bg-(--sync-yellow) text-[#0B132B] border-transparent shadow-[0_0_15px_rgba(255,194,26,0.4)]' 
+                    : 'bg-(--sync-bg-elevated) text-(--sync-text-primary) border-(--sync-border) hover:bg-(--sync-surface)'
                 }`}
               >
                 {lang === 'ar' ? cat.name_ar : cat.name_en}
@@ -202,8 +202,7 @@ export default function SyncToolsGrid() {
             <button 
               onClick={prevPage}
               disabled={safeCurrentPage === 1}
-              className="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[rgba(255,255,255,0.1)]"
-              style={{ border: '1px solid rgba(255,255,255,0.1)' }}
+              className="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-(--sync-bg-elevated) border border-(--sync-border)"
             >
               <ChevronLeft className="w-6 h-6" style={{ color: 'var(--sync-text-primary)' }} />
             </button>
@@ -216,10 +215,10 @@ export default function SyncToolsGrid() {
                   <button
                     key={pageNum}
                     onClick={() => goToPage(pageNum)}
-                    className={`w-10 h-10 rounded-full font-bold text-sm transition-all duration-300 ${
+                    className={`w-10 h-10 rounded-full font-bold text-sm transition-all duration-300 border ${
                       isActive 
-                        ? 'bg-(--sync-yellow) text-[#0B132B] shadow-[0_0_15px_rgba(255,194,26,0.4)]' 
-                        : 'bg-[rgba(255,255,255,0.05)] text-(--sync-text-primary) hover:bg-[rgba(255,255,255,0.1)]'
+                        ? 'bg-(--sync-yellow) text-[#0B132B] border-transparent shadow-[0_0_15px_rgba(255,194,26,0.4)]' 
+                        : 'bg-(--sync-bg-elevated) text-(--sync-text-primary) border-(--sync-border) hover:bg-(--sync-surface)'
                     }`}
                   >
                     {pageNum}
@@ -231,8 +230,7 @@ export default function SyncToolsGrid() {
             <button 
               onClick={nextPage}
               disabled={safeCurrentPage === totalPages}
-              className="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[rgba(255,255,255,0.1)]"
-              style={{ border: '1px solid rgba(255,255,255,0.1)' }}
+              className="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-(--sync-bg-elevated) border border-(--sync-border)"
             >
               <ChevronRight className="w-6 h-6" style={{ color: 'var(--sync-text-primary)' }} />
             </button>
@@ -265,7 +263,7 @@ export default function SyncToolsGrid() {
                     style={{
                       background: meta.bestDeal 
                         ? 'linear-gradient(135deg, var(--sync-yellow), transparent 80%)' 
-                        : 'linear-gradient(135deg, rgba(255,255,255,0.2), transparent 80%)'
+                        : 'linear-gradient(135deg, var(--sync-border), transparent 80%)'
                     }}
                   >
                     {/* Outer Hover Glow */}
@@ -297,12 +295,12 @@ export default function SyncToolsGrid() {
                       )}
                       
                       {/* Cover Image */}
-                      <div className="w-full h-48 relative overflow-hidden bg-[#070b19] flex items-center justify-center">
+                      <div className="w-full h-48 relative overflow-hidden bg-(--sync-bg-elevated) flex items-center justify-center">
                         {product.cover_image_url ? (
                           <img 
                             src={product.cover_image_url} 
                             alt={product.name} 
-                            className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700 sync-light-image-filter"
                             onError={(e) => { e.currentTarget.style.display = 'none'; }}
                           />
                         ) : (
@@ -335,7 +333,7 @@ export default function SyncToolsGrid() {
                       </div>
 
                       {isAvailable && (
-                        <div className="flex items-center justify-between relative z-10 pt-8 mt-auto" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                        <div className="flex items-center justify-between relative z-10 pt-8 mt-auto" style={{ borderTop: '1px solid var(--sync-border)' }}>
                           <div>
                             <p className="opacity-60 text-sm mb-1 font-medium" style={{ color: 'var(--sync-text-primary)' }}>{lang === 'ar' ? 'تبدأ من' : 'Starting from'}</p>
                             <div className="flex items-baseline gap-1">

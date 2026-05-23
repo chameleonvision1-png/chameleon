@@ -165,13 +165,13 @@ export default function RechargeModal({ isOpen, onClose, userId }: RechargeModal
     <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-[#0B132B]/80 backdrop-blur-sm" onClick={!isSubmitting ? handleModalClose : undefined} />
       
-      <div className="relative w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]" style={{ background: '#0d1530', border: '1px solid rgba(255,255,255,0.1)' }}>
+      <div className="relative w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]" style={{ background: 'var(--sync-surface)', border: '1px solid var(--sync-border)' }}>
         {/* Header */}
-        <div className="p-6 border-b border-white/10 flex items-center justify-between shrink-0" style={{ background: '#0a1128' }}>
+        <div className="p-6 border-b flex items-center justify-between shrink-0" style={{ background: 'var(--sync-bg-elevated)', borderBottom: '1px solid var(--sync-border)' }}>
           <h2 className="text-2xl font-black" style={{ color: 'var(--sync-text-primary)' }}>
             {lang === 'ar' ? 'شحن الرصيد' : 'Top Up Balance'}
           </h2>
-          <button onClick={handleModalClose} className="p-2 hover:bg-white/5 rounded-full transition-colors text-white/50 hover:text-white" disabled={isSubmitting}>
+          <button onClick={handleModalClose} className="p-2 rounded-full sync-modal-close-btn" disabled={isSubmitting}>
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -207,7 +207,7 @@ export default function RechargeModal({ isOpen, onClose, userId }: RechargeModal
                     <button
                       key={val}
                       onClick={() => handleAmountSelect(val)}
-                      className={`py-3 rounded-xl font-bold text-lg border transition-all ${amount === val ? 'bg-[#ffc21a]/10 border-[#ffc21a] text-[#ffc21a]' : 'border-white/10 hover:border-white/30 text-white/70'}`}
+                      className={`py-3 rounded-xl font-bold text-lg border transition-all ${amount === val ? 'bg-(--sync-yellow)/10 border-(--sync-yellow) text-(--sync-yellow)' : 'border-(--sync-border) hover:border-(--sync-yellow) text-(--sync-text-dim)'}`}
                     >
                       ${val}
                     </button>
@@ -216,20 +216,20 @@ export default function RechargeModal({ isOpen, onClose, userId }: RechargeModal
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleAmountSelect('custom')}
-                    className={`px-4 py-3 rounded-xl font-bold text-sm border transition-all whitespace-nowrap ${amount === 'custom' ? 'bg-[#ffc21a]/10 border-[#ffc21a] text-[#ffc21a]' : 'border-white/10 hover:border-white/30 text-white/70'}`}
+                    className={`px-4 py-3 rounded-xl font-bold text-sm border transition-all whitespace-nowrap ${amount === 'custom' ? 'bg-(--sync-yellow)/10 border-(--sync-yellow) text-(--sync-yellow)' : 'border-(--sync-border) hover:border-(--sync-yellow) text-(--sync-text-dim)'}`}
                   >
                     {lang === 'ar' ? 'مبلغ آخر' : 'Custom'}
                   </button>
                   {amount === 'custom' && (
                     <div className="relative flex-1">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 font-bold">$</span>
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-(--sync-yellow) font-bold">$</span>
                       <input 
                         type="number" 
                         min="1"
                         value={customAmount}
                         onChange={(e) => setCustomAmount(e.target.value)}
                         placeholder="0.00"
-                        className="w-full pl-8 pr-4 py-3 rounded-xl border border-[#ffc21a]/50 bg-[#0a1128] text-[#ffc21a] font-bold text-lg outline-none focus:border-[#ffc21a] transition-all"
+                        className="w-full pl-8 pr-4 py-3 rounded-xl border border-(--sync-yellow)/50 bg-black/10 text-(--sync-yellow) font-bold text-lg outline-none focus:border-(--sync-yellow) transition-all"
                       />
                     </div>
                   )}
@@ -242,13 +242,13 @@ export default function RechargeModal({ isOpen, onClose, userId }: RechargeModal
                   {lang === 'ar' ? 'طريقة الدفع' : 'Payment Method'}
                 </label>
                 <div className="grid grid-cols-1 gap-3">
-                  <label className={`flex flex-col gap-4 p-4 rounded-xl border transition-all ${paymentMethod === 'vodafone' ? 'border-[#ffc21a] bg-[#ffc21a]/5' : 'border-white/10 hover:border-white/20'}`}>
+                  <label className={`flex flex-col gap-4 p-4 rounded-xl border transition-all cursor-pointer ${paymentMethod === 'vodafone' ? 'border-(--sync-yellow) bg-(--sync-yellow)/5' : 'border-(--sync-border) hover:border-(--sync-border)'}`}>
                     <div className="flex items-center gap-4 cursor-pointer" onClick={() => setPaymentMethod('vodafone')}>
                       <input type="radio" checked={paymentMethod === 'vodafone'} readOnly className="hidden" />
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${paymentMethod === 'vodafone' ? 'border-[#ffc21a]' : 'border-white/30'}`}>
-                        {paymentMethod === 'vodafone' && <div className="w-2.5 h-2.5 rounded-full bg-[#ffc21a]" />}
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${paymentMethod === 'vodafone' ? 'border-(--sync-yellow)' : 'border-(--sync-border)'}`}>
+                        {paymentMethod === 'vodafone' && <div className="w-2.5 h-2.5 rounded-full bg-(--sync-yellow)" />}
                       </div>
-                      <CreditCard className="w-5 h-5 opacity-60 shrink-0" />
+                      <CreditCard className="w-5 h-5 opacity-60 shrink-0 text-(--sync-text-primary)" />
                       <div>
                         <p className="font-bold text-sm text-(--sync-text-primary)">
                           {lang === 'ar' ? 'محفظة إلكترونية / إنستاباي' : 'Mobile Wallet / Instapay'}
@@ -266,18 +266,18 @@ export default function RechargeModal({ isOpen, onClose, userId }: RechargeModal
                           value={senderNumber}
                           onChange={(e) => setSenderNumber(e.target.value)}
                           placeholder={lang === 'ar' ? 'اكتب الرقم أو الحساب' : 'Enter number or account'}
-                          className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-[#ffc21a] transition-colors text-(--sync-text-primary)"
+                          className="w-full bg-black/10 border border-(--sync-border) rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-(--sync-yellow) transition-colors text-(--sync-text-primary)"
                         />
                       </div>
                     )}
                   </label>
 
-                  <label className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all ${paymentMethod === 'crypto' ? 'border-[#ffc21a] bg-[#ffc21a]/5' : 'border-white/10 hover:border-white/20'}`}>
+                  <label className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all ${paymentMethod === 'crypto' ? 'border-(--sync-yellow) bg-(--sync-yellow)/5' : 'border-(--sync-border) hover:border-(--sync-border)'}`}>
                     <input type="radio" checked={paymentMethod === 'crypto'} onChange={() => setPaymentMethod('crypto')} className="hidden" />
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'crypto' ? 'border-[#ffc21a]' : 'border-white/30'}`}>
-                      {paymentMethod === 'crypto' && <div className="w-2.5 h-2.5 rounded-full bg-[#ffc21a]" />}
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'crypto' ? 'border-(--sync-yellow)' : 'border-(--sync-border)'}`}>
+                      {paymentMethod === 'crypto' && <div className="w-2.5 h-2.5 rounded-full bg-(--sync-yellow)" />}
                     </div>
-                    <span className="text-lg">₿</span>
+                    <span className="text-lg text-(--sync-text-primary)">₿</span>
                     <div>
                       <p className="font-bold text-sm text-(--sync-text-primary)">Cryptocurrency</p>
                     </div>
@@ -286,8 +286,8 @@ export default function RechargeModal({ isOpen, onClose, userId }: RechargeModal
               </div>
 
               {/* Payment Instructions */}
-              <div className="p-4 rounded-xl border border-white/5" style={{ background: '#0a1128' }}>
-                <p className="text-sm font-bold mb-2 text-[#ffc21a]">
+              <div className="p-4 rounded-xl border border-(--sync-border)" style={{ background: 'var(--sync-bg-elevated)' }}>
+                <p className="text-sm font-bold mb-2 text-(--sync-yellow)">
                   {lang === 'ar' ? 'تعليمات الدفع:' : 'Payment Instructions:'}
                 </p>
                 {paymentMethod === 'vodafone' ? (
@@ -299,7 +299,7 @@ export default function RechargeModal({ isOpen, onClose, userId }: RechargeModal
                 ) : (
                   <div className="text-xs opacity-70 space-y-1.5 text-(--sync-text-primary)">
                     <p>USDT (TRC20) Wallet:</p>
-                    <code className="block p-2 bg-black/50 rounded mt-1 break-all select-all">TBD_WALLET_ADDRESS_HERE</code>
+                    <code className="block p-2 bg-black/30 rounded mt-1 break-all select-all">TBD_WALLET_ADDRESS_HERE</code>
                     <p className="mt-2">{lang === 'ar' ? 'حول وارفع صورة المعاملة.' : 'Transfer and upload the transaction screenshot.'}</p>
                   </div>
                 )}
@@ -311,14 +311,14 @@ export default function RechargeModal({ isOpen, onClose, userId }: RechargeModal
                   {lang === 'ar' ? 'صورة إثبات الدفع *' : 'Payment Proof *'}
                 </label>
                 {proofPreview ? (
-                  <div className="relative rounded-xl overflow-hidden border border-white/10">
+                  <div className="relative rounded-xl overflow-hidden border border-(--sync-border)">
                     <img src={proofPreview} alt="Proof" className="w-full max-h-48 object-contain bg-black/50" />
                     <button onClick={() => { setProofFile(null); setProofPreview(null); }} className="absolute top-2 right-2 p-2 rounded-lg bg-red-500/80 text-white hover:bg-red-500 transition-colors">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 ) : (
-                  <button onClick={() => fileInputRef.current?.click()} className="w-full py-6 rounded-xl border-2 border-dashed border-white/10 hover:border-[#ffc21a]/30 transition-all flex flex-col items-center gap-2 bg-[#0a1128]">
+                  <button onClick={() => fileInputRef.current?.click()} className="w-full py-6 rounded-xl border-2 border-dashed border-(--sync-border) hover:border-(--sync-yellow)/30 transition-all flex flex-col items-center gap-2 bg-(--sync-bg-elevated)">
                     <Upload className="w-6 h-6 opacity-30" />
                     <span className="text-sm opacity-50">{lang === 'ar' ? 'اضغط لرفع الصورة' : 'Click to upload'}</span>
                   </button>
@@ -338,7 +338,7 @@ export default function RechargeModal({ isOpen, onClose, userId }: RechargeModal
 
         {/* Footer */}
         {!isSuccess && (
-          <div className="p-6 border-t border-white/10 shrink-0 bg-[#0a1128]">
+          <div className="p-6 border-t border-(--sync-border) shrink-0 bg-(--sync-bg-elevated)">
             <button
               onClick={handleSubmit}
               disabled={isSubmitting}
