@@ -102,7 +102,7 @@ const GiftCard = ({ plan, tool, lang, currency, onAddToCart }: { plan: Plan; too
   const features: string[] = Array.isArray(plan.features) ? plan.features : [];
 
   return (
-    <div className="flex flex-col relative" style={{ perspective: '1500px' }}>
+    <div className={`flex flex-col relative ${!plan.is_active ? 'opacity-45 hover:opacity-75 transition-opacity' : ''}`} style={{ perspective: '1500px' }}>
       {/* Physical Gift Card */}
       <div 
         className="relative transition-all duration-700 hover:-translate-y-4 cursor-pointer mb-8"
@@ -278,13 +278,19 @@ const GiftCard = ({ plan, tool, lang, currency, onAddToCart }: { plan: Plan; too
 
           {/* Action Button */}
           <button 
-            disabled={isOutOfStock}
-            className={`w-full py-4 mt-6 rounded-xl font-bold text-lg transition-all duration-300 ${!isOutOfStock ? 'hover:scale-105 cursor-pointer' : 'opacity-50 cursor-not-allowed'} shadow-[0_0_20px_rgba(0,0,0,0.2)] relative overflow-hidden group/btn z-30 shrink-0 flex items-center justify-center gap-2`} 
+            disabled={isOutOfStock || !plan.is_active}
+            className={`w-full py-4 mt-6 rounded-xl font-bold text-lg transition-all duration-300 ${(isOutOfStock || !plan.is_active) ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 cursor-pointer'} shadow-[0_0_20px_rgba(0,0,0,0.2)] relative overflow-hidden group/btn z-30 shrink-0 flex items-center justify-center gap-2`} 
             style={{ background: plan.is_highlighted ? 'var(--sync-yellow)' : 'var(--sync-surface)', color: plan.is_highlighted ? '#0B132B' : 'var(--sync-text-primary)', border: plan.is_highlighted ? 'none' : '1px solid var(--sync-yellow)' }}
-            onClick={(e) => { e.stopPropagation(); if (!isOutOfStock) onAddToCart(); }}
+            onClick={(e) => { e.stopPropagation(); if (!isOutOfStock && plan.is_active) onAddToCart(); }}
           >
             <ShoppingCart className="w-5 h-5 relative z-10" />
-            <span className="relative z-10">{lang === 'ar' ? 'أضف للسلة' : 'Add to Cart'}</span>
+            <span className="relative z-10">
+              {!plan.is_active
+                ? (lang === 'ar' ? 'غير متوفر' : 'Unavailable')
+                : isOutOfStock 
+                  ? (lang === 'ar' ? 'نفذت الكمية' : 'Out of Stock') 
+                  : (lang === 'ar' ? 'أضف للسلة' : 'Add to Cart')}
+            </span>
             <div className="absolute inset-0 opacity-0 group-hover/btn:opacity-20 transition-opacity duration-300" style={{ background: plan.is_highlighted ? '#fff' : 'var(--sync-yellow)' }} />
           </button>
         </div>
@@ -374,11 +380,10 @@ export default function ToolPage({ params }: { params: Promise<{ slug: string }>
         if (error) throw error;
 
         if (data) {
-          // Filter out inactive plans and sort plans by sort_order
-          const activePlans = (data.plans || [])
-            .filter((p: any) => p.is_active)
+          // Sort plans by sort_order, keeping inactive ones to render as dimmed
+          const sortedPlans = (data.plans || [])
             .sort((a: any, b: any) => a.sort_order - b.sort_order);
-          const sorted = { ...data, plans: activePlans };
+          const sorted = { ...data, plans: sortedPlans };
           setProduct(sorted as unknown as Product);
         } else {
           setProduct(null);
