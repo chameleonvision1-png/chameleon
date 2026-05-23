@@ -494,6 +494,7 @@ export type Database = {
           id: string
           is_active: boolean
           is_highlighted: boolean
+          has_extra_discount: boolean
           max_accounts: number
           original_price_usd: number | null
           store_original_price_usd: number | null
@@ -522,6 +523,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_highlighted?: boolean
+          has_extra_discount?: boolean
           max_accounts?: number
           original_price_usd?: number | null
           store_original_price_usd?: number | null
@@ -550,6 +552,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_highlighted?: boolean
+          has_extra_discount?: boolean
           max_accounts?: number
           original_price_usd?: number | null
           store_original_price_usd?: number | null

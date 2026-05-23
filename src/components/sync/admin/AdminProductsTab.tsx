@@ -139,7 +139,7 @@ export default function AdminProductsTab({ products, onRefresh }: { products: an
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {plans.map(plan => (
-              <div key={plan.id} className="rounded-3xl border border-white/10 relative overflow-hidden group hover:-translate-y-2 transition-transform duration-300 shadow-2xl" style={{ background: '#080b14' }}>
+              <div key={plan.id} className={`rounded-3xl border border-white/10 relative overflow-hidden group hover:-translate-y-2 transition-transform duration-300 shadow-2xl ${!plan.is_active ? 'opacity-45 hover:opacity-75 transition-opacity' : ''}`} style={{ background: '#080b14' }}>
                 {plan.is_highlighted && (
                   <div className="absolute top-0 inset-x-0 h-1 z-10" style={{ background: 'var(--sync-yellow)' }}></div>
                 )}

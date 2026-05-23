@@ -24,6 +24,8 @@ interface Plan {
   store_original_price_usd: number | null;
   duration_days: number;
   is_highlighted: boolean;
+  has_extra_discount: boolean;
+  is_active: boolean;
   discount_label: string | null;
   features: string[];
   sort_order: number;
@@ -158,7 +160,7 @@ const GiftCard = ({ plan, tool, lang, currency, onAddToCart }: { plan: Plan; too
               </div>
             ) : <div className="flex-1" />}
             
-            {(plan.is_highlighted || convertedStoreOld) && (
+            {(plan.has_extra_discount || convertedStoreOld) && (
               <div className="shrink-0 flex flex-col items-center justify-center">
                 <div className="bg-red-500/10 border border-red-500/30 rounded px-2.5 py-1.5 flex flex-col items-center justify-center min-w-[90px]">
                   <span className="text-red-500 text-[9px] font-black tracking-widest uppercase whitespace-nowrap mb-0.5">
@@ -363,7 +365,7 @@ export default function ToolPage({ params }: { params: Promise<{ slug: string }>
           .from('products')
           .select(`
             id, slug, name, description_en, description_ar, cover_image_url,
-            plans(id, title_en, title_ar, price_usd, original_price_usd, store_original_price_usd, duration_days, is_highlighted, discount_label, features, sort_order, delivery_type, stock_count, units_sold, mini_card_url)
+            plans(id, title_en, title_ar, price_usd, original_price_usd, store_original_price_usd, duration_days, is_highlighted, has_extra_discount, is_active, discount_label, features, sort_order, delivery_type, stock_count, units_sold, mini_card_url)
           `)
           .eq('slug', unwrappedParams.slug)
           .eq('is_active', true)
@@ -372,8 +374,11 @@ export default function ToolPage({ params }: { params: Promise<{ slug: string }>
         if (error) throw error;
 
         if (data) {
-          // Sort plans by sort_order
-          const sorted = { ...data, plans: (data.plans || []).sort((a: any, b: any) => a.sort_order - b.sort_order) };
+          // Filter out inactive plans and sort plans by sort_order
+          const activePlans = (data.plans || [])
+            .filter((p: any) => p.is_active)
+            .sort((a: any, b: any) => a.sort_order - b.sort_order);
+          const sorted = { ...data, plans: activePlans };
           setProduct(sorted as unknown as Product);
         } else {
           setProduct(null);

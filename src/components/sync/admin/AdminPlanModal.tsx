@@ -27,6 +27,7 @@ export default function AdminPlanModal({ isOpen, onClose, product, plan, onSucce
     delivery_type: 'ready_account',
     is_active: true,
     is_highlighted: false,
+    has_extra_discount: false,
     sort_order: 0,
     max_accounts: 1,
     features: [] as string[],
@@ -56,6 +57,7 @@ export default function AdminPlanModal({ isOpen, onClose, product, plan, onSucce
         delivery_type: plan.delivery_type || 'ready_account',
         is_active: plan.is_active ?? true,
         is_highlighted: plan.is_highlighted ?? false,
+        has_extra_discount: plan.has_extra_discount ?? false,
         sort_order: plan.sort_order || 0,
         max_accounts: plan.max_accounts || 1,
         features: Array.isArray(plan.features) ? plan.features : [],
@@ -81,6 +83,7 @@ export default function AdminPlanModal({ isOpen, onClose, product, plan, onSucce
         delivery_type: 'ready_account',
         is_active: true,
         is_highlighted: false,
+        has_extra_discount: false,
         sort_order: 0,
         max_accounts: 1,
         features: [],
@@ -375,7 +378,7 @@ export default function AdminPlanModal({ isOpen, onClose, product, plan, onSucce
             </ul>
           </div>
 
-          <div className="flex items-center gap-6 pt-2">
+          <div className="flex flex-wrap items-center gap-6 pt-2">
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" checked={formData.is_active} onChange={e => setFormData({...formData, is_active: e.target.checked})} className="w-5 h-5 rounded border-white/20 accent-(--sync-yellow) cursor-pointer" />
               <span className="font-bold text-sm">Active (Visible)</span>
@@ -384,6 +387,13 @@ export default function AdminPlanModal({ isOpen, onClose, product, plan, onSucce
               <input type="checkbox" checked={formData.is_highlighted} onChange={e => setFormData({...formData, is_highlighted: e.target.checked})} className="w-5 h-5 rounded border-white/20 accent-(--sync-yellow) cursor-pointer" />
               <div className="flex flex-col">
                 <span className="font-bold text-sm text-(--sync-yellow)">Highlight Package</span>
+                <span className="text-[10px] opacity-60">Draws a highlighted gold border around the card</span>
+              </div>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" checked={formData.has_extra_discount} onChange={e => setFormData({...formData, has_extra_discount: e.target.checked})} className="w-5 h-5 rounded border-white/20 accent-(--sync-yellow) cursor-pointer" />
+              <div className="flex flex-col">
+                <span className="font-bold text-sm text-red-400">Extra Discount</span>
                 <span className="text-[10px] opacity-60">Enables "Extra Discount" fire badge</span>
               </div>
             </label>

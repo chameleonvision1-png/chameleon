@@ -25,6 +25,7 @@ interface Product {
     price_usd: number;
     discount_label: string | null;
     is_highlighted: boolean;
+    is_active: boolean;
   }[];
 }
 
@@ -62,14 +63,18 @@ export default function SyncToolsGrid() {
           .select(`
             id, slug, name, cover_image_url, is_active, sort_order,
             category:categories(id, name_en, name_ar, slug),
-            plans(id, price_usd, discount_label, is_highlighted)
+            plans(id, price_usd, discount_label, is_highlighted, is_active)
           `)
           .order('is_active', { ascending: false })
           .order('sort_order');
 
         if (prodError) throw prodError;
         if (productsData) {
-          setProducts(productsData as unknown as Product[]);
+          const processed = (productsData as any[]).map(p => ({
+            ...p,
+            plans: (p.plans || []).filter((pl: any) => pl.is_active)
+          }));
+          setProducts(processed as unknown as Product[]);
         }
       } catch (err) {
         console.error("Products fetch error:", err);
