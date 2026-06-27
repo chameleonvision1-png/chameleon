@@ -1,0 +1,73 @@
+<svg width="800" height="450" viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Light premium ticket background -->
+    <linearGradient id="ticketBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EBF1FC" />
+      <stop offset="100%" stop-color="#D7E3F8" />
+    </linearGradient>
+    
+    <pattern id="dotPattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="3" cy="3" r="1.5" fill="#3B82F6" opacity="0.12" />
+    </pattern>
+    
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-color="#050918" flood-opacity="0.15" />
+    </filter>
+  </defs>
+
+  <!-- Ticket Base -->
+  <rect width="800" height="450" rx="24" fill="url(#ticketBg)" />
+  <!-- Dot Matrix Pattern Layer -->
+  <rect width="800" height="450" rx="24" fill="url(#dotPattern)" />
+
+  <!-- Holographic Side Ribbon -->
+  <path d="M 600 0 L 680 0 L 680 450 L 600 450 Z" fill="#3B82F6" opacity="0.05" />
+  
+  <!-- Dashed Ticket Cut line -->
+  <line x1="640" y1="0" x2="640" y2="450" stroke="#3B82F6" stroke-width="4" stroke-dasharray="12 12" opacity="0.3" />
+  
+  <!-- Left Side Ticket Cutout -->
+  <circle cx="0" cy="225" r="25" fill="#04165d" />
+  <!-- Right Side Ticket Cutout -->
+  <circle cx="800" cy="225" r="25" fill="#04165d" />
+  
+  <!-- Outer Gold Border -->
+  <rect x="20" y="20" width="760" height="410" rx="16" fill="none" stroke="#FFC21A" stroke-width="2.5" opacity="0.4" />
+
+  <!-- Gold Smart Chip Icon (Top Left) -->
+  <g transform="translate(60, 60)" opacity="0.85">
+    <rect width="50" height="38" rx="6" fill="#FFC21A" stroke="#B88A00" stroke-width="1.5" />
+    <line x1="0" y1="12" x2="50" y2="12" stroke="#B88A00" stroke-width="1" />
+    <line x1="0" y1="26" x2="50" y2="26" stroke="#B88A00" stroke-width="1" />
+    <line x1="16" y1="0" x2="16" y2="38" stroke="#B88A00" stroke-width="1" />
+    <line x1="34" y1="0" x2="34" y2="38" stroke="#B88A00" stroke-width="1" />
+    <rect x="16" y="12" width="18" height="14" rx="2" fill="none" stroke="#B88A00" stroke-width="1.5" />
+  </g>
+
+  <!-- Product Icon -->
+  <g>
+    <circle cx="160" cy="190" r="18" fill="#3B82F6" />
+            <circle cx="160" cy="226" r="18" fill="#FFC21A" />
+            <circle cx="196" cy="190" r="18" fill="#3B82F6" />
+            <circle cx="196" cy="226" r="18" fill="#FFC21A" />
+            <path d="M 160 262 C 170 262 178 270 178 280 C 178 290 170 298 160 298 C 150 298 142 290 142 280 C 142 270 150 262 160 262 Z" fill="#3B82F6" />
+  </g>
+
+  <!-- Ticket Label Text -->
+  <text x="310" y="215" font-family="'Inter', system-ui, sans-serif" font-weight="900" font-size="44" fill="#050918" letter-spacing="2" filter="url(#shadow)">FIGMA</text>
+  <text x="312" y="250" font-family="'Inter', system-ui, sans-serif" font-weight="800" font-size="16" fill="#FFC21A" letter-spacing="4">ACCESS TICKET</text>
+  <text x="312" y="275" font-family="'Inter', system-ui, sans-serif" font-weight="600" font-size="11" fill="#3B82F6" letter-spacing="6" opacity="0.8">SYNC PREMIUM</text>
+
+  <!-- Vector Barcode on the Right side -->
+  <g transform="translate(695, 75)">
+    <!-- Barcode lines -->
+    <rect x="0" y="0" width="4" height="300" fill="#050918" opacity="0.8" />
+    <rect x="8" y="0" width="8" height="300" fill="#050918" opacity="0.8" />
+    <rect x="20" y="0" width="2" height="300" fill="#050918" opacity="0.8" />
+    <rect x="26" y="0" width="6" height="300" fill="#050918" opacity="0.8" />
+    <rect x="36" y="0" width="12" height="300" fill="#050918" opacity="0.8" />
+    <rect x="52" y="0" width="4" height="300" fill="#050918" opacity="0.8" />
+    <rect x="60" y="0" width="2" height="300" fill="#050918" opacity="0.8" />
+    <rect x="66" y="0" width="8" height="300" fill="#050918" opacity="0.8" />
+  </g>
+</svg>

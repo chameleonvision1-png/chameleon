@@ -1,0 +1,36 @@
+<svg width="800" height="450" viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Premium background matching Canva style -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#050918" />
+      <stop offset="100%" stop-color="#0D152D" />
+    </linearGradient>
+    <filter id="blur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="30" />
+    </filter>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="10" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Solid Premium Background -->
+  <rect width="800" height="450" fill="url(#bgGrad)" />
+  
+  <!-- Subtle Elegant Outer Border (Like Canva) -->
+  <rect x="25" y="25" width="750" height="400" rx="15" fill="none" stroke="#FFC21A" stroke-width="2" opacity="0.15" />
+  
+  <!-- Centered Logo Group -->
+  <g>
+    
+      <circle cx="400" cy="225" r="120" fill="#3B82F6" opacity="0.15" filter="url(#blur)" />
+      <!-- Main tracks -->
+      <path d="M 260 175 L 540 175 M 260 275 L 540 275" stroke="#3B82F6" stroke-width="16" stroke-linecap="round" />
+      <!-- Crossbars -->
+      <path d="M 310 130 L 310 320 M 400 130 L 400 320 M 490 130 L 490 320" stroke="#FFC21A" stroke-width="16" stroke-linecap="round" filter="url(#glow)" />
+    
+  </g>
+</svg>

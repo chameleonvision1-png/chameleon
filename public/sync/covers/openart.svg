@@ -1,0 +1,39 @@
+<svg width="800" height="450" viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Premium background matching Canva style -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#050918" />
+      <stop offset="100%" stop-color="#0D152D" />
+    </linearGradient>
+    <filter id="blur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="30" />
+    </filter>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="10" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Solid Premium Background -->
+  <rect width="800" height="450" fill="url(#bgGrad)" />
+  
+  <!-- Subtle Elegant Outer Border (Like Canva) -->
+  <rect x="25" y="25" width="750" height="400" rx="15" fill="none" stroke="#FFC21A" stroke-width="2" opacity="0.15" />
+  
+  <!-- Centered Logo Group -->
+  <g>
+    
+      <circle cx="400" cy="225" r="120" fill="#3B82F6" opacity="0.15" filter="url(#blur)" />
+      <!-- Palette shape -->
+      <path d="M 280 225 C 280 150 330 110 400 110 C 470 110 520 160 520 225 C 520 290 460 340 400 340 C 350 340 330 310 310 310 C 290 310 280 290 280 225 Z" fill="none" stroke="#FFC21A" stroke-width="16" stroke-linejoin="round" filter="url(#glow)" />
+      <!-- Color dots -->
+      <circle cx="340" cy="180" r="18" fill="#3B82F6" />
+      <circle cx="400" cy="160" r="18" fill="#FFC21A" />
+      <circle cx="460" cy="190" r="18" fill="#FFFFFF" />
+      <circle cx="450" cy="260" r="18" fill="#3B82F6" opacity="0.7" />
+    
+  </g>
+</svg>

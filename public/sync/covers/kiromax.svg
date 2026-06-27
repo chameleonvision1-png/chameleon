@@ -1,0 +1,36 @@
+<svg width="800" height="450" viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Premium background matching Canva style -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#050918" />
+      <stop offset="100%" stop-color="#0D152D" />
+    </linearGradient>
+    <filter id="blur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="30" />
+    </filter>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="10" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Solid Premium Background -->
+  <rect width="800" height="450" fill="url(#bgGrad)" />
+  
+  <!-- Subtle Elegant Outer Border (Like Canva) -->
+  <rect x="25" y="25" width="750" height="400" rx="15" fill="none" stroke="#FFC21A" stroke-width="2" opacity="0.15" />
+  
+  <!-- Centered Logo Group -->
+  <g>
+    
+      <circle cx="400" cy="225" r="120" fill="#3B82F6" opacity="0.15" filter="url(#blur)" />
+      <!-- Hexagon -->
+      <polygon points="400,100 520,170 520,310 400,380 280,310 280,170" fill="none" stroke="#3B82F6" stroke-width="10" stroke-linejoin="round" />
+      <!-- Lightning bolt -->
+      <path d="M 420 130 L 320 230 L 390 230 L 360 330 L 480 210 L 410 210 Z" fill="#FFC21A" filter="url(#glow)" />
+    
+  </g>
+</svg>

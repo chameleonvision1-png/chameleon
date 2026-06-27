@@ -130,3 +130,42 @@
   background-color: var(--sync-surface);
   color: var(--sync-text-primary);
 }
+
+/* Theme-aware Gift Cards variables (optimized for zero lag & perfect theme alignment) */
+[data-theme="sync-dark"] {
+  --gift-card-normal-start: #0f1a38;
+  --gift-card-normal-end: #0b132b;
+  --gift-card-premium-start: #0b132b;
+  --gift-card-premium-end: #050918;
+  --gift-card-text-primary: #ffffff;
+  --gift-card-accent: #FFC21A;
+  --gift-card-border: rgba(255, 194, 26, 0.2);
+  --gift-card-dots-opacity: 0.06;
+  --gift-card-glow-opacity: 0.15;
+}
+
+[data-theme="sync-light"] {
+  --gift-card-normal-start: #ffffff;
+  --gift-card-normal-end: #e2eafc;
+  --gift-card-premium-start: #e2eafc;
+  --gift-card-premium-end: #c7d6f7;
+  --gift-card-text-primary: #0B132B;
+  --gift-card-accent: #2563EB;
+  --gift-card-border: rgba(11, 19, 43, 0.15);
+  --gift-card-dots-opacity: 0.08;
+  --gift-card-glow-opacity: 0.05;
+}
+
+.gift-card-svg {
+  will-change: transform;
+}
+
+.gift-card-svg.normal-card {
+  --gift-card-start: var(--gift-card-normal-start);
+  --gift-card-end: var(--gift-card-normal-end);
+}
+
+.gift-card-svg.premium-card {
+  --gift-card-start: var(--gift-card-premium-start);
+  --gift-card-end: var(--gift-card-premium-end);
+}

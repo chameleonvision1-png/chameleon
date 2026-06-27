@@ -1,0 +1,35 @@
+<svg width="800" height="450" viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Premium background matching Canva style -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#050918" />
+      <stop offset="100%" stop-color="#0D152D" />
+    </linearGradient>
+    <filter id="blur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="30" />
+    </filter>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="10" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Solid Premium Background -->
+  <rect width="800" height="450" fill="url(#bgGrad)" />
+  
+  <!-- Subtle Elegant Outer Border (Like Canva) -->
+  <rect x="25" y="25" width="750" height="400" rx="15" fill="none" stroke="#FFC21A" stroke-width="2" opacity="0.15" />
+  
+  <!-- Centered Logo Group -->
+  <g>
+    
+      <circle cx="400" cy="225" r="130" stroke="#3B82F6" stroke-width="8" stroke-dasharray="15 10" fill="none" opacity="0.4" />
+      <circle cx="400" cy="225" r="110" stroke="#FFC21A" stroke-width="12" fill="none" filter="url(#glow)" />
+      <!-- Futuristic M -->
+      <path d="M 330 280 L 330 170 L 400 240 L 470 170 L 470 280" stroke="#FFC21A" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#glow)" />
+    
+  </g>
+</svg>

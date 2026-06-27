@@ -51,6 +51,529 @@ interface Product {
   plans: Plan[];
 }
 
+const TicketSVG = ({ slug, name, lang, plan }: { slug: string; name: string; lang: string; plan: Plan }) => {
+  const getIcon = (type: string) => {
+    switch (type) {
+      case 'star':
+        return <path d="M 0 -12 L 3 -3 L 12 -3 L 5 2 L 8 10 L 0 5 L -8 10 L -5 2 L -12 -3 L -3 -3 Z" fill="var(--gift-card-accent)" />;
+      case 'zap':
+        return <path d="M 4 -14 L -8 0 L -1 0 L -5 16 L 8 2 L 1 2 Z" fill="var(--gift-card-accent)" />;
+      case 'cloud':
+        return <path d="M -6 6 C -12 6 -12 -2 -6 -2 C -6 -10 6 -10 6 -2 C 12 -2 12 6 6 6 Z" fill="none" stroke="var(--gift-card-accent)" strokeWidth="2.5" />;
+      case 'lock':
+        return (
+          <g transform="translate(-8, -6)">
+            <rect x="0" y="5" width="16" height="11" rx="2" fill="none" stroke="var(--gift-card-accent)" strokeWidth="2.5" />
+            <path d="M 3 5 L 3 2.5 C 3 0.5 13 0.5 13 2.5 L 13 5" fill="none" stroke="var(--gift-card-accent)" strokeWidth="2.5" />
+          </g>
+        );
+      case 'check':
+        return (
+          <g>
+            <circle cx="0" cy="0" r="9" fill="none" stroke="var(--gift-card-accent)" strokeWidth="2.5" />
+            <path d="M -4 0 L -1 3 L 4 -3" fill="none" stroke="var(--gift-card-accent)" strokeWidth="2.5" strokeLinecap="round" />
+          </g>
+        );
+      case 'device':
+        return (
+          <g transform="translate(-11, -8)">
+            <rect width="22" height="15" rx="2" fill="none" stroke="var(--gift-card-accent)" strokeWidth="2.5" />
+            <line x1="4" y1="15" x2="18" y2="15" stroke="var(--gift-card-accent)" strokeWidth="2.5" />
+            <line x1="7" y1="18" x2="15" y2="18" stroke="var(--gift-card-accent)" strokeWidth="2.5" />
+          </g>
+        );
+      case 'film':
+        return (
+          <g transform="translate(-10, -10)">
+            <rect x="0" y="0" width="20" height="20" rx="2" fill="none" stroke="var(--gift-card-accent)" strokeWidth="2.5" />
+            <line x1="0" y1="6" x2="20" y2="6" stroke="var(--gift-card-accent)" strokeWidth="2" />
+            <line x1="0" y1="14" x2="20" y2="14" stroke="var(--gift-card-accent)" strokeWidth="2" />
+            <circle cx="4" cy="3" r="1.5" fill="var(--gift-card-accent)" />
+            <circle cx="16" cy="3" r="1.5" fill="var(--gift-card-accent)" />
+            <circle cx="4" cy="17" r="1.5" fill="var(--gift-card-accent)" />
+            <circle cx="16" cy="17" r="1.5" fill="var(--gift-card-accent)" />
+          </g>
+        );
+      case 'music':
+        return (
+          <g transform="translate(-5, -7)">
+            <circle cx="0" cy="12" r="4" fill="var(--gift-card-accent)" />
+            <path d="M 4 0 L 4 12" stroke="var(--gift-card-accent)" strokeWidth="2.5" />
+            <path d="M 4 0 Q 10 0 10 4" fill="none" stroke="var(--gift-card-accent)" strokeWidth="2.5" strokeLinecap="round" />
+          </g>
+        );
+      case 'design':
+        return (
+          <g transform="translate(-10, -10)">
+            <path d="M 3 18 C 3 13 8 10 13 10 C 18 10 20 14 18 18 C 16 21 11 21 8 21 C 5 21 3 18 3 18 Z" fill="none" stroke="var(--gift-card-accent)" strokeWidth="2.5" />
+            <circle cx="8" cy="14" r="2" fill="var(--gift-card-accent)" />
+            <circle cx="13" cy="14" r="2" fill="var(--gift-card-accent)" />
+          </g>
+        );
+      case 'search':
+        return (
+          <g transform="translate(-4, -4)">
+            <circle cx="0" cy="0" r="6" fill="none" stroke="var(--gift-card-accent)" strokeWidth="2.5" />
+            <line x1="4.5" y1="4.5" x2="11" y2="11" stroke="var(--gift-card-accent)" strokeWidth="2.5" strokeLinecap="round" />
+          </g>
+        );
+      case 'code':
+        return <path d="M -5 -8 L -10 -3 L -5 2 M 5 -8 L 10 -3 L 5 2" fill="none" stroke="var(--gift-card-accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />;
+      case 'cpu':
+        return (
+          <g transform="translate(-10, -10)">
+            <rect x="2" y="2" width="16" height="16" rx="3" fill="none" stroke="var(--gift-card-accent)" strokeWidth="2.5" />
+            <line x1="0" y1="6" x2="2" y2="6" stroke="var(--gift-card-accent)" strokeWidth="2" />
+            <line x1="0" y1="14" x2="2" y2="14" stroke="var(--gift-card-accent)" strokeWidth="2" />
+            <line x1="18" y1="6" x2="20" y2="6" stroke="var(--gift-card-accent)" strokeWidth="2" />
+            <line x1="18" y1="14" x2="20" y2="14" stroke="var(--gift-card-accent)" strokeWidth="2" />
+            <line x1="6" y1="0" x2="6" y2="2" stroke="var(--gift-card-accent)" strokeWidth="2" />
+            <line x1="14" y1="0" x2="14" y2="2" stroke="var(--gift-card-accent)" strokeWidth="2" />
+            <line x1="6" y1="18" x2="6" y2="20" stroke="var(--gift-card-accent)" strokeWidth="2" />
+            <line x1="14" y1="18" x2="14" y2="20" stroke="var(--gift-card-accent)" strokeWidth="2" />
+          </g>
+        );
+      default:
+        return <circle cx="0" cy="0" r="8" fill="var(--gift-card-accent)" />;
+    }
+  };
+
+  const CONFIGS: Record<string, {
+    topLabel: string;
+    brandName: string;
+    gradient: [string, string];
+    premiumGradient: [string, string];
+    features: { icon: string; label: string }[];
+  }> = {
+    'gemini': {
+      topLabel: 'Google Ai pro',
+      brandName: 'GEMINI PRO',
+      gradient: ['#0046ff', '#001a75'],
+      premiumGradient: ['#0b132b', '#050918'],
+      features: [
+        { icon: 'star', label: '1.5 Pro' },
+        { icon: 'zap', label: 'Fast Speed' },
+        { icon: 'cloud', label: '5TB Storage' },
+        { icon: 'check', label: 'Workspace' },
+        { icon: 'code', label: 'AI Coding' },
+        { icon: 'search', label: 'Live Web' },
+        { icon: 'lock', label: 'Private' },
+        { icon: 'star', label: 'Priority' }
+      ]
+    },
+    'chatgpt': {
+      topLabel: 'OpenAi pro',
+      brandName: 'CHATGPT PLUS',
+      gradient: ['#0046ff', '#001a75'],
+      premiumGradient: ['#0b132b', '#050918'],
+      features: [
+        { icon: 'star', label: 'GPT-4o' },
+        { icon: 'design', label: 'DALL-E 3' },
+        { icon: 'code', label: 'Advanced Code' },
+        { icon: 'zap', label: 'Voice Mode' },
+        { icon: 'search', label: 'Custom GPTs' },
+        { icon: 'lock', label: 'Private Data' },
+        { icon: 'cloud', label: 'Workspace' },
+        { icon: 'star', label: 'Priority' }
+      ]
+    },
+    'netflix': {
+      topLabel: 'Netflix pro',
+      brandName: 'NETFLIX',
+      gradient: ['#0046ff', '#001a75'],
+      premiumGradient: ['#0b132b', '#050918'],
+      features: [
+        { icon: 'device', label: '4K Ultra HD' },
+        { icon: 'lock', label: 'Private Profile' },
+        { icon: 'star', label: 'Atmos Sound' },
+        { icon: 'cloud', label: 'Offline Save' },
+        { icon: 'film', label: 'Unlimited' },
+        { icon: 'check', label: 'Warranty' },
+        { icon: 'device', label: 'Multi-Device' },
+        { icon: 'zap', label: 'Ad-Free' }
+      ]
+    },
+    'canva': {
+      topLabel: 'Canva pro',
+      brandName: 'CANVA PRO',
+      gradient: ['#0046ff', '#001a75'],
+      premiumGradient: ['#0b132b', '#050918'],
+      features: [
+        { icon: 'star', label: 'Magic Studio' },
+        { icon: 'lock', label: 'Brand Kit' },
+        { icon: 'design', label: 'Premium Stock' },
+        { icon: 'check', label: 'BG Remover' },
+        { icon: 'zap', label: 'Magic Resize' },
+        { icon: 'cloud', label: 'Templates' },
+        { icon: 'film', label: 'AI Video' },
+        { icon: 'device', label: 'Collab' }
+      ]
+    },
+    'spotify': {
+      topLabel: 'Spotify pro',
+      brandName: 'SPOTIFY',
+      gradient: ['#0046ff', '#001a75'],
+      premiumGradient: ['#0b132b', '#050918'],
+      features: [
+        { icon: 'music', label: 'Hi-Fi Audio' },
+        { icon: 'check', label: 'Ad-Free' },
+        { icon: 'cloud', label: 'Offline Play' },
+        { icon: 'zap', label: 'Unlimited Skips' },
+        { icon: 'star', label: 'Live Lyrics' },
+        { icon: 'lock', label: 'Group Session' },
+        { icon: 'music', label: 'High Bitrate' },
+        { icon: 'check', label: 'Podcasts' }
+      ]
+    },
+    'cursor': {
+      topLabel: 'Cursor pro',
+      brandName: 'CURSOR PRO',
+      gradient: ['#0046ff', '#001a75'],
+      premiumGradient: ['#0b132b', '#050918'],
+      features: [
+        { icon: 'code', label: 'Autocomplete' },
+        { icon: 'star', label: 'Composer' },
+        { icon: 'zap', label: 'Pro Models' },
+        { icon: 'lock', label: 'Privacy Mode' },
+        { icon: 'cloud', label: 'AI History' },
+        { icon: 'check', label: 'Terminal Chat' },
+        { icon: 'code', label: 'Symbol Search' },
+        { icon: 'zap', label: 'Fast Apply' }
+      ]
+    },
+    'claude': {
+      topLabel: 'Anthropic pro',
+      brandName: 'CLAUDE PRO',
+      gradient: ['#0046ff', '#001a75'],
+      premiumGradient: ['#0b132b', '#050918'],
+      features: [
+        { icon: 'star', label: 'Claude 3.5' },
+        { icon: 'zap', label: 'High Limits' },
+        { icon: 'code', label: 'Artifacts' },
+        { icon: 'cloud', label: 'Projects' },
+        { icon: 'search', label: 'AI Analysis' },
+        { icon: 'check', label: 'Priority' },
+        { icon: 'lock', label: 'Private Data' },
+        { icon: 'star', label: 'API Access' }
+      ]
+    },
+    'figma': {
+      topLabel: 'Figma pro',
+      brandName: 'FIGMA PRO',
+      gradient: ['#0046ff', '#001a75'],
+      premiumGradient: ['#0b132b', '#050918'],
+      features: [
+        { icon: 'design', label: 'Dev Mode' },
+        { icon: 'star', label: 'Prototyping' },
+        { icon: 'zap', label: 'Collab' },
+        { icon: 'cloud', label: 'Shared Library' },
+        { icon: 'check', label: 'Unlimited' },
+        { icon: 'lock', label: 'Private Files' },
+        { icon: 'star', label: 'Plugins' },
+        { icon: 'device', label: 'Figma Slides' }
+      ]
+    },
+    'amazon-prime-video': {
+      topLabel: 'Prime pro',
+      brandName: 'PRIME VIDEO',
+      gradient: ['#0046ff', '#001a75'],
+      premiumGradient: ['#0b132b', '#050918'],
+      features: [
+        { icon: 'device', label: '4K Ultra HD' },
+        { icon: 'lock', label: '2 Screens' },
+        { icon: 'film', label: 'Originals' },
+        { icon: 'cloud', label: 'Downloads' },
+        { icon: 'star', label: 'X-Ray Details' },
+        { icon: 'check', label: 'Warranty' },
+        { icon: 'device', label: 'Multi-Device' },
+        { icon: 'zap', label: 'Ad-Free' }
+      ]
+    },
+    'prime-video': {
+      topLabel: 'Prime pro',
+      brandName: 'PRIME VIDEO',
+      gradient: ['#0046ff', '#001a75'],
+      premiumGradient: ['#0b132b', '#050918'],
+      features: [
+        { icon: 'device', label: '4K Ultra HD' },
+        { icon: 'lock', label: '2 Screens' },
+        { icon: 'film', label: 'Originals' },
+        { icon: 'cloud', label: 'Downloads' },
+        { icon: 'star', label: 'X-Ray Details' },
+        { icon: 'check', label: 'Warranty' },
+        { icon: 'device', label: 'Multi-Device' },
+        { icon: 'zap', label: 'Ad-Free' }
+      ]
+    },
+    'perplexity': {
+      topLabel: 'Perplexity pro',
+      brandName: 'PERPLEXITY',
+      gradient: ['#0046ff', '#001a75'],
+      premiumGradient: ['#0b132b', '#050918'],
+      features: [
+        { icon: 'search', label: 'Pro Queries' },
+        { icon: 'cloud', label: 'File Upload' },
+        { icon: 'star', label: 'Claude/GPT-4' },
+        { icon: 'check', label: 'Citations' },
+        { icon: 'zap', label: 'Copilot' },
+        { icon: 'lock', label: 'Collection' },
+        { icon: 'star', label: 'AI Writing' },
+        { icon: 'check', label: 'API Access' }
+      ]
+    },
+    'replit': {
+      topLabel: 'Replit pro',
+      brandName: 'REPLIT CORE',
+      gradient: ['#0046ff', '#001a75'],
+      premiumGradient: ['#0b132b', '#050918'],
+      features: [
+        { icon: 'code', label: 'Cloud VM' },
+        { icon: 'zap', label: 'Autocompletions' },
+        { icon: 'cloud', label: 'Instant Deploy' },
+        { icon: 'lock', label: 'Private Repls' },
+        { icon: 'star', label: 'Replit AI' },
+        { icon: 'check', label: 'Workspace' },
+        { icon: 'code', label: 'SSH Access' },
+        { icon: 'zap', label: 'Fast Boost' }
+      ]
+    },
+    'lovable-ai': {
+      topLabel: 'Lovable pro',
+      brandName: 'LOVABLE PRO',
+      gradient: ['#0046ff', '#001a75'],
+      premiumGradient: ['#0b132b', '#050918'],
+      features: [
+        { icon: 'star', label: 'AI Prompting' },
+        { icon: 'zap', label: 'Fast Build' },
+        { icon: 'cloud', label: '1-Click Deploy' },
+        { icon: 'code', label: 'Export Code' },
+        { icon: 'check', label: 'Custom Domain' },
+        { icon: 'lock', label: 'Private Apps' },
+        { icon: 'star', label: 'GPT-4o Engine' },
+        { icon: 'zap', label: 'Premium VM' }
+      ]
+    },
+    'manus-pro': {
+      topLabel: 'Manus pro',
+      brandName: 'MANUS PRO',
+      gradient: ['#0046ff', '#001a75'],
+      premiumGradient: ['#0b132b', '#050918'],
+      features: [
+        { icon: 'zap', label: 'Automations' },
+        { icon: 'star', label: '3300+ Credits' },
+        { icon: 'device', label: 'Web Control' },
+        { icon: 'code', label: 'Multi-Agent' },
+        { icon: 'check', label: 'Unlimited tasks' },
+        { icon: 'lock', label: 'Secure Session' },
+        { icon: 'star', label: 'Priority VM' },
+        { icon: 'zap', label: 'API Access' }
+      ]
+    },
+    'openart': {
+      topLabel: 'OpenArt pro',
+      brandName: 'OPENART',
+      gradient: ['#0046ff', '#001a75'],
+      premiumGradient: ['#0b132b', '#050918'],
+      features: [
+        { icon: 'design', label: '12k Credits' },
+        { icon: 'star', label: 'All AI Models' },
+        { icon: 'zap', label: 'AI Upscaler' },
+        { icon: 'cloud', label: 'Fine-Tuning' },
+        { icon: 'check', label: 'Brush Edit' },
+        { icon: 'lock', label: 'Private Gen' },
+        { icon: 'star', label: 'Sketch-to-Img' },
+        { icon: 'design', label: 'Ad-Free' }
+      ]
+    },
+    'nordvpn': {
+      topLabel: 'NordVPN pro',
+      brandName: 'NORDVPN',
+      gradient: ['#0046ff', '#001a75'],
+      premiumGradient: ['#0b132b', '#050918'],
+      features: [
+        { icon: 'lock', label: 'Ultra Secure' },
+        { icon: 'zap', label: 'High Speed' },
+        { icon: 'cloud', label: 'Global Servers' },
+        { icon: 'device', label: '6 Devices' },
+        { icon: 'check', label: 'Shield Ad-Block' },
+        { icon: 'star', label: 'Double VPN' },
+        { icon: 'lock', label: 'No Logs Policy' },
+        { icon: 'check', label: 'Fast P2P' }
+      ]
+    },
+    'telegram-premium': {
+      topLabel: 'Telegram pro',
+      brandName: 'TELEGRAM',
+      gradient: ['#0046ff', '#001a75'],
+      premiumGradient: ['#0b132b', '#050918'],
+      features: [
+        { icon: 'zap', label: 'Double Limits' },
+        { icon: 'cloud', label: 'Fast Download' },
+        { icon: 'star', label: 'Premium Badge' },
+        { icon: 'lock', label: 'Voice-to-Text' },
+        { icon: 'check', label: 'Ad-Free' },
+        { icon: 'design', label: 'Emojis' },
+        { icon: 'star', label: 'Profile Badge' },
+        { icon: 'zap', label: 'Realtime Translation' }
+      ]
+    },
+    'railway': {
+      topLabel: 'Railway pro',
+      brandName: 'RAILWAY.COM',
+      gradient: ['#0046ff', '#001a75'],
+      premiumGradient: ['#0b132b', '#050918'],
+      features: [
+        { icon: 'cpu', label: 'Auto Deploy' },
+        { icon: 'cloud', label: 'Database Host' },
+        { icon: 'check', label: 'Zero Downtime' },
+        { icon: 'zap', label: 'Private Net' },
+        { icon: 'lock', label: 'CLI Control' },
+        { icon: 'star', label: 'Pro Limits' },
+        { icon: 'cloud', label: 'Team Shared' },
+        { icon: 'check', label: 'SSL Included' }
+      ]
+    },
+    'kiromax': {
+      topLabel: 'Kiromax pro',
+      brandName: 'KIROMAX AI',
+      gradient: ['#0046ff', '#001a75'],
+      premiumGradient: ['#0b132b', '#050918'],
+      features: [
+        { icon: 'zap', label: '5000+ Credits' },
+        { icon: 'check', label: 'Safety Limit' },
+        { icon: 'star', label: 'Balance Upgrade' },
+        { icon: 'lock', label: 'Fast Recharge' },
+        { icon: 'cloud', label: 'Flex Limits' },
+        { icon: 'code', label: 'API Access' },
+        { icon: 'star', label: 'Premium VM' },
+        { icon: 'check', label: 'All AI models' }
+      ]
+    },
+    'adobe': {
+      topLabel: 'Adobe pro',
+      brandName: 'ADOBE CC',
+      gradient: ['#0046ff', '#001a75'],
+      premiumGradient: ['#0b132b', '#050918'],
+      features: [
+        { icon: 'design', label: '20+ Apps' },
+        { icon: 'cloud', label: '100GB Cloud' },
+        { icon: 'star', label: 'Firefly AI' },
+        { icon: 'check', label: 'Official License' },
+        { icon: 'zap', label: 'Font Library' },
+        { icon: 'lock', label: 'Portfolio' },
+        { icon: 'design', label: 'Illustrator' },
+        { icon: 'star', label: 'Photoshop AI' }
+      ]
+    },
+    'xai-super-grok': {
+      topLabel: 'xAI pro',
+      brandName: 'SUPER GROK',
+      gradient: ['#0046ff', '#001a75'],
+      premiumGradient: ['#0b132b', '#050918'],
+      features: [
+        { icon: 'star', label: 'Grok 4.2' },
+        { icon: 'cpu', label: 'Parallel Agents' },
+        { icon: 'search', label: 'DeepSearch' },
+        { icon: 'zap', label: 'Think Mode' },
+        { icon: 'lock', label: 'X Premium+' },
+        { icon: 'check', label: 'Real-Time Data' },
+        { icon: 'star', label: 'Fast speed' },
+        { icon: 'cpu', label: 'Full Access' }
+      ]
+    }
+  };
+
+  const defaultConfig = {
+    topLabel: 'Premium pro',
+    brandName: name.toUpperCase(),
+    gradient: ['#0046ff', '#001a75'] as [string, string],
+    premiumGradient: ['#0b132b', '#050918'] as [string, string],
+    features: [
+      { icon: 'star', label: 'Premium Access' },
+      { icon: 'zap', label: 'Fast Speed' },
+      { icon: 'lock', label: 'Private Account' },
+      { icon: 'check', label: 'Full Warranty' },
+      { icon: 'device', label: 'All Devices' },
+      { icon: 'cloud', label: 'Cloud Storage' },
+      { icon: 'film', label: 'No Ads' },
+      { icon: 'star', label: '24/7 Support' }
+    ]
+  };
+
+  const config = CONFIGS[slug] || defaultConfig;
+  
+  const isPremium = plan.is_highlighted || (plan.duration_days && plan.duration_days > 180);
+  const [colorStart, colorEnd] = isPremium ? config.premiumGradient : config.gradient;
+  const xCoords = [65, 160, 255, 350, 445, 540, 635, 730];
+
+  return (
+    <svg width="100%" height="100%" viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg" className={`w-full h-full object-cover gift-card-svg ${isPremium ? 'premium-card' : 'normal-card'}`}>
+      <defs>
+        <linearGradient id={`giftCardBg-${slug}-${plan.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="var(--gift-card-start)" />
+          <stop offset="100%" stopColor="var(--gift-card-end)" />
+        </linearGradient>
+        
+        <pattern id="dotPattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+          <circle cx="3" cy="3" r="1.5" fill="var(--gift-card-text-primary)" opacity="var(--gift-card-dots-opacity)" />
+        </pattern>
+
+        <radialGradient id={`glowGrad-${slug}-${plan.id}`} cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="var(--gift-card-accent)" stopOpacity="var(--gift-card-glow-opacity)" />
+          <stop offset="100%" stopColor="var(--gift-card-accent)" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+
+      {/* Gift Card Base Rect */}
+      <rect width="800" height="450" rx="28" fill={`url(#giftCardBg-${slug}-${plan.id})`} />
+      <rect width="800" height="450" rx="28" fill="url(#dotPattern)" />
+
+      {/* Soft hardware-accelerated radial glow (zero rendering lag) */}
+      <circle cx="400" cy="225" r="240" fill={`url(#glowGrad-${slug}-${plan.id})`} />
+
+      {/* Glossy Diagonal Reflections (Holographic Card Effect) */}
+      <path d="M 150 0 L 320 0 L 170 450 L 0 450 Z" fill="#FFFFFF" opacity="0.05" />
+      <path d="M 380 0 L 440 0 L 290 450 L 230 450 Z" fill="#FFFFFF" opacity="0.03" />
+
+      {/* Sleek Thin Border */}
+      <rect x="15" y="15" width="770" height="420" rx="24" fill="none" stroke="var(--gift-card-border)" strokeWidth="2" />
+
+      {/* Top Left Branding Text */}
+      <text x="400" y="90" fontFamily="'Inter', system-ui, sans-serif" fontWeight="500" fontSize="20" fill="var(--gift-card-text-primary)" opacity="0.8" textAnchor="middle" letterSpacing="3">{config.topLabel}</text>
+
+      {/* Graffiti/Brush splash effect behind brand name */}
+      <path d="M 160 220 C 300 240 500 240 640 220 C 500 205 300 205 160 220 Z" fill="var(--gift-card-accent)" opacity="var(--gift-card-glow-opacity)" />
+      <circle cx="280" cy="235" r="3" fill="var(--gift-card-accent)" opacity="0.3" />
+      <circle cx="340" cy="230" r="4.5" fill="var(--gift-card-accent)" opacity="0.3" />
+      <circle cx="480" cy="240" r="3.5" fill="var(--gift-card-accent)" opacity="0.3" />
+      <circle cx="560" cy="233" r="4" fill="var(--gift-card-accent)" opacity="0.3" />
+
+      {/* Offset hardware-accelerated text drop shadows (zero rendering lag) */}
+      <text x="400" y="225" fontFamily="'Outfit', 'Inter', system-ui, sans-serif" fontWeight="900" fontSize="72" fill="#000000" opacity="0.22" letterSpacing="4" textAnchor="middle">
+        {config.brandName}
+      </text>
+
+      {/* Center Brand Name */}
+      <text x="400" y="222" fontFamily="'Outfit', 'Inter', system-ui, sans-serif" fontWeight="900" fontSize="72" fill="var(--gift-card-accent)" letterSpacing="4" textAnchor="middle">
+        {config.brandName}
+      </text>
+
+      {/* Bottom Features Row */}
+      {config.features.map((feat, idx) => {
+        const x = xCoords[idx] || 400;
+        return (
+          <g key={idx}>
+            <g transform={`translate(${x}, 320)`}>
+              {getIcon(feat.icon)}
+            </g>
+            <text x={x} y={365} fontFamily="'Inter', system-ui, sans-serif" fontWeight="700" fontSize="11" fill="var(--gift-card-text-primary)" opacity="0.8" textAnchor="middle">{feat.label}</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+};
+
 const GiftCard = ({ plan, tool, lang, currency, onAddToCart }: { plan: Plan; tool: Product; lang: string; currency: any; onAddToCart: () => void }) => {
   const [isFlipped, setIsFlipped] = React.useState(false);
   const [showOptions, setShowOptions] = React.useState(false);
@@ -139,10 +662,14 @@ const GiftCard = ({ plan, tool, lang, currency, onAddToCart }: { plan: Plan; too
             <div className="w-full h-full rounded-xl border flex flex-col items-center justify-center relative overflow-hidden shadow-inner" 
                 style={{ 
                   borderColor: 'rgba(255,194,26,0.3)',
-                  background: '#04165d'
+                  background: 'var(--sync-bg-elevated)'
                 }}>
               <div className="absolute inset-0 opacity-20 mix-blend-overlay z-10" style={{ background: 'url("https://www.transparenttextures.com/patterns/carbon-fibre.png")', pointerEvents: 'none' }}></div>
-              <img src={plan.mini_card_url || '/sync-covers/products-ticket.jpg'} alt="Products" className="w-full h-full object-cover relative z-0 sync-light-image-filter" />
+              {plan.mini_card_url ? (
+                <img src={plan.mini_card_url} alt="Products" className="w-full h-full object-cover relative z-0 sync-light-image-filter" />
+              ) : (
+                <TicketSVG slug={tool.slug} name={tool.name} lang={lang} plan={plan} />
+              )}
             </div>
           </div>
 
