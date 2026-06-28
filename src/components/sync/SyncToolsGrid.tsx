@@ -256,7 +256,7 @@ export default function SyncToolsGrid() {
                 style={{ [lang === 'ar' ? 'paddingRight' : 'paddingLeft']: '38px', [lang === 'ar' ? 'paddingLeft' : 'paddingRight']: searchQuery ? '34px' : '14px' }}
               />
               {searchQuery && (
-                <button onClick={() => handleSearchChange('')} className="absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center hover:bg-(--sync-surface)" style={{ [lang === 'ar' ? 'left' : 'right']: '8px' }}>
+                <button onClick={() => handleSearchChange('')} aria-label={lang === 'ar' ? 'مسح البحث' : 'Clear search'} className="absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center hover:bg-(--sync-surface)" style={{ [lang === 'ar' ? 'left' : 'right']: '8px' }}>
                   <X className="w-3.5 h-3.5" style={{ color: 'var(--sync-text-dim)' }} />
                 </button>
               )}
@@ -268,6 +268,8 @@ export default function SyncToolsGrid() {
                 onClick={() => setShowViewOptions(!showViewOptions)}
                 className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 border bg-(--sync-yellow) text-[#0B132B] border-transparent shadow-[0_0_12px_rgba(255,194,26,0.3)]"
                 title={lang === 'ar' ? viewLabels[viewMode].ar : viewLabels[viewMode].en}
+                aria-label={lang === 'ar' ? 'تغيير طريقة العرض' : 'Change view mode'}
+                aria-expanded={showViewOptions}
               >
                 {viewIcons[viewMode]}
               </button>
@@ -293,6 +295,8 @@ export default function SyncToolsGrid() {
               <button
                 onClick={() => setShowSortDropdown(!showSortDropdown)}
                 className={`h-10 px-4 rounded-full text-xs font-bold flex items-center gap-2 transition-all duration-300 border whitespace-nowrap ${showSortDropdown ? 'bg-(--sync-yellow) text-[#0B132B] border-transparent' : 'bg-(--sync-bg-elevated) text-(--sync-text-primary) border-(--sync-border) hover:bg-(--sync-surface)'}`}
+                aria-label={lang === 'ar' ? 'ترتيب حسب' : 'Sort by'}
+                aria-expanded={showSortDropdown}
               >
                 <ArrowUpDown className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">{lang === 'ar' ? sortLabels[sortMode].ar : sortLabels[sortMode].en}</span>
@@ -318,10 +322,10 @@ export default function SyncToolsGrid() {
           </div>
 
           {/* ── Row 2 (mobile): Categories + Pagination ── */}
-          <div className="flex items-center justify-between gap-2 w-full xl:w-auto xl:contents">
+          <div className="flex flex-wrap items-center justify-between gap-2 w-full xl:w-auto xl:contents">
 
             {/* Categories (3 visible + arrows) */}
-            <div className="flex items-center gap-1 xl:gap-1.5 xl:order-2">
+            <div className="flex items-center gap-1 xl:gap-1.5 xl:order-2" role="navigation" aria-label={lang === 'ar' ? 'التصنيفات' : 'Categories'}>
               <button
                 onClick={() => {
                   const currentIdx = allCats.findIndex(c => c.slug === activeCategory);
@@ -330,6 +334,7 @@ export default function SyncToolsGrid() {
                   if (prevIdx < catStartIndex) setCatStartIndex(prevIdx);
                 }}
                 disabled={allCats.findIndex(c => c.slug === activeCategory) === 0}
+                aria-label={lang === 'ar' ? 'التصنيف السابق' : 'Previous category'}
                 className="w-7 h-7 xl:w-8 xl:h-8 rounded-full flex items-center justify-center transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-(--sync-bg-elevated) border border-(--sync-border)"
               >
                 <ChevronLeft className="w-3.5 h-3.5 xl:w-4 xl:h-4" style={{ color: 'var(--sync-text-primary)' }} />
@@ -340,6 +345,7 @@ export default function SyncToolsGrid() {
                   <button
                     key={cat.slug}
                     onClick={() => handleCategoryChange(cat.slug)}
+                    aria-pressed={activeCategory === cat.slug}
                     className={`px-3 py-1.5 xl:px-5 xl:py-2 rounded-full text-[11px] xl:text-xs font-bold transition-all duration-300 border whitespace-nowrap ${
                       activeCategory === cat.slug
                         ? 'bg-(--sync-yellow) text-[#0B132B] border-transparent shadow-[0_0_12px_rgba(255,194,26,0.35)]'
@@ -359,6 +365,7 @@ export default function SyncToolsGrid() {
                   if (nextIdx >= catStartIndex + VISIBLE_CATS) setCatStartIndex(nextIdx - VISIBLE_CATS + 1);
                 }}
                 disabled={allCats.findIndex(c => c.slug === activeCategory) === allCats.length - 1}
+                aria-label={lang === 'ar' ? 'التصنيف التالي' : 'Next category'}
                 className="w-7 h-7 xl:w-8 xl:h-8 rounded-full flex items-center justify-center transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-(--sync-bg-elevated) border border-(--sync-border)"
               >
                 <ChevronRight className="w-3.5 h-3.5 xl:w-4 xl:h-4" style={{ color: 'var(--sync-text-primary)' }} />
@@ -369,38 +376,53 @@ export default function SyncToolsGrid() {
             <div className="flex-1 hidden xl:block xl:order-3" />
 
             {/* Pagination */}
-            <div className={`flex items-center gap-1 xl:gap-2 xl:order-6 transition-opacity duration-300 ${totalPages > 1 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+            <div className={`flex items-center gap-1 xl:gap-2 xl:order-6 transition-opacity duration-300 ${totalPages > 1 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} role="navigation" aria-label={lang === 'ar' ? 'الصفحات' : 'Pages'}>
               <button 
                 onClick={prevPage}
                 disabled={safeCurrentPage === 1}
+                aria-label={lang === 'ar' ? 'الصفحة السابقة' : 'Previous page'}
                 className="w-7 h-7 xl:w-8 xl:h-8 rounded-full flex items-center justify-center transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-(--sync-bg-elevated) border border-(--sync-border)"
               >
                 <ChevronLeft className="w-3.5 h-3.5 xl:w-4 xl:h-4" style={{ color: 'var(--sync-text-primary)' }} />
               </button>
 
               <div className="flex items-center gap-1 xl:gap-1.5">
-                {Array.from({ length: totalPages || 1 }).map((_, idx) => {
-                  const pageNum = idx + 1;
-                  const isActive = pageNum === safeCurrentPage;
-                  return (
-                    <button
-                      key={pageNum}
-                      onClick={() => goToPage(pageNum)}
-                      className={`w-7 h-7 xl:w-8 xl:h-8 rounded-full font-bold text-[11px] xl:text-xs transition-all duration-300 border ${
-                        isActive
-                          ? 'bg-(--sync-yellow) text-[#0B132B] border-transparent shadow-[0_0_12px_rgba(255,194,26,0.35)]'
-                          : 'bg-(--sync-bg-elevated) text-(--sync-text-primary) border-(--sync-border) hover:bg-(--sync-surface)'
-                      }`}
-                    >
-                      {pageNum}
-                    </button>
-                  );
-                })}
+                {(() => {
+                  const pages = Array.from({ length: totalPages || 1 }, (_, i) => i + 1);
+                  const MAX_VISIBLE = 5;
+                  let visiblePages = pages;
+                  if (pages.length > MAX_VISIBLE) {
+                    const half = Math.floor(MAX_VISIBLE / 2);
+                    let start = Math.max(1, safeCurrentPage - half);
+                    let end = start + MAX_VISIBLE - 1;
+                    if (end > pages.length) { end = pages.length; start = end - MAX_VISIBLE + 1; }
+                    visiblePages = pages.slice(start - 1, end);
+                  }
+                  return visiblePages.map((pageNum) => {
+                    const isActive = pageNum === safeCurrentPage;
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => goToPage(pageNum)}
+                        aria-label={`${lang === 'ar' ? 'صفحة' : 'Page'} ${pageNum}`}
+                        aria-current={isActive ? 'page' : undefined}
+                        className={`w-7 h-7 xl:w-8 xl:h-8 rounded-full font-bold text-[11px] xl:text-xs transition-all duration-300 border ${
+                          isActive
+                            ? 'bg-(--sync-yellow) text-[#0B132B] border-transparent shadow-[0_0_12px_rgba(255,194,26,0.35)]'
+                            : 'bg-(--sync-bg-elevated) text-(--sync-text-primary) border-(--sync-border) hover:bg-(--sync-surface)'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  });
+                })()}
               </div>
 
               <button 
                 onClick={nextPage}
                 disabled={safeCurrentPage === totalPages}
+                aria-label={lang === 'ar' ? 'الصفحة التالية' : 'Next page'}
                 className="w-7 h-7 xl:w-8 xl:h-8 rounded-full flex items-center justify-center transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-(--sync-bg-elevated) border border-(--sync-border)"
               >
                 <ChevronRight className="w-3.5 h-3.5 xl:w-4 xl:h-4" style={{ color: 'var(--sync-text-primary)' }} />
