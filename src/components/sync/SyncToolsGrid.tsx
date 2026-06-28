@@ -238,165 +238,175 @@ export default function SyncToolsGrid() {
       <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-12 2xl:px-24">
         <h2 className="sync-heading text-4xl md:text-5xl text-center mb-12">{t.dealsTitle}</h2>
         
-        {/* ═══ SINGLE TOOLBAR ROW ═══ */}
-        <div className="flex items-center gap-3 mb-10 flex-wrap xl:flex-nowrap">
+        {/* ═══ TOOLBAR ═══ */}
+        <div className="flex flex-col gap-3 mb-10 xl:flex-row xl:items-center xl:gap-3">
 
-          {/* ── Search ── */}
-          <div className="relative w-full sm:w-auto sm:min-w-[200px] order-1">
-            <Search className="absolute top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: 'var(--sync-text-dim)', [lang === 'ar' ? 'right' : 'left']: '14px' }} />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              placeholder={lang === 'ar' ? 'ابحث...' : 'Search...'}
-              className="w-full h-10 rounded-full text-sm font-medium transition-all duration-300 border outline-none bg-(--sync-bg-elevated) text-(--sync-text-primary) border-(--sync-border) placeholder:text-(--sync-text-dim) focus:border-(--sync-yellow) focus:shadow-[0_0_12px_rgba(255,194,26,0.15)]"
-              style={{ [lang === 'ar' ? 'paddingRight' : 'paddingLeft']: '38px', [lang === 'ar' ? 'paddingLeft' : 'paddingRight']: searchQuery ? '34px' : '14px' }}
-            />
-            {searchQuery && (
-              <button onClick={() => handleSearchChange('')} className="absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center hover:bg-(--sync-surface)" style={{ [lang === 'ar' ? 'left' : 'right']: '8px' }}>
-                <X className="w-3.5 h-3.5" style={{ color: 'var(--sync-text-dim)' }} />
-              </button>
-            )}
-          </div>
+          {/* ── Row 1 (mobile): Search + View + Sort ── */}
+          <div className="flex items-center gap-2 w-full xl:w-auto xl:contents">
 
-          {/* ── Categories (scrollable, 3 visible + arrows navigate) ── */}
-          <div className="flex items-center gap-1.5 order-2">
-            <button
-              onClick={() => {
-                const currentIdx = allCats.findIndex(c => c.slug === activeCategory);
-                const prevIdx = Math.max(0, currentIdx - 1);
-                handleCategoryChange(allCats[prevIdx].slug);
-                if (prevIdx < catStartIndex) setCatStartIndex(prevIdx);
-              }}
-              disabled={allCats.findIndex(c => c.slug === activeCategory) === 0}
-              className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-(--sync-bg-elevated) border border-(--sync-border)"
-            >
-              <ChevronLeft className="w-4 h-4" style={{ color: 'var(--sync-text-primary)' }} />
-            </button>
-
-            <div className="flex items-center gap-1.5">
-              {visibleCats.map(cat => (
-                <button
-                  key={cat.slug}
-                  onClick={() => handleCategoryChange(cat.slug)}
-                  className={`px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 border whitespace-nowrap ${
-                    activeCategory === cat.slug
-                      ? 'bg-(--sync-yellow) text-[#0B132B] border-transparent shadow-[0_0_12px_rgba(255,194,26,0.35)]'
-                      : 'bg-(--sync-bg-elevated) text-(--sync-text-primary) border-(--sync-border) hover:bg-(--sync-surface)'
-                  }`}
-                >
-                  {lang === 'ar' ? cat.name_ar : cat.name_en}
+            {/* Search */}
+            <div className="relative flex-1 xl:flex-none xl:min-w-[200px]">
+              <Search className="absolute top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: 'var(--sync-text-dim)', [lang === 'ar' ? 'right' : 'left']: '14px' }} />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                placeholder={lang === 'ar' ? 'ابحث...' : 'Search...'}
+                className="w-full h-10 rounded-full text-sm font-medium transition-all duration-300 border outline-none bg-(--sync-bg-elevated) text-(--sync-text-primary) border-(--sync-border) placeholder:text-(--sync-text-dim) focus:border-(--sync-yellow) focus:shadow-[0_0_12px_rgba(255,194,26,0.15)]"
+                style={{ [lang === 'ar' ? 'paddingRight' : 'paddingLeft']: '38px', [lang === 'ar' ? 'paddingLeft' : 'paddingRight']: searchQuery ? '34px' : '14px' }}
+              />
+              {searchQuery && (
+                <button onClick={() => handleSearchChange('')} className="absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center hover:bg-(--sync-surface)" style={{ [lang === 'ar' ? 'left' : 'right']: '8px' }}>
+                  <X className="w-3.5 h-3.5" style={{ color: 'var(--sync-text-dim)' }} />
                 </button>
-              ))}
+              )}
             </div>
 
-            <button
-              onClick={() => {
-                const currentIdx = allCats.findIndex(c => c.slug === activeCategory);
-                const nextIdx = Math.min(allCats.length - 1, currentIdx + 1);
-                handleCategoryChange(allCats[nextIdx].slug);
-                if (nextIdx >= catStartIndex + VISIBLE_CATS) setCatStartIndex(nextIdx - VISIBLE_CATS + 1);
-              }}
-              disabled={allCats.findIndex(c => c.slug === activeCategory) === allCats.length - 1}
-              className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-(--sync-bg-elevated) border border-(--sync-border)"
-            >
-              <ChevronRight className="w-4 h-4" style={{ color: 'var(--sync-text-primary)' }} />
-            </button>
-          </div>
+            {/* View Mode (single button with popout) */}
+            <div className="relative xl:order-5" ref={viewBtnRef}>
+              <button
+                onClick={() => setShowViewOptions(!showViewOptions)}
+                className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 border bg-(--sync-yellow) text-[#0B132B] border-transparent shadow-[0_0_12px_rgba(255,194,26,0.3)]"
+                title={lang === 'ar' ? viewLabels[viewMode].ar : viewLabels[viewMode].en}
+              >
+                {viewIcons[viewMode]}
+              </button>
 
-          {/* ── Spacer ── */}
-          <div className="flex-1 hidden xl:block order-3" />
-
-          {/* ── Sort Dropdown ── */}
-          <div className="relative order-5 xl:order-4">
-            <button
-              onClick={() => setShowSortDropdown(!showSortDropdown)}
-              className={`h-10 px-4 rounded-full text-xs font-bold flex items-center gap-2 transition-all duration-300 border whitespace-nowrap ${showSortDropdown ? 'bg-(--sync-yellow) text-[#0B132B] border-transparent' : 'bg-(--sync-bg-elevated) text-(--sync-text-primary) border-(--sync-border) hover:bg-(--sync-surface)'}`}
-            >
-              <ArrowUpDown className="w-3.5 h-3.5" />
-              <span>{lang === 'ar' ? sortLabels[sortMode].ar : sortLabels[sortMode].en}</span>
-            </button>
-            {showSortDropdown && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setShowSortDropdown(false)} />
-                <div className="absolute top-full mt-2 z-50 min-w-[180px] rounded-2xl border shadow-xl overflow-hidden" style={{ background: 'var(--sync-bg-elevated)', borderColor: 'var(--sync-border)', [lang === 'ar' ? 'left' : 'right']: 0 }}>
-                  {(Object.keys(sortLabels) as SortMode[]).map((key) => (
+              {showViewOptions && (
+                <div className="absolute top-full mt-2 z-50 rounded-2xl border shadow-xl overflow-hidden" style={{ background: 'var(--sync-bg-elevated)', borderColor: 'var(--sync-border)', [lang === 'ar' ? 'left' : 'right']: 0 }}>
+                  {(['grid', 'list', 'compact'] as ViewMode[]).map((mode) => (
                     <button
-                      key={key}
-                      onClick={() => handleSortChange(key)}
-                      className={`w-full text-start px-5 py-2.5 text-xs font-semibold transition-all duration-200 ${sortMode === key ? 'bg-(--sync-yellow) text-[#0B132B]' : 'text-(--sync-text-primary) hover:bg-(--sync-surface)'}`}
+                      key={mode}
+                      onClick={() => handleViewChange(mode)}
+                      className={`w-full flex items-center gap-3 px-4 py-2.5 text-xs font-semibold transition-all duration-200 whitespace-nowrap ${viewMode === mode ? 'bg-(--sync-yellow) text-[#0B132B]' : 'text-(--sync-text-primary) hover:bg-(--sync-surface)'}`}
                     >
-                      {lang === 'ar' ? sortLabels[key].ar : sortLabels[key].en}
+                      {viewIcons[mode]}
+                      <span>{lang === 'ar' ? viewLabels[mode].ar : viewLabels[mode].en}</span>
                     </button>
                   ))}
                 </div>
-              </>
-            )}
+              )}
+            </div>
+
+            {/* Sort Dropdown */}
+            <div className="relative xl:order-4">
+              <button
+                onClick={() => setShowSortDropdown(!showSortDropdown)}
+                className={`h-10 px-4 rounded-full text-xs font-bold flex items-center gap-2 transition-all duration-300 border whitespace-nowrap ${showSortDropdown ? 'bg-(--sync-yellow) text-[#0B132B] border-transparent' : 'bg-(--sync-bg-elevated) text-(--sync-text-primary) border-(--sync-border) hover:bg-(--sync-surface)'}`}
+              >
+                <ArrowUpDown className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">{lang === 'ar' ? sortLabels[sortMode].ar : sortLabels[sortMode].en}</span>
+              </button>
+              {showSortDropdown && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setShowSortDropdown(false)} />
+                  <div className="absolute top-full mt-2 z-50 min-w-[180px] rounded-2xl border shadow-xl overflow-hidden" style={{ background: 'var(--sync-bg-elevated)', borderColor: 'var(--sync-border)', [lang === 'ar' ? 'left' : 'right']: 0 }}>
+                    {(Object.keys(sortLabels) as SortMode[]).map((key) => (
+                      <button
+                        key={key}
+                        onClick={() => handleSortChange(key)}
+                        className={`w-full text-start px-5 py-2.5 text-xs font-semibold transition-all duration-200 ${sortMode === key ? 'bg-(--sync-yellow) text-[#0B132B]' : 'text-(--sync-text-primary) hover:bg-(--sync-surface)'}`}
+                      >
+                        {lang === 'ar' ? sortLabels[key].ar : sortLabels[key].en}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+
           </div>
 
-          {/* ── View Mode (single button with hover popout) ── */}
-          <div className="relative order-4 xl:order-5" ref={viewBtnRef}>
-            <button
-              onClick={() => setShowViewOptions(!showViewOptions)}
-              className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 border bg-(--sync-yellow) text-[#0B132B] border-transparent shadow-[0_0_12px_rgba(255,194,26,0.3)]"
-              title={lang === 'ar' ? viewLabels[viewMode].ar : viewLabels[viewMode].en}
-            >
-              {viewIcons[viewMode]}
-            </button>
+          {/* ── Row 2 (mobile): Categories + Pagination ── */}
+          <div className="flex items-center justify-between gap-2 w-full xl:w-auto xl:contents">
 
-            {showViewOptions && (
-              <div className="absolute top-full mt-2 z-50 rounded-2xl border shadow-xl overflow-hidden" style={{ background: 'var(--sync-bg-elevated)', borderColor: 'var(--sync-border)', [lang === 'ar' ? 'left' : 'right']: 0 }}>
-                {(['grid', 'list', 'compact'] as ViewMode[]).map((mode) => (
+            {/* Categories (3 visible + arrows) */}
+            <div className="flex items-center gap-1 xl:gap-1.5 xl:order-2">
+              <button
+                onClick={() => {
+                  const currentIdx = allCats.findIndex(c => c.slug === activeCategory);
+                  const prevIdx = Math.max(0, currentIdx - 1);
+                  handleCategoryChange(allCats[prevIdx].slug);
+                  if (prevIdx < catStartIndex) setCatStartIndex(prevIdx);
+                }}
+                disabled={allCats.findIndex(c => c.slug === activeCategory) === 0}
+                className="w-7 h-7 xl:w-8 xl:h-8 rounded-full flex items-center justify-center transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-(--sync-bg-elevated) border border-(--sync-border)"
+              >
+                <ChevronLeft className="w-3.5 h-3.5 xl:w-4 xl:h-4" style={{ color: 'var(--sync-text-primary)' }} />
+              </button>
+
+              <div className="flex items-center gap-1 xl:gap-1.5">
+                {visibleCats.map(cat => (
                   <button
-                    key={mode}
-                    onClick={() => handleViewChange(mode)}
-                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-xs font-semibold transition-all duration-200 whitespace-nowrap ${viewMode === mode ? 'bg-(--sync-yellow) text-[#0B132B]' : 'text-(--sync-text-primary) hover:bg-(--sync-surface)'}`}
-                  >
-                    {viewIcons[mode]}
-                    <span>{lang === 'ar' ? viewLabels[mode].ar : viewLabels[mode].en}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* ── Pagination ── */}
-          <div className={`flex items-center gap-2 order-6 transition-opacity duration-300 ${totalPages > 1 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-            <button 
-              onClick={prevPage}
-              disabled={safeCurrentPage === 1}
-              className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-(--sync-bg-elevated) border border-(--sync-border)"
-            >
-              <ChevronLeft className="w-4 h-4" style={{ color: 'var(--sync-text-primary)' }} />
-            </button>
-
-            <div className="flex items-center gap-1.5">
-              {Array.from({ length: totalPages || 1 }).map((_, idx) => {
-                const pageNum = idx + 1;
-                const isActive = pageNum === safeCurrentPage;
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => goToPage(pageNum)}
-                    className={`w-8 h-8 rounded-full font-bold text-xs transition-all duration-300 border ${
-                      isActive
+                    key={cat.slug}
+                    onClick={() => handleCategoryChange(cat.slug)}
+                    className={`px-3 py-1.5 xl:px-5 xl:py-2 rounded-full text-[11px] xl:text-xs font-bold transition-all duration-300 border whitespace-nowrap ${
+                      activeCategory === cat.slug
                         ? 'bg-(--sync-yellow) text-[#0B132B] border-transparent shadow-[0_0_12px_rgba(255,194,26,0.35)]'
                         : 'bg-(--sync-bg-elevated) text-(--sync-text-primary) border-(--sync-border) hover:bg-(--sync-surface)'
                     }`}
                   >
-                    {pageNum}
+                    {lang === 'ar' ? cat.name_ar : cat.name_en}
                   </button>
-                );
-              })}
+                ))}
+              </div>
+
+              <button
+                onClick={() => {
+                  const currentIdx = allCats.findIndex(c => c.slug === activeCategory);
+                  const nextIdx = Math.min(allCats.length - 1, currentIdx + 1);
+                  handleCategoryChange(allCats[nextIdx].slug);
+                  if (nextIdx >= catStartIndex + VISIBLE_CATS) setCatStartIndex(nextIdx - VISIBLE_CATS + 1);
+                }}
+                disabled={allCats.findIndex(c => c.slug === activeCategory) === allCats.length - 1}
+                className="w-7 h-7 xl:w-8 xl:h-8 rounded-full flex items-center justify-center transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-(--sync-bg-elevated) border border-(--sync-border)"
+              >
+                <ChevronRight className="w-3.5 h-3.5 xl:w-4 xl:h-4" style={{ color: 'var(--sync-text-primary)' }} />
+              </button>
             </div>
 
-            <button 
-              onClick={nextPage}
-              disabled={safeCurrentPage === totalPages}
-              className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-(--sync-bg-elevated) border border-(--sync-border)"
-            >
-              <ChevronRight className="w-4 h-4" style={{ color: 'var(--sync-text-primary)' }} />
-            </button>
+            {/* Spacer (desktop only) */}
+            <div className="flex-1 hidden xl:block xl:order-3" />
+
+            {/* Pagination */}
+            <div className={`flex items-center gap-1 xl:gap-2 xl:order-6 transition-opacity duration-300 ${totalPages > 1 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+              <button 
+                onClick={prevPage}
+                disabled={safeCurrentPage === 1}
+                className="w-7 h-7 xl:w-8 xl:h-8 rounded-full flex items-center justify-center transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-(--sync-bg-elevated) border border-(--sync-border)"
+              >
+                <ChevronLeft className="w-3.5 h-3.5 xl:w-4 xl:h-4" style={{ color: 'var(--sync-text-primary)' }} />
+              </button>
+
+              <div className="flex items-center gap-1 xl:gap-1.5">
+                {Array.from({ length: totalPages || 1 }).map((_, idx) => {
+                  const pageNum = idx + 1;
+                  const isActive = pageNum === safeCurrentPage;
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => goToPage(pageNum)}
+                      className={`w-7 h-7 xl:w-8 xl:h-8 rounded-full font-bold text-[11px] xl:text-xs transition-all duration-300 border ${
+                        isActive
+                          ? 'bg-(--sync-yellow) text-[#0B132B] border-transparent shadow-[0_0_12px_rgba(255,194,26,0.35)]'
+                          : 'bg-(--sync-bg-elevated) text-(--sync-text-primary) border-(--sync-border) hover:bg-(--sync-surface)'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <button 
+                onClick={nextPage}
+                disabled={safeCurrentPage === totalPages}
+                className="w-7 h-7 xl:w-8 xl:h-8 rounded-full flex items-center justify-center transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-(--sync-bg-elevated) border border-(--sync-border)"
+              >
+                <ChevronRight className="w-3.5 h-3.5 xl:w-4 xl:h-4" style={{ color: 'var(--sync-text-primary)' }} />
+              </button>
+            </div>
+
           </div>
 
         </div>
